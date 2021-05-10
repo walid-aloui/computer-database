@@ -53,6 +53,13 @@ public class CommandLineInterface {
 			Database.db.showDetails(CommandLineInterface.getComputerId());
 			break;
 
+		case 4:
+			int computerId = CommandLineInterface.getComputerId();
+			String column = CommandLineInterface.getColumn();
+			String newValue = CommandLineInterface.getNewValue();
+			Database.db.updateComputer(computerId, column, newValue);
+			break;
+
 		case 5:
 			String name = CommandLineInterface.getComputerName();
 			String introduced = CommandLineInterface.getComputerIntroduced();
@@ -74,11 +81,9 @@ public class CommandLineInterface {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Veuillez entrer l'id de l'ordinateur");
 		if (sc.hasNextInt()) {
-			int input = sc.nextInt();
-			return input;
+			return sc.nextInt();
 		}
 		System.out.println("Veuillez entrer un chiffre !");
-
 		return getComputerId();
 	}
 
@@ -86,8 +91,7 @@ public class CommandLineInterface {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Entrez le nom de l'ordinateur (obligatoire)");
 		if (sc.hasNextLine()) {
-			String input = sc.nextLine();
-			return input;
+			return sc.nextLine();
 		}
 		System.out.println("Veuillez entrer une chaine de caractère !");
 		return getComputerName();
@@ -97,8 +101,7 @@ public class CommandLineInterface {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Entrez la date de debut de fabrication (facultatif)");
 		if (sc.hasNextLine()) {
-			String input = sc.nextLine();
-			return input;
+			return sc.nextLine();
 		}
 		System.out.println("Veuillez entrer une chaine de caractère !");
 		return getComputerIntroduced();
@@ -108,8 +111,7 @@ public class CommandLineInterface {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Entrez la date de fin de fabrication (facultatif)");
 		if (sc.hasNextLine()) {
-			String input = sc.nextLine();
-			return input;
+			return sc.nextLine();
 		}
 		System.out.println("Veuillez entrer une chaine de caractère !");
 		return getComputerDiscontinued();
@@ -119,11 +121,30 @@ public class CommandLineInterface {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Entrez l'id du fabriquant (facultatif)");
 		if (sc.hasNextInt()) {
-			int input = sc.nextInt();
-			return String.valueOf(input);
+			return String.valueOf(sc.nextInt());
 		}
 		System.out.println("Veuillez entrer un chiffre !");
 		return getComputerCompanyId();
+	}
+
+	private static String getColumn() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Entrez le nom de la colonne");
+		if (sc.hasNextLine()) {
+			return sc.nextLine();
+		}
+		System.out.println("Veuillez entrer une chaine de caractère !");
+		return getColumn();
+	}
+
+	private static String getNewValue() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Entrez la nouvelle valeur");
+		if (sc.hasNextLine()) {
+			return sc.nextLine();
+		}
+		System.out.println("Veuillez entrer une chaine de caractère !");
+		return getNewValue();
 	}
 
 }
