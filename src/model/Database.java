@@ -48,4 +48,19 @@ public class Database {
 		}
 	}
 
+	// Methode qui permet de renvoyer la liste des ordinateurs
+
+	public ResultSet getComputers() throws SQLException {
+		return statement.executeQuery("select id,name from computer");
+	}
+
+	// Methode qui permet d'afficher la liste des ordinateurs
+
+	public void showComputers() throws SQLException {
+		ResultSet resultSet = getComputers();
+		while (resultSet.next()) {
+			System.out.println("id: " + resultSet.getInt("id") + " name: " + resultSet.getString("name"));
+		}
+	}
+
 }
