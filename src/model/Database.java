@@ -94,4 +94,29 @@ public class Database {
 		System.out.println("Nombre de suppression: " + statement.getUpdateCount());
 	}
 
+	// Methode qui permet de creer un ordinateur dans la bdd
+
+	public void createComputer(String name, String introduced, String discontinued, String company_id)
+			throws SQLException {
+		String query = "insert into computer(name, introduced, discontinued, company_id) values ('" + name + "',";
+
+		if (introduced.equals(""))
+			query += "NULL,";
+		else
+			query += ("'" + introduced + "',");
+
+		if (discontinued.equals(""))
+			query += "NULL,";
+		else
+			query += ("'" + discontinued + "',");
+
+		if (company_id.equals(""))
+			query += "NULL)";
+		else
+			query += ("'" + company_id + "')");
+
+		statement.execute(query);
+		System.out.println("Nombre d'insertion: " + statement.getUpdateCount());
+	}
+
 }
