@@ -63,4 +63,22 @@ public class Database {
 		}
 	}
 
+	// Methode qui permet de renvoyer les details d'un ordinateur
+
+	public ResultSet getDetails(int id) throws SQLException {
+		return statement.executeQuery("select name,introduced,discontinued,company_id from computer where id = " + id);
+	}
+
+	// Methode qui permet d'afficher les details d'un ordinateur
+
+	public void showDetails(int id) throws SQLException {
+		ResultSet resultSet = getDetails(id);
+		while (resultSet.next()) {
+			System.out.println("name: " + resultSet.getString("name"));
+			System.out.println("introduced: " + resultSet.getString("introduced"));
+			System.out.println("discontinued: " + resultSet.getString("discontinued"));
+			System.out.println("company_id: " + resultSet.getInt("company_id"));
+		}
+	}
+
 }
