@@ -1,7 +1,6 @@
 package ui;
 
 import java.sql.SQLException;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import model.Database;
@@ -35,6 +34,7 @@ public class CommandLineInterface {
 
 			CommandLineInterface.executeOption(opt);
 		}
+		sc.close();
 	}
 
 	// Methode qui permet d'executer l'option selectionner
@@ -53,6 +53,18 @@ public class CommandLineInterface {
 			Database.db.showDetails(CommandLineInterface.getComputerId());
 			break;
 
+		case 5:
+			String name = CommandLineInterface.getComputerName();
+			String introduced = CommandLineInterface.getComputerIntroduced();
+			String discontinued = CommandLineInterface.getComputerDiscontinued();
+			String company_id = CommandLineInterface.getComputerCompanyId();
+			Database.db.createComputer(name, introduced, discontinued, company_id);
+			break;
+
+		case 6:
+			Database.db.deleteComputer(CommandLineInterface.getComputerId());
+			break;
+
 		default:
 			break;
 		}
@@ -62,10 +74,56 @@ public class CommandLineInterface {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Veuillez entrer l'id de l'ordinateur");
 		if (sc.hasNextInt()) {
-			return sc.nextInt();
+			int input = sc.nextInt();
+			return input;
 		}
 		System.out.println("Veuillez entrer un chiffre !");
+
 		return getComputerId();
+	}
+
+	private static String getComputerName() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Entrez le nom de l'ordinateur (obligatoire)");
+		if (sc.hasNextLine()) {
+			String input = sc.nextLine();
+			return input;
+		}
+		System.out.println("Veuillez entrer une chaine de caractère !");
+		return getComputerName();
+	}
+
+	private static String getComputerIntroduced() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Entrez la date de debut de fabrication (facultatif)");
+		if (sc.hasNextLine()) {
+			String input = sc.nextLine();
+			return input;
+		}
+		System.out.println("Veuillez entrer une chaine de caractère !");
+		return getComputerIntroduced();
+	}
+
+	private static String getComputerDiscontinued() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Entrez la date de fin de fabrication (facultatif)");
+		if (sc.hasNextLine()) {
+			String input = sc.nextLine();
+			return input;
+		}
+		System.out.println("Veuillez entrer une chaine de caractère !");
+		return getComputerDiscontinued();
+	}
+
+	private static String getComputerCompanyId() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Entrez l'id du fabriquant (facultatif)");
+		if (sc.hasNextInt()) {
+			int input = sc.nextInt();
+			return String.valueOf(input);
+		}
+		System.out.println("Veuillez entrer un chiffre !");
+		return getComputerCompanyId();
 	}
 
 }
