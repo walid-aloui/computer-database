@@ -25,13 +25,32 @@ public class CommandLineInterface {
 				System.out.println("7- Quitter\n");
 				try {
 					opt = sc.nextShort();
-				}catch(InputMismatchException e) {
+				} catch (InputMismatchException e) {
 					System.out.println("Veuillez entrez un chiffre !");
 					ShowMenu();
 				}
 				if (opt < 1 || opt > 7)
 					System.out.println("Option invalide !");
 			} while (opt < 1 || opt > 7);
+
+			CommandLineInterface.executeOption(opt);
+		}
+	}
+
+	// Methode qui permet d'executer l'option selectionner
+
+	private static void executeOption(short opt) throws SQLException {
+		switch (opt) {
+		case 1:
+			Database.db.showCompanies();
+			break;
+
+		case 2:
+			Database.db.showComputers();
+			break;
+
+		default:
+			break;
 		}
 	}
 
