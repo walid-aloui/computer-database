@@ -81,4 +81,17 @@ public class Database {
 		}
 	}
 
+	// Methode qui permet de modifier un ordinateur dans la bdd
+
+	public void updateComputer(int id, String column, String newValue) throws SQLException {
+		statement.execute("update computer set " + column + " = '" + newValue + "' where id = " + id);
+	}
+
+	// Methode qui permet de supprimer un ordinateur de la bdd
+
+	public void deleteComputer(int id) throws SQLException {
+		statement.execute("delete from computer where id = " + id);
+		System.out.println("Nombre de suppression: " + statement.getUpdateCount());
+	}
+
 }
