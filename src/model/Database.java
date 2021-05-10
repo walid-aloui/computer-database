@@ -33,4 +33,19 @@ public class Database {
 		statement = con.createStatement();
 	}
 
+	// Methode qui permet de renvoyer la liste des fabriquants
+
+	public ResultSet getCompanies() throws SQLException {
+		return statement.executeQuery("select name from company");
+	}
+
+	// Methode qui permet d'afficher la liste des fabriquants
+
+	public void showCompanies() throws SQLException {
+		ResultSet resultSet = getCompanies();
+		while (resultSet.next()) {
+			System.out.println(resultSet.getString("name"));
+		}
+	}
+
 }
