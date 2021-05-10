@@ -23,9 +23,9 @@ public class CommandLineInterface {
 				System.out.println("5- Creer un ordinateur");
 				System.out.println("6- Supprimer un ordinateur");
 				System.out.println("7- Quitter\n");
-				try {
+				if (sc.hasNextShort()) {
 					opt = sc.nextShort();
-				} catch (InputMismatchException e) {
+				} else {
 					System.out.println("Veuillez entrez un chiffre !");
 					ShowMenu();
 				}
@@ -49,9 +49,23 @@ public class CommandLineInterface {
 			Database.db.showComputers();
 			break;
 
+		case 3:
+			Database.db.showDetails(CommandLineInterface.getComputerId());
+			break;
+
 		default:
 			break;
 		}
+	}
+
+	private static int getComputerId() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Veuillez entrer l'id de l'ordinateur");
+		if (sc.hasNextInt()) {
+			return sc.nextInt();
+		}
+		System.out.println("Veuillez entrer un chiffre !");
+		return getComputerId();
 	}
 
 }
