@@ -2,14 +2,15 @@ package model;
 
 import java.sql.SQLException;
 
+import exception.InconsistentStateException;
 import ui.CommandLineInterface;
 
 public class MainApp {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InconsistentStateException {
 		try {
-			Database db = Database.create();
-			CommandLineInterface.ShowMenu();
+			CommandLineInterface cli = new CommandLineInterface();
+			cli.ShowMenu();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
