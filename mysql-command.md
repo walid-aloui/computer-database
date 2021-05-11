@@ -36,3 +36,6 @@ drop table tablename;
 
 ## Afficher les types des champs d'une bdd
 describe tablename;
+
+## Recuperer les colonnes d'une table d'une bdd
+select column_name FROM information_schema.columns WHERE table_name = 'computer' AND table_schema='computer-database-db';
