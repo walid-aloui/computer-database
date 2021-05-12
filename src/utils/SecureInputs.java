@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import daos.DaoCompany;
-import daos.DaoComputer;
 import exception.InconsistentStateException;
 import ui.ChoixMenu;
 
@@ -37,12 +36,6 @@ public class SecureInputs {
 
 	public static boolean isCompany(int id) throws InconsistentStateException {
 		return DaoCompany.create().getCompanyById(id) != null;
-	}
-
-	// Methode qui renvoie true si l'id correspond a un ordinateur et false sinon
-
-	public static boolean isComputer(int id) throws InconsistentStateException {
-		return DaoComputer.create().getComputerById(id) != null;
 	}
 
 	// Methode qui renvoie true si l'entier appartient a l'enum ChoixMenu
