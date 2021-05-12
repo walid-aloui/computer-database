@@ -1,5 +1,6 @@
 package utils;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,7 +35,7 @@ public class SecureInputs {
 
 	// Methode qui renvoie true si l'id correspond a un fabriquant et false sinon
 
-	public static boolean isCompany(int id) throws InconsistentStateException {
+	public static boolean isCompany(int id) throws SQLException, InconsistentStateException {
 		return DaoCompany.create().getCompanyById(id) != null;
 	}
 

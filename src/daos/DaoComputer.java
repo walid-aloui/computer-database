@@ -40,34 +40,21 @@ public class DaoComputer {
 
 	// Methode qui permet de recuperer tous les ordinateurs
 
-	public LinkedList<Computer> getAllComputers() {
+	public LinkedList<Computer> getAllComputers() throws SQLException {
 		String query = "select id,name,introduced,discontinued,company_id from computer";
-		ResultSet resultSet = null;
-		try {
-			resultSet = statement.executeQuery(query);
-		} catch (SQLException e) {
-			System.out.println("Echec getAllComputers " + e);
-			return null;
-		}
+		ResultSet resultSet = statement.executeQuery(query);
 		LinkedList<Computer> allComputers = MapperComputer.map(resultSet);
 		return allComputers;
 	}
 
 	// Methode qui permet de recuperer un ordinateur avec son id
 
-	public Computer getComputerById(int id) throws InconsistentStateException {
+	public Computer getComputerById(int id) throws SQLException, InconsistentStateException {
 		Database db = Database.create();
 		String query = "select id,name,introduced,discontinued,company_id from computer where id = ?";
-		PreparedStatement preparedStatement;
-		ResultSet resultSet = null;
-		try {
-			preparedStatement = db.getCon().prepareStatement(query);
-			preparedStatement.setInt(1, id);
-			resultSet = preparedStatement.executeQuery();
-		} catch (SQLException e) {
-			System.out.println("Echec getComputerById " + e);
-			return null;
-		}
+		PreparedStatement preparedStatement = db.getCon().prepareStatement(query);
+		preparedStatement.setInt(1, id);
+		ResultSet resultSet = preparedStatement.executeQuery();
 		LinkedList<Computer> computer = MapperComputer.map(resultSet);
 		switch (computer.size()) {
 		case 0:
@@ -85,41 +72,30 @@ public class DaoComputer {
 	// Methode qui permet d'update le champ d'un ordinateur
 
 	public void updateComputerById(int id, String newName, String newIntroduced, String newDiscontinued,
-			String newCompanyId) {
+			String newCompanyId) throws SQLException {
 		String query = "update computer set name=" + SecureInputs.addQuote(newName) + ",introduced="
 				+ SecureInputs.addQuote(newIntroduced) + ",discontinued=" + SecureInputs.addQuote(newDiscontinued)
 				+ ",company_id=" + SecureInputs.addQuote(newCompanyId) + " where id = " + id;
-		try {
-			statement.execute(query);
-		} catch (SQLException e) {
-			System.out.println("Echec updateComputerById " + e);
-		}
+		statement.execute(query);
 	}
 
 	// Methode qui permet de supprimer un ordinateur
 
-	public void deleteComputerById(int id) {
+	public void deleteComputerById(int id) throws SQLException {
 		String query = "delete from computer where id = " + id;
-		try {
-			statement.execute(query);
-			System.out.println("Nombre de suppression: " + statement.getUpdateCount());
-		} catch (SQLException e) {
-			System.out.println("Echec deleteComputerById " + e);
-		}
+		statement.execute(query);
+		System.out.println("Nombre de suppression: " + statement.getUpdateCount());
 	}
 
 	// Methode qui permet d'inserer un ordinateur
 
-	public void insertComputer(String name, String introduced, String discontinued, String company_id) {
+	public void insertComputer(String name, String introduced, String discontinued, String company_id)
+			throws SQLException {
 		String query = "insert into computer (name, introduced, discontinued, company_id) values ("
 				+ SecureInputs.addQuote(name) + "," + SecureInputs.addQuote(introduced) + ","
 				+ SecureInputs.addQuote(discontinued) + "," + SecureInputs.addQuote(company_id) + ")";
-		try {
-			statement.execute(query);
-			System.out.println("Nombre d'insertion: " + statement.getUpdateCount());
-		} catch (SQLException e) {
-			System.out.println("Echec insertComputer " + e);
-		}
+		statement.execute(query);
+		System.out.println("Nombre d'insertion: " + statement.getUpdateCount());
 	}
 
 }

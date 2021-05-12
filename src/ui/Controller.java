@@ -1,5 +1,6 @@
 package ui;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -25,7 +26,7 @@ public class Controller {
 
 	// Methode qui permet d'executer l'option selectionner
 
-	void executeOption(int opt) throws InconsistentStateException {
+	void executeOption(int opt) throws SQLException, InconsistentStateException {
 		ChoixMenu choice = ChoixMenu.values()[opt - 1];
 		switch (choice) {
 		case LIST_COMPANIES:
@@ -59,14 +60,14 @@ public class Controller {
 
 	// Methode qui permet d'executer l'option qui liste les fabricants
 
-	private void executeListCompanies() {
+	private void executeListCompanies() throws SQLException {
 		LinkedList<Company> allCompanies = DaoCompany.create().getAllCompanies();
 		view.showCompanies(allCompanies);
 	}
 
 	// Methode qui permet d'executer l'option qui liste les ordinateurs
 
-	private void executeListComputers() {
+	private void executeListComputers() throws SQLException {
 		LinkedList<Computer> allComputers = DaoComputer.create().getAllComputers();
 		view.showComputers(allComputers);
 	}
@@ -74,7 +75,7 @@ public class Controller {
 	// Methode qui permet d'executer l'option qui affiche les details d'un
 	// ordinateur
 
-	private void executeShowDetails() throws InconsistentStateException {
+	private void executeShowDetails() throws SQLException, InconsistentStateException {
 		int id = getComputerId();
 		Computer c = DaoComputer.create().getComputerById(id);
 		if (c == null)
@@ -85,7 +86,7 @@ public class Controller {
 
 	// Methode qui permet d'executer l'option qui update un ordinateur
 
-	private void executeUpdateComputer() throws InconsistentStateException {
+	private void executeUpdateComputer() throws SQLException, InconsistentStateException {
 		int id = getComputerId();
 		String newName = getComputerName();
 		String newIntroduced = getComputerIntroduced();
@@ -96,7 +97,7 @@ public class Controller {
 
 	// Methode qui permet d'executer l'option qui insere un ordinateur
 
-	private void executeInsertComputer() throws InconsistentStateException {
+	private void executeInsertComputer() throws SQLException, InconsistentStateException {
 		String name = getComputerName();
 		String introduced = getComputerIntroduced();
 		String discontinued = getComputerDiscontinued(introduced);
@@ -106,14 +107,14 @@ public class Controller {
 
 	// Methode qui permet d'executer l'option qui supprime un ordinateur
 
-	private void executeDeleteComputer() throws InconsistentStateException {
+	private void executeDeleteComputer() throws SQLException {
 		int id = getComputerId();
 		DaoComputer.create().deleteComputerById(id);
 	}
 
 	// Methode qui permet demander l'id de l'ordinateur a l'utilisateur
 
-	private int getComputerId() throws InconsistentStateException {
+	private int getComputerId() {
 		System.out.println("Veuillez entrer l'id de l'ordinateur");
 		Scanner sc = new Scanner(System.in);
 		String input = sc.nextLine();
@@ -126,7 +127,7 @@ public class Controller {
 
 	// Methode qui permet demander l'id du fabricant a l'utilisateur
 
-	private String getCompanyId() throws InconsistentStateException {
+	private String getCompanyId() throws SQLException, InconsistentStateException {
 		System.out.println("Veuillez entrer l'id du fabricant");
 		Scanner sc = new Scanner(System.in);
 		String input = sc.nextLine();

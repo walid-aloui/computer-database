@@ -1,5 +1,6 @@
 package ui;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import exception.InconsistentStateException;
@@ -17,7 +18,7 @@ public class CommandLineInterface {
 
 	// Methode qui permet d'afficher le menu
 
-	public void runCli() throws InconsistentStateException {
+	public void runCli() throws SQLException, InconsistentStateException {
 		Scanner sc = new Scanner(System.in);
 		int opt = 0;
 		while (opt != ChoixMenu.QUIT.getNumber()) {

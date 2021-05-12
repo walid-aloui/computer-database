@@ -39,35 +39,21 @@ public class DaoCompany {
 
 	// Methode qui permet de recuperer tous les fabricants
 
-	public LinkedList<Company> getAllCompanies() {
+	public LinkedList<Company> getAllCompanies() throws SQLException {
 		String query = "select id,name from company";
-		ResultSet resultSet;
-		try {
-			resultSet = statement.executeQuery(query);
-		} catch (SQLException e) {
-			System.out.println("Echec getAllCompanies " + e);
-			return null;
-		}
+		ResultSet resultSet = statement.executeQuery(query);
 		LinkedList<Company> allCompanies = MapperCompany.map(resultSet);
 		return allCompanies;
 	}
 
 	// Methode qui permet de recuperer un fabricant avec son id
 
-	public Company getCompanyById(int id) throws InconsistentStateException {
+	public Company getCompanyById(int id) throws SQLException, InconsistentStateException {
 		Database db = Database.create();
 		String query = "select id,name from company where id = ?";
-		PreparedStatement preparedStatement;
-		ResultSet resultSet = null;
-
-		try {
-			preparedStatement = db.getCon().prepareStatement(query);
-			preparedStatement.setInt(1, id);
-			resultSet = preparedStatement.executeQuery();
-		} catch (SQLException e) {
-			System.out.println("Echec getCompanyById " + e);
-			return null;
-		}
+		PreparedStatement preparedStatement = db.getCon().prepareStatement(query);
+		preparedStatement.setInt(1, id);
+		ResultSet resultSet = preparedStatement.executeQuery();
 		LinkedList<Company> company = MapperCompany.map(resultSet);
 		switch (company.size()) {
 		case 0:
