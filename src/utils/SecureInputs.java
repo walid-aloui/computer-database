@@ -1,8 +1,8 @@
 package utils;
 
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import daos.DaoCompany;
 import daos.DaoComputer;
@@ -22,27 +22,26 @@ public class SecureInputs {
 		}
 	}
 
-	// Methode qui renvoie true si la chaine est une date et false sinon
+	// Methode qui permet de convertir une chaine de caractere en une date
 
-	public static boolean isDate(String s) {
+	public static Date toDate(String s) {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		try {
-			simpleDateFormat.parse(s);
-			return true;
+			return simpleDateFormat.parse(s);
 		} catch (ParseException e) {
-			return false;
+			return null;
 		}
 	}
 
 	// Methode qui renvoie true si l'id correspond a un fabriquant et false sinon
 
-	public static boolean isCompany(int id) throws SQLException, InconsistentStateException {
+	public static boolean isCompany(int id) throws InconsistentStateException {
 		return DaoCompany.create().getCompanyById(id) != null;
 	}
 
 	// Methode qui renvoie true si l'id correspond a un ordinateur et false sinon
 
-	public static boolean isComputer(int id) throws SQLException, InconsistentStateException {
+	public static boolean isComputer(int id) throws InconsistentStateException {
 		return DaoComputer.create().getComputerById(id) != null;
 	}
 

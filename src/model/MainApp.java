@@ -1,18 +1,18 @@
 package model;
 
-import java.sql.SQLException;
+import java.text.ParseException;
 
 import exception.InconsistentStateException;
 import ui.CommandLineInterface;
 
 public class MainApp {
 
-	public static void main(String[] args) throws InconsistentStateException {
+	public static void main(String[] args) throws ParseException {
+		CommandLineInterface cli = new CommandLineInterface();
 		try {
-			CommandLineInterface cli = new CommandLineInterface();
 			cli.showMenu();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (InconsistentStateException e) {
+			System.out.println("Erreur main " + e);
 		}
 	}
 

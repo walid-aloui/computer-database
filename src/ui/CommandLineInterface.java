@@ -1,6 +1,6 @@
 package ui;
 
-import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -15,7 +15,7 @@ public class CommandLineInterface {
 
 	// Methode qui permet d'afficher le menu
 
-	public void showMenu() throws SQLException, InconsistentStateException {
+	public void showMenu() throws InconsistentStateException {
 		Scanner sc = new Scanner(System.in);
 		int opt = 0;
 		while (opt != ChoixMenu.QUIT.getNumber()) {
@@ -45,7 +45,7 @@ public class CommandLineInterface {
 
 	// Methode qui permet d'executer l'option selectionner
 
-	private void executeOption(int opt) throws SQLException, InconsistentStateException {
+	private void executeOption(int opt) throws InconsistentStateException {
 		ChoixMenu choice = ChoixMenu.values()[opt - 1];
 		switch (choice) {
 		case LIST_COMPANIES:
@@ -67,20 +67,16 @@ public class CommandLineInterface {
 		case UPDATE_COMPUTER:
 			int id2 = getComputerId();
 			String newName = getComputerName();
-			System.out.println("Veuillez entrer la nouvelle date d'introduction");
-			String newIntroduced = getComputerDate();
-			System.out.println("Veuillez entrer la nouvelle date d'arret");
-			String newDiscontinued = getComputerDate();
+			String newIntroduced = getComputerIntroduced();
+			String newDiscontinued = getComputerDiscontinued(newIntroduced);
 			String newCompanyId = getCompanyId();
 			DaoComputer.create().updateComputerById(id2, newName, newIntroduced, newDiscontinued, newCompanyId);
 			break;
 
 		case INSERT_COMPUTER:
 			String name = getComputerName();
-			System.out.println("Veuillez entrer la date d'introduction");
-			String introduced = getComputerDate();
-			System.out.println("Veuillez entrer la date d'arret");
-			String discontinued = getComputerDate();
+			String introduced = getComputerIntroduced();
+			String discontinued = getComputerDiscontinued(introduced);
 			String company_id = getCompanyId();
 			DaoComputer.create().insertComputer(name, introduced, discontinued, company_id);
 			break;
@@ -113,7 +109,7 @@ public class CommandLineInterface {
 
 	// Methode qui permet demander l'id de l'ordinateur a l'utilisateur
 
-	private int getComputerId() throws SQLException, InconsistentStateException {
+	private int getComputerId() throws InconsistentStateException {
 		System.out.println("Veuillez entrer l'id de l'ordinateur");
 		Scanner sc = new Scanner(System.in);
 		String input = sc.nextLine();
@@ -131,7 +127,7 @@ public class CommandLineInterface {
 
 	// Methode qui permet demander l'id du fabricant a l'utilisateur
 
-	private String getCompanyId() throws SQLException, InconsistentStateException {
+	private String getCompanyId() throws InconsistentStateException {
 		System.out.println("Veuillez entrer l'id du fabricant");
 		Scanner sc = new Scanner(System.in);
 		String input = sc.nextLine();
@@ -167,10 +163,32 @@ public class CommandLineInterface {
 	private String getComputerDate() {
 		Scanner sc = new Scanner(System.in);
 		String input = sc.nextLine();
-		if (input.equals("") || SecureInputs.isDate(input))
+		if (input.equals("") || SecureInputs.toDate(input) != null)
 			return input;
 		System.out.println("Format date invalide !");
 		return getComputerDate();
+	}
+
+	// Methode qui permet de demander la date d'introduction
+
+	private String getComputerIntroduced() {
+		System.out.println("Veuillez entrer la date d'introduction");
+		return getComputerDate();
+	}
+
+	// Methode qui permet de demander la date d'arret
+
+	private String getComputerDiscontinued(String introduced) {
+		System.out.println("Veuillez entrer la date d'arret");
+		String discontinued = getComputerDate();
+		if (introduced.equals("") || discontinued.equals(""))
+			return discontinued;
+		Date intro = SecureInputs.toDate(introduced);
+		Date discon = SecureInputs.toDate(discontinued);
+		if (discon.after(intro))
+			return discontinued;
+		System.out.println("La date d'arret doit etre plus grande que la date d'introduction !");
+		return getComputerDiscontinued(introduced);
 	}
 
 }

@@ -29,8 +29,7 @@ public class Database {
 		try {
 			con = (Connection) DriverManager.getConnection(url, username, password);
 		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Connexion non etablit !");
+			System.out.println("Connexion non etablit !" + e);
 		}
 	}
 
