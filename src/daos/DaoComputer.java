@@ -41,7 +41,6 @@ public class DaoComputer {
 	// Methode qui permet de recuperer tous les ordinateurs
 
 	public LinkedList<Computer> getAllComputers() throws SQLException {
-		Database db = Database.create();
 		String query = "select id,name,introduced,discontinued,company_id from computer";
 		ResultSet resultSet = statement.executeQuery(query);
 		LinkedList<Computer> allComputers = MapperComputer.map(resultSet);
@@ -74,7 +73,6 @@ public class DaoComputer {
 
 	public void updateComputerById(int id, String newName, String newIntroduced, String newDiscontinued,
 			String newCompanyId) throws SQLException {
-		Database db = Database.create();
 		String query = "update computer set name=" + SecureInputs.addQuote(newName) + ",introduced="
 				+ SecureInputs.addQuote(newIntroduced) + ",discontinued=" + SecureInputs.addQuote(newDiscontinued)
 				+ ",company_id=" + SecureInputs.addQuote(newCompanyId) + " where id = " + id;
@@ -84,7 +82,6 @@ public class DaoComputer {
 	// Methode qui permet de supprimer un ordinateur
 
 	public void deleteComputerById(int id) throws SQLException {
-		Database db = Database.create();
 		String query = "delete from computer where id = " + id;
 		statement.execute(query);
 		System.out.println("Nombre de suppression: " + statement.getUpdateCount());
@@ -94,11 +91,9 @@ public class DaoComputer {
 
 	public void insertComputer(String name, String introduced, String discontinued, String company_id)
 			throws SQLException {
-		Database db = Database.create();
 		String query = "insert into computer (name, introduced, discontinued, company_id) values ("
 				+ SecureInputs.addQuote(name) + "," + SecureInputs.addQuote(introduced) + ","
 				+ SecureInputs.addQuote(discontinued) + "," + SecureInputs.addQuote(company_id) + ")";
-		System.out.println("query = " + query);
 		statement.execute(query);
 		System.out.println("Nombre d'insertion: " + statement.getUpdateCount());
 	}

@@ -40,7 +40,6 @@ public class DaoCompany {
 	// Methode qui permet de recuperer tous les fabricants
 
 	public LinkedList<Company> getAllCompanies() throws SQLException {
-		Database db = Database.create();
 		String query = "select id,name from company";
 		ResultSet resultSet = statement.executeQuery(query);
 		LinkedList<Company> allCompanies = MapperCompany.map(resultSet);
@@ -68,4 +67,5 @@ public class DaoCompany {
 					"Le fabricant avec id = " + id + " figure plusieurs fois dans la base de donnée !");
 		}
 	}
+
 }

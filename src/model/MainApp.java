@@ -10,7 +10,7 @@ public class MainApp {
 	public static void main(String[] args) throws InconsistentStateException {
 		try {
 			CommandLineInterface cli = new CommandLineInterface();
-			cli.ShowMenu();
+			cli.showMenu();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

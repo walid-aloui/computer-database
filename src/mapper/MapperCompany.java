@@ -19,4 +19,5 @@ public class MapperCompany {
 		}
 		return company;
 	}
+
 }

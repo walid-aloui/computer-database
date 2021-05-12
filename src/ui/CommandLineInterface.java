@@ -15,10 +15,10 @@ public class CommandLineInterface {
 
 	// Methode qui permet d'afficher le menu
 
-	public void ShowMenu() throws SQLException, InconsistentStateException {
+	public void showMenu() throws SQLException, InconsistentStateException {
 		Scanner sc = new Scanner(System.in);
-		short opt = 0;
-		while (opt != 7) {
+		int opt = 0;
+		while (opt != ChoixMenu.QUIT.getNumber()) {
 			do {
 				System.out.println("\nVeuillez selectionner l'option souhaite");
 				System.out.println("1- Afficher la liste des fabriquants");
@@ -28,15 +28,15 @@ public class CommandLineInterface {
 				System.out.println("5- Creer un ordinateur");
 				System.out.println("6- Supprimer un ordinateur");
 				System.out.println("7- Quitter\n");
-				if (sc.hasNextShort()) {
-					opt = sc.nextShort();
+				if (sc.hasNextInt()) {
+					opt = sc.nextInt();
 				} else {
 					System.out.println("Veuillez entrez un chiffre !");
-					ShowMenu();
+					showMenu();
 				}
-				if (opt < 1 || opt > 7)
+				if (!SecureInputs.isChoixMenu(opt))
 					System.out.println("Option invalide !");
-			} while (opt < 1 || opt > 7);
+			} while (!SecureInputs.isChoixMenu(opt));
 
 			executeOption(opt);
 		}
@@ -45,25 +45,26 @@ public class CommandLineInterface {
 
 	// Methode qui permet d'executer l'option selectionner
 
-	private void executeOption(short opt) throws SQLException, InconsistentStateException {
-		switch (opt) {
-		case 1:
+	private void executeOption(int opt) throws SQLException, InconsistentStateException {
+		ChoixMenu choice = ChoixMenu.values()[opt - 1];
+		switch (choice) {
+		case LIST_COMPANIES:
 			LinkedList<Company> allCompanies = DaoCompany.create().getAllCompanies();
 			showCompanies(allCompanies);
 			break;
 
-		case 2:
+		case LIST_COMPUTERS:
 			LinkedList<Computer> allComputers = DaoComputer.create().getAllComputers();
 			showComputers(allComputers);
 			break;
 
-		case 3:
+		case SHOW_DETAILS_COMPUTER:
 			int id = getComputerId();
 			Computer c = DaoComputer.create().getComputerById(id);
 			System.out.println(c);
 			break;
 
-		case 4:
+		case UPDATE_COMPUTER:
 			int id2 = getComputerId();
 			String newName = getComputerName();
 			System.out.println("Veuillez entrer la nouvelle date d'introduction");
@@ -74,7 +75,7 @@ public class CommandLineInterface {
 			DaoComputer.create().updateComputerById(id2, newName, newIntroduced, newDiscontinued, newCompanyId);
 			break;
 
-		case 5:
+		case INSERT_COMPUTER:
 			String name = getComputerName();
 			System.out.println("Veuillez entrer la date d'introduction");
 			String introduced = getComputerDate();
@@ -84,7 +85,7 @@ public class CommandLineInterface {
 			DaoComputer.create().insertComputer(name, introduced, discontinued, company_id);
 			break;
 
-		case 6:
+		case DELETE_COMPUTER:
 			int id3 = getComputerId();
 			DaoComputer.create().deleteComputerById(id3);
 			break;
@@ -110,19 +111,29 @@ public class CommandLineInterface {
 		}
 	}
 
-	private int getComputerId() {
-		Scanner sc = new Scanner(System.in);
+	// Methode qui permet demander l'id de l'ordinateur a l'utilisateur
+
+	private int getComputerId() throws SQLException, InconsistentStateException {
 		System.out.println("Veuillez entrer l'id de l'ordinateur");
+		Scanner sc = new Scanner(System.in);
 		String input = sc.nextLine();
-		if (SecureInputs.isInteger(input))
-			return Integer.parseInt(input);
-		System.out.println("Veuillez entrer un entier !");
-		return getComputerId();
+		if (!SecureInputs.isInteger(input)) {
+			System.out.println("Veuillez entrer un entier !");
+			return getComputerId();
+		}
+		int id = Integer.parseInt(input);
+		if (!SecureInputs.isComputer(id)) {
+			System.out.println("id de l'ordinateur incorrect !");
+			return getComputerId();
+		}
+		return id;
 	}
 
+	// Methode qui permet demander l'id du fabricant a l'utilisateur
+
 	private String getCompanyId() throws SQLException, InconsistentStateException {
-		Scanner sc = new Scanner(System.in);
 		System.out.println("Veuillez entrer l'id du fabricant");
+		Scanner sc = new Scanner(System.in);
 		String input = sc.nextLine();
 		if (input.equals(""))
 			return input;
@@ -138,9 +149,11 @@ public class CommandLineInterface {
 		return input;
 	}
 
+	// Methode qui permet demander le nom de l'ordinateur a l'utilisateur
+
 	private String getComputerName() {
-		Scanner sc = new Scanner(System.in);
 		System.out.println("Entrez le nom de l'ordinateur (obligatoire)");
+		Scanner sc = new Scanner(System.in);
 		String input = sc.nextLine();
 		if (input.equals("")) {
 			System.out.println("Le nom est obligatoire !");
@@ -148,6 +161,8 @@ public class CommandLineInterface {
 		}
 		return input;
 	}
+
+	// Methode qui permet demander la date de l'ordinateur a l'utilisateur
 
 	private String getComputerDate() {
 		Scanner sc = new Scanner(System.in);
