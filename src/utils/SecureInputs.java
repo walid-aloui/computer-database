@@ -1,13 +1,8 @@
 package utils;
 
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import daos.DaoCompany;
-import exception.InconsistentStateException;
-import ui.ChoixMenu;
 
 public class SecureInputs {
 
@@ -33,24 +28,22 @@ public class SecureInputs {
 		}
 	}
 
-	// Methode qui renvoie true si l'id correspond a un fabriquant et false sinon
-
-	public static boolean isCompany(int id) throws SQLException, InconsistentStateException {
-		return DaoCompany.create().getCompanyById(id) != null;
-	}
-
-	// Methode qui renvoie true si l'entier appartient a l'enum ChoixMenu
-
-	public static boolean isChoixMenu(int n) {
-		return (n >= ChoixMenu.LIST_COMPANIES.getNumber() && n <= ChoixMenu.QUIT.getNumber());
-	}
-
 	// Methode qui renvoie "NULL" si la chaine est vide et ajoute des ' sinon
 
 	public static String addQuote(String s) {
 		if (s.equals(""))
 			return "NULL";
 		return "'" + s + "'";
+	}
+
+	// Methode qui permet de verifier la saisie de la pagination
+
+	public static boolean isValidPage(String choice, int numPage, int totalPage) {
+		if  (choice.equals("q") || 
+			(choice.equals("a") && numPage > 1) || 
+			(choice.equals("z") && numPage < totalPage))
+			return true;
+		return false;
 	}
 
 }

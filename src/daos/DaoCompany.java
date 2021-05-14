@@ -68,4 +68,10 @@ public class DaoCompany {
 		}
 	}
 
+	// Methode qui renvoie true si l'id correspond a un fabriquant et false sinon
+
+	public boolean isCompany(int id) throws SQLException, InconsistentStateException {
+		return getCompanyById(id) != null;
+	}
+
 }

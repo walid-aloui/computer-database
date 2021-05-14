@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
+
 import exception.InconsistentStateException;
 import mapper.MapperComputer;
 import model.Computer;
@@ -77,6 +78,7 @@ public class DaoComputer {
 				+ SecureInputs.addQuote(newIntroduced) + ",discontinued=" + SecureInputs.addQuote(newDiscontinued)
 				+ ",company_id=" + SecureInputs.addQuote(newCompanyId) + " where id = " + id;
 		statement.execute(query);
+		System.out.println("Nombre de update: " + statement.getUpdateCount());
 	}
 
 	// Methode qui permet de supprimer un ordinateur
@@ -96,6 +98,31 @@ public class DaoComputer {
 				+ SecureInputs.addQuote(discontinued) + "," + SecureInputs.addQuote(company_id) + ")";
 		statement.execute(query);
 		System.out.println("Nombre d'insertion: " + statement.getUpdateCount());
+	}
+
+	// Methode qui permet de recuperer n ordinateurs a partir de l'offset
+
+	public LinkedList<Computer> getPartOfComputers(int n, int offset) throws SQLException {
+		Database db = Database.create();
+		String query = "select id,name,introduced,discontinued,company_id from computer LIMIT ?,?";
+		PreparedStatement preparedStatement = db.getCon().prepareStatement(query);
+		preparedStatement.setInt(1, n);
+		preparedStatement.setInt(2, offset);
+		ResultSet resultSet = preparedStatement.executeQuery();
+		LinkedList<Computer> computers = MapperComputer.map(resultSet);
+		return computers;
+	}
+
+	// Methode qui renvoie le nombre d'ordinateur dans la table computer
+
+	public int getNumberOfComputer() throws SQLException {
+		String query = "select count(*) as elements from computer";
+		ResultSet resultSet = statement.executeQuery(query);
+		if(resultSet.next()) {
+			int res = resultSet.getInt("elements");
+			return res;
+		}
+		return -1;
 	}
 
 }

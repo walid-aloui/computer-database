@@ -3,12 +3,12 @@ package model;
 import java.sql.SQLException;
 
 import exception.InconsistentStateException;
-import ui.CommandLineInterface;
+import ui.Cli;
 
 public class MainApp {
 
 	public static void main(String[] args) {
-		CommandLineInterface cli = new CommandLineInterface();
+		Cli cli = new Cli();
 		try {
 			cli.runCli();
 		} catch (InconsistentStateException e) {

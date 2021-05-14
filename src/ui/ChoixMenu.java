@@ -14,6 +14,12 @@ public enum ChoixMenu {
 		this.number = number;
 	}
 
+	// Methode qui renvoie true si l'entier appartient a l'enum ChoixMenu
+
+	public static boolean isChoixMenu(int n) {
+		return (n >= LIST_COMPANIES.getNumber() && n <= QUIT.getNumber());
+	}
+
 	// Getter
 
 	public int getNumber() {

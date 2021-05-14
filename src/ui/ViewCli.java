@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import model.Company;
 import model.Computer;
 
-public class View {
+public class ViewCli {
 
 	// Methode qui permet d'afficher le menu
 
@@ -35,4 +35,11 @@ public class View {
 			System.out.println(c);
 		}
 	}
+
+	// Methode qui permet d'afficher une page
+
+	public void showPage(Page p) {
+		System.out.println(p);
+	}
+
 }
