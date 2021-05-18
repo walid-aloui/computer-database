@@ -1,8 +1,7 @@
 package com.excilys.cdb.utils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class SecureInputs {
 
@@ -15,11 +14,13 @@ public class SecureInputs {
 		}
 	}
 
-	public static Date toDate(String s) {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	public static LocalDate toDate(String s) {
 		try {
-			return simpleDateFormat.parse(s);
-		} catch (ParseException e) {
+			LocalDate date = LocalDate.parse(s);
+			return date;
+		} catch (DateTimeParseException e) {
+			return null;
+		} catch(NullPointerException e) {
 			return null;
 		}
 	}

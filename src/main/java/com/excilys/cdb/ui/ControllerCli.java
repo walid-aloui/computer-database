@@ -1,7 +1,7 @@
 package com.excilys.cdb.ui;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -70,9 +70,9 @@ public class ControllerCli {
 			Page p = new Page(numPage, totalPage);
 			viewCli.showPage(p);
 			String choice = askPage(numPage, p.getTotalPage());
-			if (choice.equals("q")) {
+			if ("q".equals(choice)) {
 				break;
-			} else if (choice.equals("a")) {
+			} else if ("a".equals(choice)) {
 				numPage--;
 			} else {
 				numPage++;
@@ -92,16 +92,16 @@ public class ControllerCli {
 	private void executeUpdateComputer() throws SQLException, InconsistentStateException {
 		int id = askComputerId();
 		String newName = askComputerName();
-		String newIntroduced = askComputerIntroduced();
-		String newDiscontinued = askComputerDiscontinued(newIntroduced);
+		LocalDate newIntroduced = askComputerIntroduced();
+		LocalDate newDiscontinued = askComputerDiscontinued(newIntroduced);
 		String newCompanyId = askCompanyId();
 		DaoComputer.getInstance().updateComputerById(id, newName, newIntroduced, newDiscontinued, newCompanyId);
 	}
 
 	private void executeInsertComputer() throws SQLException, InconsistentStateException {
 		String name = askComputerName();
-		String introduced = askComputerIntroduced();
-		String discontinued = askComputerDiscontinued(introduced);
+		LocalDate introduced = askComputerIntroduced();
+		LocalDate discontinued = askComputerDiscontinued(introduced);
 		String company_id = askCompanyId();
 		DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
 	}
@@ -124,8 +124,8 @@ public class ControllerCli {
 	private String askCompanyId() throws SQLException, InconsistentStateException {
 		System.out.println("Veuillez entrer l'id du fabricant");
 		String input = sc.nextLine();
-		if (input.equals(""))
-			return input;
+		if ("".equals(input))
+			return null;
 		if (!SecureInputs.isInteger(input)) {
 			System.out.println("Veuillez entrer un entier !");
 			return askCompanyId();
@@ -141,34 +141,33 @@ public class ControllerCli {
 	private String askComputerName() {
 		System.out.println("Entrez le nom de l'ordinateur (obligatoire)");
 		String input = sc.nextLine();
-		if (input.equals("")) {
+		if ("".equals(input)) {
 			System.out.println("Le nom est obligatoire !");
 			return askComputerName();
 		}
 		return input;
 	}
 
-	private String askComputerDate() {
+	private LocalDate askComputerDate() {
 		String input = sc.nextLine();
-		if (input.equals("") || SecureInputs.toDate(input) != null)
-			return input;
+		if ("".equals(input))
+			return null;
+		LocalDate date = SecureInputs.toDate(input);
+		if (date != null)
+			return date;
 		System.out.println("Format date invalide !");
 		return askComputerDate();
 	}
 
-	private String askComputerIntroduced() {
+	private LocalDate askComputerIntroduced() {
 		System.out.println("Veuillez entrer la date d'introduction");
 		return askComputerDate();
 	}
 
-	private String askComputerDiscontinued(String introduced) {
+	private LocalDate askComputerDiscontinued(LocalDate introduced) {
 		System.out.println("Veuillez entrer la date d'arret");
-		String discontinued = askComputerDate();
-		if (introduced.equals("") || discontinued.equals(""))
-			return discontinued;
-		Date intro = SecureInputs.toDate(introduced);
-		Date discon = SecureInputs.toDate(discontinued);
-		if (discon.after(intro))
+		LocalDate discontinued = askComputerDate();
+		if (introduced == null || discontinued == null || discontinued.isAfter(introduced))
 			return discontinued;
 		System.out.println("La date d'arret doit etre plus grande que la date d'introduction !");
 		return askComputerDiscontinued(introduced);
