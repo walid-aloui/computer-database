@@ -2,6 +2,7 @@ package com.excilys.cdb.utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 
 public class SecureInputs {
 
@@ -14,14 +15,14 @@ public class SecureInputs {
 		}
 	}
 
-	public static LocalDate toDate(String s) {
+	public static Optional<LocalDate> toDate(String s) {
 		try {
 			LocalDate date = LocalDate.parse(s);
-			return date;
+			return Optional.of(date);
 		} catch (DateTimeParseException e) {
-			return null;
-		} catch(NullPointerException e) {
-			return null;
+			return Optional.empty();
+		} catch (NullPointerException e) {
+			return Optional.empty();
 		}
 	}
 

@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.LinkedList;
+import java.util.Optional;
 
 import com.excilys.cdb.exception.InconsistentStateException;
 import com.excilys.cdb.mapper.MapperComputer;
@@ -39,7 +40,7 @@ public class DaoComputer {
 		return allComputers;
 	}
 
-	public Computer getComputerById(int id) throws SQLException, InconsistentStateException {
+	public Optional<Computer> getComputerById(int id) throws SQLException, InconsistentStateException {
 		Database db = Database.getInstance();
 		Connection con = DriverManager.getConnection(db.getUrl(), db.getUsername(), db.getPassword());
 		Statement statement = con.createStatement();
@@ -48,29 +49,33 @@ public class DaoComputer {
 		LinkedList<Computer> computer = MapperComputer.map(resultSet);
 		statement.close();
 		con.close();
-		switch (computer.size()) {
-		case 0:
-			return null;
-
-		case 1:
-			return computer.getFirst();
-
-		default:
-			throw new InconsistentStateException(
-					"L'ordinateur avec id = " + id + " figure plusieurs fois dans la base de donnée !");
-		}
+		if (computer.isEmpty())
+			return Optional.empty();
+		return Optional.of(computer.getFirst());
 	}
 
-	public void updateComputerById(int id, String newName, LocalDate newIntroduced, LocalDate newDiscontinued,
-			String newCompanyId) throws SQLException {
+	public void updateComputerById(int id, String newName, Optional<LocalDate> newIntroduced,
+			Optional<LocalDate> newDiscontinued, Optional<String> newCompanyId) throws SQLException {
 		Database db = Database.getInstance();
 		Connection con = DriverManager.getConnection(db.getUrl(), db.getUsername(), db.getPassword());
 		String query = "update computer set name=?,introduced=?,discontinued=?,copany_id=? where id = " + id;
 		PreparedStatement preparedStatement = con.prepareStatement(query);
 		preparedStatement.setString(1, newName);
-		preparedStatement.setString(2, newIntroduced.toString());
-		preparedStatement.setString(3, newDiscontinued.toString());
-		preparedStatement.setString(4, newCompanyId);
+		if (newIntroduced.isPresent()) {
+			preparedStatement.setString(2, newIntroduced.get().toString());
+		} else {
+			preparedStatement.setString(2, null);
+		}
+		if (newDiscontinued.isPresent()) {
+			preparedStatement.setString(3, newDiscontinued.get().toString());
+		} else {
+			preparedStatement.setString(3, null);
+		}
+		if (newCompanyId.isPresent()) {
+			preparedStatement.setString(4, newCompanyId.get());
+		} else {
+			preparedStatement.setString(4, null);
+		}
 		preparedStatement.execute();
 		System.out.println("Nombre de update: " + preparedStatement.getUpdateCount());
 		preparedStatement.close();
@@ -88,22 +93,28 @@ public class DaoComputer {
 		con.close();
 	}
 
-	public void insertComputer(String name, LocalDate introduced, LocalDate discontinued, String company_id)
-			throws SQLException {
+	public void insertComputer(String name, Optional<LocalDate> introduced, Optional<LocalDate> discontinued,
+			Optional<String> company_id) throws SQLException {
 		Database db = Database.getInstance();
 		Connection con = DriverManager.getConnection(db.getUrl(), db.getUsername(), db.getPassword());
 		String query = "insert into computer (name, introduced, discontinued, company_id) values (?,?,?,?)";
 		PreparedStatement preparedStatement = con.prepareStatement(query);
 		preparedStatement.setString(1, name);
-		if (introduced == null)
+		if (introduced.isPresent()) {
+			preparedStatement.setString(2, introduced.get().toString());
+		} else {
 			preparedStatement.setString(2, null);
-		else
-			preparedStatement.setString(2, introduced.toString());
-		if (discontinued == null)
+		}
+		if (discontinued.isPresent()) {
+			preparedStatement.setString(3, discontinued.get().toString());
+		} else {
 			preparedStatement.setString(3, null);
-		else
-			preparedStatement.setString(3, discontinued.toString());
-		preparedStatement.setString(4, company_id);
+		}
+		if (company_id.isPresent()) {
+			preparedStatement.setString(4, company_id.get());
+		} else {
+			preparedStatement.setString(4, null);
+		}
 		preparedStatement.execute();
 		System.out.println("Nombre d'insertion: " + preparedStatement.getUpdateCount());
 		preparedStatement.close();
