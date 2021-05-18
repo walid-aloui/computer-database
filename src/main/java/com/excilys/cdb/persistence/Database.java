@@ -8,8 +8,9 @@ public class Database {
 	private final String password = "qwerty1234";
 
 	public static Database getInstance() {
-		if (db == null)
+		if (db == null) {
 			db = new Database();
+		}
 		return db;
 	}
 

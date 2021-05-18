@@ -18,8 +18,9 @@ public class DaoCompany {
 	private static DaoCompany daoCompany;
 
 	public static DaoCompany getInstance() {
-		if (daoCompany == null)
+		if (daoCompany == null) {
 			daoCompany = new DaoCompany();
+		}
 		return daoCompany;
 	}
 
@@ -47,8 +48,9 @@ public class DaoCompany {
 		LinkedList<Company> company = MapperCompany.map(resultSet);
 		statement.close();
 		con.close();
-		if (company.isEmpty())
+		if (company.isEmpty()) {
 			return Optional.empty();
+		}
 		return Optional.of(company.getFirst());
 	}
 

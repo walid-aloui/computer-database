@@ -20,8 +20,9 @@ public class DaoComputer {
 	private static DaoComputer daoComputer;
 
 	public static DaoComputer getInstance() {
-		if (daoComputer == null)
+		if (daoComputer == null) {
 			daoComputer = new DaoComputer();
+		}
 		return daoComputer;
 	}
 
@@ -49,8 +50,9 @@ public class DaoComputer {
 		LinkedList<Computer> computer = MapperComputer.map(resultSet);
 		statement.close();
 		con.close();
-		if (computer.isEmpty())
+		if (computer.isEmpty()) {
 			return Optional.empty();
+		}
 		return Optional.of(computer.getFirst());
 	}
 

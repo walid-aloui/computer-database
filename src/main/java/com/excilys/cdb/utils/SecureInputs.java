@@ -27,8 +27,9 @@ public class SecureInputs {
 	}
 
 	public static boolean isValidPage(String choice, int numPage, int totalPage) {
-		if (choice.equals("q") || (choice.equals("a") && numPage > 1) || (choice.equals("z") && numPage < totalPage))
+		if (choice.equals("q") || (choice.equals("a") && numPage > 1) || (choice.equals("z") && numPage < totalPage)) {
 			return true;
+		}
 		return false;
 	}
 

@@ -64,8 +64,9 @@ public class ControllerCli {
 	private void executeListComputers() throws SQLException {
 		int numberOfComputer = DaoComputer.getInstance().getNumberOfComputer();
 		int totalPage = numberOfComputer / Page.getMAX_ELEMENT();
-		if (numberOfComputer % Page.getMAX_ELEMENT() != 0)
+		if (numberOfComputer % Page.getMAX_ELEMENT() != 0) {
 			totalPage++;
+		}
 		int numPage = 1;
 		while (true) {
 			Page p = new Page(numPage, totalPage);
@@ -126,8 +127,9 @@ public class ControllerCli {
 	private Optional<String> askCompanyId() throws SQLException, InconsistentStateException {
 		System.out.println("Veuillez entrer l'id du fabricant");
 		String input = sc.nextLine();
-		if ("".equals(input))
+		if ("".equals(input)) {
 			return Optional.empty();
+		}
 		if (!SecureInputs.isInteger(input)) {
 			System.out.println("Veuillez entrer un entier !");
 			return askCompanyId();
@@ -152,11 +154,13 @@ public class ControllerCli {
 
 	private Optional<LocalDate> askComputerDate() {
 		String input = sc.nextLine();
-		if ("".equals(input))
+		if ("".equals(input)) {
 			return Optional.empty();
+		}
 		Optional<LocalDate> date = SecureInputs.toDate(input);
-		if (date.isPresent())
+		if (date.isPresent()) {
 			return date;
+		}
 		System.out.println("Format date invalide !");
 		return askComputerDate();
 	}
@@ -169,20 +173,22 @@ public class ControllerCli {
 	private Optional<LocalDate> askComputerDiscontinued(Optional<LocalDate> introduced) {
 		System.out.println("Veuillez entrer la date d'arret");
 		Optional<LocalDate> discontinued = askComputerDate();
-		if (!introduced.isPresent() || !discontinued.isPresent() || discontinued.get().isAfter(introduced.get()))
+		if (!introduced.isPresent() || !discontinued.isPresent() || discontinued.get().isAfter(introduced.get())) {
 			return discontinued;
+		}
 		System.out.println("La date d'arret doit etre plus grande que la date d'introduction !");
 		return askComputerDiscontinued(introduced);
 	}
 
 	public String askPage(int numPage, int totalPage) {
-		if (numPage == 1)
+		if (numPage == 1) {
 			System.out.println("Taper z pour la page suivante\nq pour revenir au menu principal");
-		else if (numPage == totalPage)
+		} else if (numPage == totalPage) {
 			System.out.println("Taper a pour la page précédente\nq pour revenir au menu principal");
-		else
+		} else {
 			System.out.println(
 					"Taper a pour la page précédente et " + "z pour la suivante\nq pour revenir au menu principal");
+		}
 		String choice = sc.nextLine();
 		if (!SecureInputs.isValidPage(choice, numPage, totalPage)) {
 			System.out.println("Erreur de saisie !");
