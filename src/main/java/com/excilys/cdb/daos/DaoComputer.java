@@ -33,7 +33,8 @@ public class DaoComputer {
 		Database db = Database.getInstance();
 		Connection con = DriverManager.getConnection(db.getUrl(), db.getUsername(), db.getPassword());
 		Statement statement = con.createStatement();
-		String query = "select id,name,introduced,discontinued,company_id from computer";
+		String query = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
+				+ "from computer left join company on computer.company_id = company.id";
 		ResultSet resultSet = statement.executeQuery(query);
 		LinkedList<Computer> allComputers = MapperComputer.map(resultSet);
 		statement.close();
@@ -45,7 +46,8 @@ public class DaoComputer {
 		Database db = Database.getInstance();
 		Connection con = DriverManager.getConnection(db.getUrl(), db.getUsername(), db.getPassword());
 		Statement statement = con.createStatement();
-		String query = "select id,name,introduced,discontinued,company_id from computer where id = " + id;
+		String query = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
+				+ "from computer left join company on computer.company_id = company.id where computer.id = " + id;
 		ResultSet resultSet = statement.executeQuery(query);
 		LinkedList<Computer> computer = MapperComputer.map(resultSet);
 		statement.close();
@@ -60,7 +62,7 @@ public class DaoComputer {
 			Optional<LocalDate> newDiscontinued, Optional<String> newCompanyId) throws SQLException {
 		Database db = Database.getInstance();
 		Connection con = DriverManager.getConnection(db.getUrl(), db.getUsername(), db.getPassword());
-		String query = "update computer set name=?,introduced=?,discontinued=?,copany_id=? where id = " + id;
+		String query = "update computer set name=?,introduced=?,discontinued=?,company_id=? where id = " + id;
 		PreparedStatement preparedStatement = con.prepareStatement(query);
 		preparedStatement.setString(1, newName);
 		if (newIntroduced.isPresent()) {
@@ -127,7 +129,8 @@ public class DaoComputer {
 		Database db = Database.getInstance();
 		Connection con = DriverManager.getConnection(db.getUrl(), db.getUsername(), db.getPassword());
 		Statement statement = con.createStatement();
-		String query = "select id,name,introduced,discontinued,company_id from computer LIMIT " + offset + "," + n;
+		String query = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
+				+ "from computer left join company on computer.company_id = company.id LIMIT " + offset + "," + n;
 		ResultSet resultSet = statement.executeQuery(query);
 		LinkedList<Computer> computers = MapperComputer.map(resultSet);
 		statement.close();

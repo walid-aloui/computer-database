@@ -8,20 +8,20 @@ public class Computer {
 	private String name;
 	private LocalDate introduced;
 	private LocalDate discontinued;
-	private int companyId;
+	private Company company;
 
-	public Computer(int id, String name, LocalDate introduced, LocalDate discontinued, int companyId) {
+	public Computer(int id, String name, LocalDate introduced, LocalDate discontinued, Company company) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		this.companyId = companyId;
+		this.company = company;
 	}
 
 	@Override
 	public String toString() {
 		return "Computer [id=" + id + ", name=" + name + ", introduced=" + introduced + ", discontinued=" + discontinued
-				+ ", companyId=" + companyId + "]";
+				+ ", companyId=" + company.getId() + "]";
 	}
 
 }

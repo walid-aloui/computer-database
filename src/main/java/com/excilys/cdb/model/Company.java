@@ -15,4 +15,8 @@ public class Company {
 		return "Company [id=" + id + ", name=" + name + "]";
 	}
 
+	public int getId() {
+		return id;
+	}
+
 }
