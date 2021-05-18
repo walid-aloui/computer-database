@@ -1,9 +1,11 @@
 package com.excilys.cdb.ui;
 
-import java.sql.SQLException;
 import java.util.Scanner;
 
-import com.excilys.cdb.exception.InconsistentStateException;
+import com.excilys.cdb.exception.CloseException;
+import com.excilys.cdb.exception.ExecuteQueryException;
+import com.excilys.cdb.exception.MapperException;
+import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.utils.SecureInputs;
 
 public class Cli {
@@ -16,7 +18,7 @@ public class Cli {
 		this.controllerCli = new ControllerCli(sc);
 	}
 
-	public void runCli() throws SQLException, InconsistentStateException {
+	public void runCli() throws OpenException, ExecuteQueryException, MapperException, CloseException {
 		int opt;
 		do {
 			opt = askChoice();

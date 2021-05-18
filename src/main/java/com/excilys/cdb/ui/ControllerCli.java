@@ -1,6 +1,5 @@
 package com.excilys.cdb.ui;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -8,7 +7,10 @@ import java.util.Scanner;
 
 import com.excilys.cdb.daos.DaoCompany;
 import com.excilys.cdb.daos.DaoComputer;
-import com.excilys.cdb.exception.InconsistentStateException;
+import com.excilys.cdb.exception.CloseException;
+import com.excilys.cdb.exception.ExecuteQueryException;
+import com.excilys.cdb.exception.MapperException;
+import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
@@ -24,7 +26,7 @@ public class ControllerCli {
 		this.sc = sc;
 	}
 
-	void executeOption(int opt) throws SQLException, InconsistentStateException {
+	void executeOption(int opt) throws OpenException, ExecuteQueryException, MapperException, CloseException {
 		ChoixMenu choice = ChoixMenu.values()[opt - 1];
 		switch (choice) {
 		case LIST_COMPANIES:
@@ -56,12 +58,12 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeListCompanies() throws SQLException {
+	private void executeListCompanies() throws OpenException, ExecuteQueryException, MapperException, CloseException {
 		LinkedList<Company> allCompanies = DaoCompany.getInstance().getAllCompanies();
 		viewCli.showCompanies(allCompanies);
 	}
 
-	private void executeListComputers() throws SQLException {
+	private void executeListComputers() throws OpenException, ExecuteQueryException, MapperException, CloseException {
 		int numberOfComputer = DaoComputer.getInstance().getNumberOfComputer();
 		int totalPage = numberOfComputer / Page.getMAX_ELEMENT();
 		if (numberOfComputer % Page.getMAX_ELEMENT() != 0) {
@@ -82,7 +84,7 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeShowDetails() throws SQLException, InconsistentStateException {
+	private void executeShowDetails() throws OpenException, ExecuteQueryException, MapperException, CloseException {
 		int id = askComputerId();
 		Optional<Computer> c = DaoComputer.getInstance().getComputerById(id);
 		if (c.isPresent()) {
@@ -92,7 +94,7 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeUpdateComputer() throws SQLException, InconsistentStateException {
+	private void executeUpdateComputer() throws OpenException, CloseException {
 		int id = askComputerId();
 		String newName = askComputerName();
 		Optional<LocalDate> newIntroduced = askComputerIntroduced();
@@ -101,7 +103,7 @@ public class ControllerCli {
 		DaoComputer.getInstance().updateComputerById(id, newName, newIntroduced, newDiscontinued, newCompanyId);
 	}
 
-	private void executeInsertComputer() throws SQLException, InconsistentStateException {
+	private void executeInsertComputer() throws OpenException, CloseException {
 		String name = askComputerName();
 		Optional<LocalDate> introduced = askComputerIntroduced();
 		Optional<LocalDate> discontinued = askComputerDiscontinued(introduced);
@@ -109,7 +111,7 @@ public class ControllerCli {
 		DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
 	}
 
-	private void executeDeleteComputer() throws SQLException {
+	private void executeDeleteComputer() throws OpenException, ExecuteQueryException, CloseException {
 		int id = askComputerId();
 		DaoComputer.getInstance().deleteComputerById(id);
 	}
@@ -124,7 +126,7 @@ public class ControllerCli {
 		return Integer.parseInt(input);
 	}
 
-	private Optional<String> askCompanyId() throws SQLException, InconsistentStateException {
+	private Optional<String> askCompanyId() {
 		System.out.println("Veuillez entrer l'id du fabricant");
 		String input = sc.nextLine();
 		if ("".equals(input)) {
@@ -132,11 +134,6 @@ public class ControllerCli {
 		}
 		if (!SecureInputs.isInteger(input)) {
 			System.out.println("Veuillez entrer un entier !");
-			return askCompanyId();
-		}
-		int id = Integer.parseInt(input);
-		if (!DaoCompany.getInstance().isCompany(id)) {
-			System.out.println("Id de fabricant incorrect !");
 			return askCompanyId();
 		}
 		return Optional.of(input);
@@ -157,7 +154,7 @@ public class ControllerCli {
 		if ("".equals(input)) {
 			return Optional.empty();
 		}
-		Optional<LocalDate> date = SecureInputs.toDate(input);
+		Optional<LocalDate> date = SecureInputs.toLocalDate(input);
 		if (date.isPresent()) {
 			return date;
 		}

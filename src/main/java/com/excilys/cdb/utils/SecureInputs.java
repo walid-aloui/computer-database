@@ -15,7 +15,7 @@ public class SecureInputs {
 		}
 	}
 
-	public static Optional<LocalDate> toDate(String s) {
+	public static Optional<LocalDate> toLocalDate(String s) {
 		try {
 			LocalDate date = LocalDate.parse(s);
 			return Optional.of(date);
