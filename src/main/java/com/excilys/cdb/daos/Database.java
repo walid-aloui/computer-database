@@ -7,6 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.exception.CloseException;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.OpenException;
@@ -17,6 +20,7 @@ public class Database {
 	private final String url = "jdbc:mysql://localhost:3306/computer-database-db";
 	private final String username = "admincdb";
 	private final String password = "qwerty1234";
+	private static final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
 	public static Database getInstance() {
 		if (db == null) {
@@ -32,7 +36,7 @@ public class Database {
 		try {
 			return DriverManager.getConnection(url, username, password);
 		} catch (SQLException e) {
-			System.out.println("Echec openConnection " + e);
+			LOGGER.error("Echec openConnection", e);
 			throw new OpenException();
 		}
 	}
@@ -41,7 +45,7 @@ public class Database {
 		try {
 			return con.createStatement();
 		} catch (SQLException e) {
-			System.out.println("Echec openStatement " + e);
+			LOGGER.error("Echec openStatement", e);
 			throw new OpenException();
 		}
 	}
@@ -50,7 +54,7 @@ public class Database {
 		try {
 			con.close();
 		} catch (SQLException e) {
-			System.out.println("Echec closeConnection " + e);
+			LOGGER.error("Echec closeConnection", e);
 			throw new CloseException();
 		}
 	}
@@ -59,7 +63,7 @@ public class Database {
 		try {
 			statement.close();
 		} catch (SQLException e) {
-			System.out.println("Echec closeStatement " + e);
+			LOGGER.error("Echec closeStatement", e);
 			throw new CloseException();
 		}
 	}
@@ -68,7 +72,7 @@ public class Database {
 		try {
 			preparedStatement.close();
 		} catch (SQLException e) {
-			System.out.println("Echec closePreparedStatement " + e);
+			LOGGER.error("Echec closePreparedStatement", e);
 			throw new CloseException();
 		}
 	}
@@ -77,7 +81,7 @@ public class Database {
 		try {
 			return statement.executeQuery(query);
 		} catch (SQLException e) {
-			System.out.println("Echec executeQuery " + e);
+			LOGGER.error("Echec executeQuery", e);
 			throw new ExecuteQueryException();
 		}
 	}
@@ -85,9 +89,9 @@ public class Database {
 	void execute(Statement statement, String query) throws ExecuteQueryException {
 		try {
 			statement.execute(query);
-			System.out.println("Nombre de ligne affecte: " + statement.getUpdateCount());
+			LOGGER.info("Nombre de ligne affecte: " + statement.getUpdateCount());
 		} catch (SQLException e) {
-			System.out.println("Echec execute " + e);
+			LOGGER.error("Echec execute", e);
 			throw new ExecuteQueryException();
 		}
 	}

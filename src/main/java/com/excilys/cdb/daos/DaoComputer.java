@@ -16,9 +16,13 @@ import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.mapper.MapperComputer;
 import com.excilys.cdb.model.Computer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DaoComputer {
 
 	private static DaoComputer daoComputer;
+	private static final Logger LOGGER = LoggerFactory.getLogger(DaoComputer.class);
 
 	public static DaoComputer getInstance() {
 		if (daoComputer == null) {
@@ -86,7 +90,7 @@ public class DaoComputer {
 				preparedStatement.setString(4, null);
 			}
 			preparedStatement.execute();
-			System.out.println("Nombre de update: " + preparedStatement.getUpdateCount());
+			LOGGER.info("Nombre de update: " + preparedStatement.getUpdateCount());
 		} catch (SQLException e) {
 			System.out.println("Id du fabricant non existant !");
 		}
@@ -129,7 +133,7 @@ public class DaoComputer {
 				preparedStatement.setString(4, null);
 			}
 			preparedStatement.execute();
-			System.out.println("Nombre d'insertion: " + preparedStatement.getUpdateCount());
+			LOGGER.info("Nombre d'insertion: " + preparedStatement.getUpdateCount());
 		} catch (SQLException e) {
 			System.out.println("Id du fabricant non existant !");
 		}

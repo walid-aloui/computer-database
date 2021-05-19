@@ -6,11 +6,16 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.LinkedList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 
 public class MapperComputer {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MapperComputer.class);
 
 	public static LinkedList<Computer> mapToComputer(ResultSet resultSet) throws MapperException {
 		LinkedList<Computer> computer = new LinkedList<Computer>();
@@ -34,7 +39,7 @@ public class MapperComputer {
 				computer.add(new Computer(id, computerName, introduced, discontinued, company));
 			}
 		} catch (SQLException e) {
-			System.out.println("Echec Mapper computer " + e);
+			LOGGER.error("Echec Mapper computer", e);
 			throw new MapperException();
 		}
 		return computer;
@@ -45,11 +50,11 @@ public class MapperComputer {
 			if (resultSet.next()) {
 				return resultSet.getInt("elements");
 			} else {
-				System.out.println("Echec mapToInt curseur vide");
+				LOGGER.error("Echec Mapper mapToInt : curseur vide");
 				throw new MapperException();
 			}
 		} catch (SQLException e) {
-			System.out.println("Echec mapToInt " + e);
+			LOGGER.error("Echec Mapper mapToInt", e);
 			throw new MapperException();
 		}
 	}

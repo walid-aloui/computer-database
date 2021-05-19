@@ -4,10 +4,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
 
 public class MapperCompany {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MapperCompany.class);
 
 	public static LinkedList<Company> mapToCompany(ResultSet resultSet) throws MapperException {
 		LinkedList<Company> company = new LinkedList<Company>();
@@ -18,7 +23,7 @@ public class MapperCompany {
 				company.add(new Company(id, name));
 			}
 		} catch (SQLException e) {
-			System.out.println("Echec Mapper company " + e);
+			LOGGER.error("Echec Mapper company", e);
 			throw new MapperException();
 		}
 		return company;
