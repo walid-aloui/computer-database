@@ -3,14 +3,11 @@ package com.excilys.cdb.daos;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-
-import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,16 +56,12 @@ public class Database extends BasicDataSource {
 
 	Connection openConnection() throws OpenException {
 		try {
+			LOGGER.info("Connection to database : " + url);
 			return this.getConnection();
 		} catch (SQLException e) {
 			LOGGER.error("Echec openConnection", e);
 			throw new OpenException();
 		}
-		/*
-		 * try { LOGGER.info("Connection to database : " + url); return
-		 * DriverManager.getConnection(url, username, password); } catch (SQLException
-		 * e) { LOGGER.error("Echec openConnection", e); throw new OpenException(); }
-		 */
 	}
 
 	Statement openStatement(Connection con) throws OpenException {

@@ -27,7 +27,6 @@ class DaoComputerTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		System.out.println("setUp()");
 		Database db = Database.getInstance();
 		Connection con = db.openConnection();
 		ScriptRunner sr = new ScriptRunner(con);
@@ -35,10 +34,6 @@ class DaoComputerTest {
 				new FileReader("/home/aloui/Bureau/computer-database/src/test/resources/test-db.sql"));
 		sr.runScript(reader);
 		db.closeConnection(con);
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
 	}
 
 	private int createWr7Computer() throws OpenException, CloseException {
@@ -57,6 +52,18 @@ class DaoComputerTest {
 		return DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
 	}
 
+	private void createComputers() {
+		DaoComputer daoComputer = DaoComputer.getInstance();
+		try {
+			for (int k = 0; k < 25; k++) {
+				daoComputer.insertComputer("test" + k, Optional.empty(), Optional.empty(), Optional.empty());
+			}
+
+		} catch (OpenException | CloseException e) {
+			fail("Should not throw an exception");
+		}
+	}
+
 	@Test
 	void testGetAllComputersShouldReturnListOfComputers() {
 		try {
@@ -69,7 +76,7 @@ class DaoComputerTest {
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
 			assertEquals(2, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -79,7 +86,7 @@ class DaoComputerTest {
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
 			assertEquals(0, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -100,7 +107,7 @@ class DaoComputerTest {
 				fail("Should not be empty");
 			}
 		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -115,7 +122,7 @@ class DaoComputerTest {
 				fail("Should be empty");
 			}
 		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -131,7 +138,7 @@ class DaoComputerTest {
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
 			assertEquals(1, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -144,7 +151,7 @@ class DaoComputerTest {
 			int numDelete = DaoComputer.getInstance().deleteComputerById(5);
 			assertEquals(0, numDelete);
 		} catch (OpenException | ExecuteQueryException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -161,7 +168,7 @@ class DaoComputerTest {
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
 			assertEquals(0, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -187,7 +194,7 @@ class DaoComputerTest {
 				fail("Should not be empty");
 			}
 		} catch (OpenException | CloseException | ExecuteQueryException | MapperException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -199,8 +206,71 @@ class DaoComputerTest {
 			int numUpdate = DaoComputer.getInstance().updateComputerById(5, "test", Optional.empty(), Optional.empty(),
 					Optional.empty());
 			assertEquals(0, numUpdate);
+
+			int numUpdate2 = DaoComputer.getInstance().updateComputerById(1, "test", Optional.empty(), Optional.empty(),
+					Optional.of("999"));
+			assertEquals(0, numUpdate2);
 		} catch (OpenException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
+		}
+	}
+
+	@Test
+	void testGetPartOfComputersShouldReturnListOfTenComputers() {
+		try {
+			createComputers();
+
+			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 0);
+			assertEquals(10, allComputers.size());
+		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+			fail("Should not throw an exception");
+		}
+	}
+	
+	@Test
+	void testGetPartOfComputersShouldReturnListOfTenComputersWithOffset10() {
+		try {
+			createComputers();
+
+			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 10);
+			assertEquals(10, allComputers.size());
+		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+			fail("Should not throw an exception");
+		}
+	}
+	
+	@Test
+	void testGetPartOfComputersShouldReturnListOfFiveComputersWithOffset10() {
+		try {
+			createComputers();
+
+			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 20);
+			assertEquals(5, allComputers.size());
+		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+			fail("Should not throw an exception");
+		}
+	}
+
+	@Test
+	void testGetPartOfComputersShouldReturnListOfTwoComputers() {
+		try {
+			createWr7Computer();
+			createTestComputer();
+
+			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 0);
+			assertEquals(2, allComputers.size());
+		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+			fail("Should not throw an exception");
+		}
+	}
+
+	@Test
+	void testGetPartOfComputersShouldReturnAnEmptyListOfComputers() {
+		try {
+			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 0);
+			assertEquals(0, allComputers.size());
+		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -213,7 +283,7 @@ class DaoComputerTest {
 			int numComputer = DaoComputer.getInstance().getNumberOfComputer();
 			assertEquals(2, numComputer);
 		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
@@ -223,7 +293,7 @@ class DaoComputerTest {
 			int numComputer = DaoComputer.getInstance().getNumberOfComputer();
 			assertEquals(0, numComputer);
 		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 
