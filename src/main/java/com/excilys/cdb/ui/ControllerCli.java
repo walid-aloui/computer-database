@@ -26,7 +26,7 @@ public class ControllerCli {
 		this.sc = sc;
 	}
 
-	void executeOption(int opt) throws OpenException, ExecuteQueryException, MapperException, CloseException {
+	public void executeOption(int opt) throws OpenException, ExecuteQueryException, MapperException, CloseException {
 		ChoixMenu choice = ChoixMenu.values()[opt - 1];
 		switch (choice) {
 		case LIST_COMPANIES:
@@ -177,7 +177,7 @@ public class ControllerCli {
 		return askComputerDiscontinued(introduced);
 	}
 
-	public String askPage(int numPage, int totalPage) {
+	private String askPage(int numPage, int totalPage) {
 		if (numPage == 1) {
 			System.out.println("Taper z pour la page suivante\nq pour revenir au menu principal");
 		} else if (numPage == totalPage) {

@@ -9,15 +9,15 @@ import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.exception.CloseException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.mapper.MapperComputer;
 import com.excilys.cdb.model.Computer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DaoComputer {
 
@@ -29,6 +29,10 @@ public class DaoComputer {
 			daoComputer = new DaoComputer();
 		}
 		return daoComputer;
+	}
+
+	public static void setDaoComputer(DaoComputer daoComputer) {
+		DaoComputer.daoComputer = daoComputer;
 	}
 
 	private DaoComputer() {
@@ -65,12 +69,25 @@ public class DaoComputer {
 		return Optional.of(computer.getFirst());
 	}
 
-	public void updateComputerById(int id, String newName, Optional<LocalDate> newIntroduced,
+	public int deleteComputerById(int id) throws OpenException, ExecuteQueryException, CloseException {
+		Database db = Database.getInstance();
+		Connection con = db.openConnection();
+		Statement statement = db.openStatement(con);
+		String query = "delete from computer where id = " + id;
+		int numDelete = db.executeUpdate(statement, query);
+		System.out.println("Nombre de suppression " + numDelete);
+		db.closeStatement(statement);
+		db.closeConnection(con);
+		return numDelete;
+	}
+
+	public int updateComputerById(int id, String newName, Optional<LocalDate> newIntroduced,
 			Optional<LocalDate> newDiscontinued, Optional<String> newCompanyId) throws OpenException, CloseException {
 		Database db = Database.getInstance();
 		Connection con = db.openConnection();
 		PreparedStatement preparedStatement = null;
 		String query = "update computer set name=?,introduced=?,discontinued=?,company_id=? where id = " + id;
+		int numUpdate = 0;
 		try {
 			preparedStatement = con.prepareStatement(query);
 			preparedStatement.setString(1, newName);
@@ -89,31 +106,23 @@ public class DaoComputer {
 			} else {
 				preparedStatement.setString(4, null);
 			}
-			preparedStatement.execute();
-			LOGGER.info("Nombre de update: " + preparedStatement.getUpdateCount());
+			numUpdate = preparedStatement.executeUpdate();
+			System.out.println("Nombre de update: " + numUpdate);
 		} catch (SQLException e) {
 			System.out.println("Id du fabricant non existant !");
 		}
 		db.closePreparedStatement(preparedStatement);
 		db.closeConnection(con);
+		return numUpdate;
 	}
 
-	public void deleteComputerById(int id) throws OpenException, ExecuteQueryException, CloseException {
-		Database db = Database.getInstance();
-		Connection con = db.openConnection();
-		Statement statement = db.openStatement(con);
-		String query = "delete from computer where id = " + id;
-		db.execute(statement, query);
-		db.closeStatement(statement);
-		db.closeConnection(con);
-	}
-
-	public void insertComputer(String name, Optional<LocalDate> introduced, Optional<LocalDate> discontinued,
+	public int insertComputer(String name, Optional<LocalDate> introduced, Optional<LocalDate> discontinued,
 			Optional<String> company_id) throws OpenException, CloseException {
 		Database db = Database.getInstance();
 		Connection con = db.openConnection();
 		String query = "insert into computer (name, introduced, discontinued, company_id) values (?,?,?,?)";
 		PreparedStatement preparedStatement = null;
+		int numInsert = 0;
 		try {
 			preparedStatement = con.prepareStatement(query);
 			preparedStatement.setString(1, name);
@@ -132,13 +141,19 @@ public class DaoComputer {
 			} else {
 				preparedStatement.setString(4, null);
 			}
-			preparedStatement.execute();
-			LOGGER.info("Nombre d'insertion: " + preparedStatement.getUpdateCount());
+			numInsert = preparedStatement.executeUpdate();
+			if (numInsert == 1) {
+				System.out.println("Insertion reussis");
+			} else {
+				System.out.println("Echec insertion");
+			}
 		} catch (SQLException e) {
+			LOGGER.info("SQLException lors de l'insertion ", e);
 			System.out.println("Id du fabricant non existant !");
 		}
 		db.closePreparedStatement(preparedStatement);
 		db.closeConnection(con);
+		return numInsert;
 	}
 
 	public LinkedList<Computer> getPartOfComputers(int n, int offset)

@@ -24,4 +24,24 @@ public class Computer {
 				+ ", companyId=" + company.getId() + "]";
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public LocalDate getIntroduced() {
+		return introduced;
+	}
+
+	public LocalDate getDiscontinued() {
+		return discontinued;
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
 }

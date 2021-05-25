@@ -41,6 +41,9 @@ public class MapperComputer {
 		} catch (SQLException e) {
 			LOGGER.error("Echec Mapper computer", e);
 			throw new MapperException();
+		} catch (NullPointerException e) {
+			LOGGER.error("Echec Mapper computer : NullPointerException");
+			throw new MapperException();
 		}
 		return computer;
 	}
@@ -55,6 +58,9 @@ public class MapperComputer {
 			}
 		} catch (SQLException e) {
 			LOGGER.error("Echec Mapper mapToInt", e);
+			throw new MapperException();
+		} catch (NullPointerException e) {
+			LOGGER.error("Echec Mapper computer : NullPointerException");
 			throw new MapperException();
 		}
 	}

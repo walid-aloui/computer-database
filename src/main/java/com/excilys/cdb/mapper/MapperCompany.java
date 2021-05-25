@@ -25,6 +25,9 @@ public class MapperCompany {
 		} catch (SQLException e) {
 			LOGGER.error("Echec Mapper company", e);
 			throw new MapperException();
+		} catch (NullPointerException e) {
+			LOGGER.error("Echec Mapper company : NullPointerException");
+			throw new MapperException();
 		}
 		return company;
 	}

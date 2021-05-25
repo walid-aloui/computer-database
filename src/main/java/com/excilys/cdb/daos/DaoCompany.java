@@ -24,6 +24,10 @@ public class DaoCompany {
 		return daoCompany;
 	}
 
+	public static void setDaoCompany(DaoCompany daoCompany) {
+		DaoCompany.daoCompany = daoCompany;
+	}
+
 	private DaoCompany() {
 	}
 

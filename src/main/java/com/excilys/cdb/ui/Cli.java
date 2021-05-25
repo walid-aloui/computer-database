@@ -41,4 +41,8 @@ public class Cli {
 		return opt;
 	}
 
+	public void setSc(Scanner sc) {
+		this.sc = sc;
+	}
+
 }

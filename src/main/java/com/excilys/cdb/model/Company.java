@@ -19,4 +19,8 @@ public class Company {
 		return id;
 	}
 
+	public String getName() {
+		return name;
+	}
+
 }
