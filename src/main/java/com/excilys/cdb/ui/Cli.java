@@ -45,4 +45,8 @@ public class Cli {
 		this.sc = sc;
 	}
 
+	public ControllerCli getControllerCli() {
+		return controllerCli;
+	}
+
 }

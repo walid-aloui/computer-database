@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 import org.apache.ibatis.jdbc.ScriptRunner;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -81,7 +80,7 @@ class DaoComputerTest {
 	}
 
 	@Test
-	void testGetAllComputersShouldReturnAnEmptyListOfComputers() throws Exception {
+	void testGetAllComputersShouldReturnAnEmptyListOfComputers() {
 		try {
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
 			assertEquals(0, allComputers.size());
@@ -150,7 +149,10 @@ class DaoComputerTest {
 
 			int numDelete = DaoComputer.getInstance().deleteComputerById(5);
 			assertEquals(0, numDelete);
-		} catch (OpenException | ExecuteQueryException | CloseException e) {
+			
+			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			assertEquals(2, allComputers.size());
+		} catch (OpenException | ExecuteQueryException | CloseException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 	}
@@ -226,7 +228,7 @@ class DaoComputerTest {
 			fail("Should not throw an exception");
 		}
 	}
-	
+
 	@Test
 	void testGetPartOfComputersShouldReturnListOfTenComputersWithOffset10() {
 		try {
@@ -238,7 +240,7 @@ class DaoComputerTest {
 			fail("Should not throw an exception");
 		}
 	}
-	
+
 	@Test
 	void testGetPartOfComputersShouldReturnListOfFiveComputersWithOffset10() {
 		try {

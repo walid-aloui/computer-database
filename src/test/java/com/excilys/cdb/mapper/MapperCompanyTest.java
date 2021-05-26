@@ -2,6 +2,8 @@ package com.excilys.cdb.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
@@ -26,6 +28,9 @@ class MapperCompanyTest {
 			assertEquals(1, company.size());
 			assertEquals(1, company.getFirst().getId());
 			assertEquals("WR7", company.getFirst().getName());
+			verify(mockResultSet, times(2)).next();
+			verify(mockResultSet, times(1)).getInt("id");
+			verify(mockResultSet, times(1)).getString("name");
 		} catch (SQLException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -38,6 +43,7 @@ class MapperCompanyTest {
 			when(mockResultSet.next()).thenReturn(false);
 			LinkedList<Company> company = MapperCompany.mapToCompany(mockResultSet);
 			assertEquals(0, company.size());
+			verify(mockResultSet, times(1)).next();
 		} catch (SQLException | MapperException e) {
 			fail("Should not throw an exception");
 		}

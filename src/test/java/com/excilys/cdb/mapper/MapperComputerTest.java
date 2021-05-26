@@ -2,6 +2,8 @@ package com.excilys.cdb.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Date;
@@ -37,6 +39,13 @@ class MapperComputerTest {
 		assertEquals(discontinued.toLocalDate(), computer.getDiscontinued());
 		assertEquals(2, computer.getCompany().getId());
 		assertEquals("companyWR7", computer.getCompany().getName());
+		verify(mockResultSet, times(2)).next();
+		verify(mockResultSet, times(1)).getInt("computer.id");
+		verify(mockResultSet, times(1)).getString("computer.name");
+		verify(mockResultSet, times(1)).getDate("introduced");
+		verify(mockResultSet, times(1)).getDate("discontinued");
+		verify(mockResultSet, times(1)).getInt("company_id");
+		verify(mockResultSet, times(1)).getString("company.name");
 	}
 
 	@Test
@@ -58,6 +67,13 @@ class MapperComputerTest {
 		assertEquals(null, computer.getDiscontinued());
 		assertEquals(0, computer.getCompany().getId());
 		assertEquals(null, computer.getCompany().getName());
+		verify(mockResultSet, times(2)).next();
+		verify(mockResultSet, times(1)).getInt("computer.id");
+		verify(mockResultSet, times(1)).getString("computer.name");
+		verify(mockResultSet, times(1)).getDate("introduced");
+		verify(mockResultSet, times(1)).getDate("discontinued");
+		verify(mockResultSet, times(1)).getInt("company_id");
+		verify(mockResultSet, times(1)).getString("company.name");
 	}
 
 	@Test
@@ -67,6 +83,7 @@ class MapperComputerTest {
 			when(mockResultSet.next()).thenReturn(false);
 			LinkedList<Computer> computerList = MapperComputer.mapToComputer(mockResultSet);
 			assertEquals(0, computerList.size());
+			verify(mockResultSet, times(1)).next();
 		} catch (SQLException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -83,10 +100,12 @@ class MapperComputerTest {
 	void testMapToIntShouldReturn0() {
 		ResultSet mockResultSet = mock(ResultSet.class);
 		try {
-			when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+			when(mockResultSet.next()).thenReturn(true);
 			when(mockResultSet.getInt("elements")).thenReturn(0);
 			int numComputer = MapperComputer.mapToInt(mockResultSet);
 			assertEquals(0, numComputer);
+			verify(mockResultSet, times(1)).next();
+			verify(mockResultSet, times(1)).getInt("elements");
 		} catch (SQLException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -96,10 +115,12 @@ class MapperComputerTest {
 	void testMapToIntShouldReturn50() {
 		ResultSet mockResultSet = mock(ResultSet.class);
 		try {
-			when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+			when(mockResultSet.next()).thenReturn(true);
 			when(mockResultSet.getInt("elements")).thenReturn(50);
 			int numComputer = MapperComputer.mapToInt(mockResultSet);
 			assertEquals(50, numComputer);
+			verify(mockResultSet, times(1)).next();
+			verify(mockResultSet, times(1)).getInt("elements");
 		} catch (SQLException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -113,6 +134,7 @@ class MapperComputerTest {
 			assertThrows(MapperException.class, () -> {
 				MapperComputer.mapToInt(mockResultSet);
 			});
+			verify(mockResultSet, times(1)).next();
 		} catch (SQLException e) {
 			fail("Should not throw an SQLException");
 		}

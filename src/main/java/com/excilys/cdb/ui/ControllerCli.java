@@ -65,10 +65,7 @@ public class ControllerCli {
 
 	private void executeListComputers() throws OpenException, ExecuteQueryException, MapperException, CloseException {
 		int numberOfComputer = DaoComputer.getInstance().getNumberOfComputer();
-		int totalPage = numberOfComputer / Page.getMAX_ELEMENT();
-		if (numberOfComputer % Page.getMAX_ELEMENT() != 0) {
-			totalPage++;
-		}
+		int totalPage = (int) Math.ceil((double) numberOfComputer / Page.getMAX_ELEMENT());
 		int numPage = 1;
 		while (true) {
 			Page p = new Page(numPage, totalPage);
@@ -196,6 +193,10 @@ public class ControllerCli {
 
 	public ViewCli getView() {
 		return viewCli;
+	}
+
+	public void setSc(Scanner sc) {
+		this.sc = sc;
 	}
 
 }

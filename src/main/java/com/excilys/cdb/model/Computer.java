@@ -20,8 +20,9 @@ public class Computer {
 
 	@Override
 	public String toString() {
+		int company_id = (company == null) ? 0 : company.getId();
 		return "Computer [id=" + id + ", name=" + name + ", introduced=" + introduced + ", discontinued=" + discontinued
-				+ ", companyId=" + company.getId() + "]";
+				+ ", companyId=" + company_id + "]";
 	}
 
 	public int getId() {
