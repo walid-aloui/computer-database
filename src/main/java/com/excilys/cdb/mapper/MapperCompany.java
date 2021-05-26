@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Company.CompanyBuilder;
 
 public class MapperCompany {
 
@@ -20,7 +21,7 @@ public class MapperCompany {
 			while (resultSet.next()) {
 				int id = resultSet.getInt("id");
 				String name = resultSet.getString("name");
-				company.add(new Company(id, name));
+				company.add(new CompanyBuilder().withId(id).withName(name).build());
 			}
 		} catch (SQLException e) {
 			LOGGER.error("Echec Mapper company", e);

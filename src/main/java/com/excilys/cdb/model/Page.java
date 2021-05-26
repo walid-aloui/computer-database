@@ -14,9 +14,9 @@ public class Page {
 	private static final int MAX_ELEMENT = 10;
 	private final LinkedList<Computer> contenue;
 
-	public Page(int numPage, int totalPage) throws OpenException, ExecuteQueryException, MapperException {
-		this.numPage = numPage;
-		this.totalPage = totalPage;
+	private Page(PageBuilder pageBuilder) throws OpenException, ExecuteQueryException, MapperException {
+		this.numPage = pageBuilder.numPage;
+		this.totalPage = pageBuilder.totalPage;
 		this.contenue = DaoComputer.getInstance().getPartOfComputers(MAX_ELEMENT, (numPage - 1) * 10);
 	}
 
@@ -36,6 +36,29 @@ public class Page {
 
 	public int getTotalPage() {
 		return totalPage;
+	}
+
+	public static class PageBuilder {
+		private int numPage;
+		private int totalPage;
+
+		public PageBuilder() {
+			super();
+		}
+
+		public PageBuilder withNumPage(int numPage) {
+			this.numPage = numPage;
+			return this;
+		}
+
+		public PageBuilder withTotalPage(int totalPage) {
+			this.totalPage = totalPage;
+			return this;
+		}
+
+		public Page build() throws OpenException, ExecuteQueryException, MapperException {
+			return new Page(this);
+		}
 	}
 
 }

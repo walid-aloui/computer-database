@@ -22,7 +22,9 @@ import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Computer.ComputerBuilder;
 
 class CliTest {
 
@@ -63,7 +65,7 @@ class CliTest {
 	private LinkedList<Computer> createListOfTenComputers() {
 		LinkedList<Computer> listComputers = new LinkedList<Computer>();
 		for (int k = 0; k < 10; k++) {
-			listComputers.add(new Computer(k, "computer_" + k, null, null, null));
+			listComputers.add(new ComputerBuilder().withId(k).withName("computer_" + k).build());
 		}
 		return listComputers;
 	}
@@ -88,9 +90,9 @@ class CliTest {
 
 		DaoCompany mockDaoCompany = mock(DaoCompany.class);
 		LinkedList<Company> allCompanies = new LinkedList<Company>();
-		allCompanies.add(new Company(1, "company_one"));
-		allCompanies.add(new Company(2, "company_two"));
-		allCompanies.add(new Company(3, "company_three"));
+		allCompanies.add(new CompanyBuilder().withId(1).withName("Company_one").build());
+		allCompanies.add(new CompanyBuilder().withId(2).withName("Company_two").build());
+		allCompanies.add(new CompanyBuilder().withId(3).withName("Company_three").build());
 		try {
 			when(mockDaoCompany.getAllCompanies()).thenReturn(allCompanies);
 			DaoCompany.setDaoCompany(mockDaoCompany);
@@ -136,7 +138,7 @@ class CliTest {
 		changeNextLineController(String.valueOf(computerId));
 
 		DaoComputer mockDaoComputer = mock(DaoComputer.class);
-		Computer computer = new Computer(computerId, "Computer_WR7", null, null, null);
+		Computer computer = new ComputerBuilder().withId(computerId).withName("Computer_WR7").build();
 		try {
 			when(mockDaoComputer.getComputerById(computerId)).thenReturn(Optional.of(computer));
 			DaoComputer.setDaoComputer(mockDaoComputer);

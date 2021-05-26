@@ -13,6 +13,7 @@ import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
+import com.excilys.cdb.model.Page.PageBuilder;
 import com.excilys.cdb.utils.SecureInputs;
 
 public class ControllerCli {
@@ -67,7 +68,7 @@ public class ControllerCli {
 		int totalPage = (int) Math.ceil((double) numberOfComputer / Page.getMAX_ELEMENT());
 		int numPage = 1;
 		while (true) {
-			Page p = new Page(numPage, totalPage);
+			Page p = new PageBuilder().withNumPage(numPage).withTotalPage(totalPage).build();
 			viewCli.showPage(p);
 			String choice = askPage(numPage, p.getTotalPage());
 			if ("q".equals(choice)) {

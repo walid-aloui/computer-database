@@ -10,12 +10,12 @@ public class Computer {
 	private LocalDate discontinued;
 	private Company company;
 
-	public Computer(int id, String name, LocalDate introduced, LocalDate discontinued, Company company) {
-		this.id = id;
-		this.name = name;
-		this.introduced = introduced;
-		this.discontinued = discontinued;
-		this.company = company;
+	private Computer(ComputerBuilder computerBuilder) {
+		this.id = computerBuilder.id;
+		this.name = computerBuilder.name;
+		this.introduced = computerBuilder.introduced;
+		this.discontinued = computerBuilder.discontinued;
+		this.company = computerBuilder.company;
 	}
 
 	@Override
@@ -43,6 +43,47 @@ public class Computer {
 
 	public Company getCompany() {
 		return company;
+	}
+
+	public static class ComputerBuilder {
+		private int id;
+		private String name;
+		private LocalDate introduced;
+		private LocalDate discontinued;
+		private Company company;
+
+		public ComputerBuilder() {
+			super();
+		}
+
+		public ComputerBuilder withId(int id) {
+			this.id = id;
+			return this;
+		}
+
+		public ComputerBuilder withName(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public ComputerBuilder withIntroduced(LocalDate introduced) {
+			this.introduced = introduced;
+			return this;
+		}
+
+		public ComputerBuilder withDiscontinued(LocalDate discontinued) {
+			this.discontinued = discontinued;
+			return this;
+		}
+
+		public ComputerBuilder withCompany(Company company) {
+			this.company = company;
+			return this;
+		}
+
+		public Computer build() {
+			return new Computer(this);
+		}
 	}
 
 }

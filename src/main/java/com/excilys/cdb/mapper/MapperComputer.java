@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Computer.ComputerBuilder;
 
 public class MapperComputer {
 
@@ -35,8 +37,9 @@ public class MapperComputer {
 				}
 				int companyId = resultSet.getInt("company_id");
 				String companyName = resultSet.getString("company.name");
-				Company company = new Company(companyId, companyName);
-				computer.add(new Computer(id, computerName, introduced, discontinued, company));
+				Company company = new CompanyBuilder().withId(companyId).withName(companyName).build();
+				computer.add(new ComputerBuilder().withId(id).withName(computerName).withIntroduced(introduced)
+						.withDiscontinued(discontinued).withCompany(company).build());
 			}
 		} catch (SQLException e) {
 			LOGGER.error("Echec Mapper computer", e);
