@@ -2,7 +2,6 @@ package com.excilys.cdb.ui;
 
 import java.util.Scanner;
 
-import com.excilys.cdb.exception.CloseException;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
@@ -18,7 +17,7 @@ public class Cli {
 		this.controllerCli = new ControllerCli(sc);
 	}
 
-	public void runCli() throws OpenException, ExecuteQueryException, MapperException, CloseException {
+	public void runCli() throws OpenException, MapperException, ExecuteQueryException {
 		int opt;
 		do {
 			opt = askChoice();

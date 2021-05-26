@@ -3,17 +3,12 @@ package com.excilys.cdb.daos;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.exception.CloseException;
-import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.OpenException;
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -30,7 +25,7 @@ public class Database extends BasicDataSource {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
 	public static Database getInstance() throws OpenException {
-		if (db == null) {
+		if (db == null || db.isClosed()) {
 			db = new Database();
 		}
 		return db;
@@ -62,79 +57,6 @@ public class Database extends BasicDataSource {
 			LOGGER.error("Echec openConnection", e);
 			throw new OpenException();
 		}
-	}
-
-	Statement openStatement(Connection con) throws OpenException {
-		try {
-			return con.createStatement();
-		} catch (SQLException e) {
-			LOGGER.error("Echec openStatement", e);
-			throw new OpenException();
-		}
-	}
-
-	void closeConnection(Connection con) throws CloseException {
-		if (con != null) {
-			try {
-				con.close();
-				LOGGER.info("Disconnection from database : " + url);
-			} catch (SQLException e) {
-				LOGGER.error("Echec closeConnection", e);
-				throw new CloseException();
-			}
-		}
-	}
-
-	void closeStatement(Statement statement) throws CloseException {
-		if (statement != null) {
-			try {
-				statement.close();
-			} catch (SQLException e) {
-				LOGGER.error("Echec closeStatement", e);
-				throw new CloseException();
-			}
-		}
-	}
-
-	void closePreparedStatement(PreparedStatement preparedStatement) throws CloseException {
-		if (preparedStatement != null) {
-			try {
-				preparedStatement.close();
-			} catch (SQLException e) {
-				LOGGER.error("Echec closePreparedStatement", e);
-				throw new CloseException();
-			}
-		}
-	}
-
-	ResultSet executeQuery(Statement statement, String query) throws ExecuteQueryException {
-		try {
-			return statement.executeQuery(query);
-		} catch (SQLException e) {
-			LOGGER.error("Echec executeQuery", e);
-			throw new ExecuteQueryException();
-		}
-	}
-
-	int executeUpdate(Statement statement, String query) throws ExecuteQueryException {
-		try {
-			return statement.executeUpdate(query);
-		} catch (SQLException e) {
-			LOGGER.error("Echec execute", e);
-			throw new ExecuteQueryException();
-		}
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
 	}
 
 }

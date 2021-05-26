@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import com.excilys.cdb.daos.DaoCompany;
 import com.excilys.cdb.daos.DaoComputer;
-import com.excilys.cdb.exception.CloseException;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
@@ -75,7 +74,7 @@ class CliTest {
 		changeNextLineCli(choiceMenu);
 		try {
 			cli.runCli();
-		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 
@@ -97,7 +96,7 @@ class CliTest {
 			DaoCompany.setDaoCompany(mockDaoCompany);
 			cli.runCli();
 			verify(mockDaoCompany, times(1)).getAllCompanies();
-		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 
@@ -122,7 +121,7 @@ class CliTest {
 			cli.runCli();
 			verify(mockDaoComputer, times(1)).getPartOfComputers(numElements, offset);
 			verify(mockDaoComputer, times(1)).getNumberOfComputer();
-		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 
@@ -143,7 +142,7 @@ class CliTest {
 			DaoComputer.setDaoComputer(mockDaoComputer);
 			cli.runCli();
 			verify(mockDaoComputer, times(1)).getComputerById(computerId);
-		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 
@@ -163,7 +162,7 @@ class CliTest {
 			DaoComputer.setDaoComputer(mockDaoComputer);
 			cli.runCli();
 			verify(mockDaoComputer, times(1)).getComputerById(computerId);
-		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 
@@ -192,7 +191,7 @@ class CliTest {
 			cli.runCli();
 			verify(mockDaoComputer, times(1)).updateComputerById(computerId, name, Optional.empty(), Optional.empty(),
 					Optional.empty());
-		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 
@@ -219,7 +218,7 @@ class CliTest {
 			cli.runCli();
 			verify(mockDaoComputer, times(1)).insertComputer(name, Optional.empty(), Optional.empty(),
 					Optional.empty());
-		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 
@@ -240,7 +239,7 @@ class CliTest {
 			DaoComputer.setDaoComputer(mockDaoComputer);
 			cli.runCli();
 			verify(mockDaoComputer, times(1)).deleteComputerById(computerId);
-		} catch (OpenException | ExecuteQueryException | MapperException | CloseException e) {
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
 

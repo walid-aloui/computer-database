@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -12,7 +11,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.exception.CloseException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
@@ -23,6 +21,21 @@ public class DaoComputer {
 
 	private static DaoComputer daoComputer;
 	private static final Logger LOGGER = LoggerFactory.getLogger(DaoComputer.class);
+	private static final String GET_ALL = "select computer.id,computer.name,"
+			+ "introduced,discontinued,company_id,company.name from computer "
+			+ "left join company on computer.company_id = company.id";
+	private static final String GET_BY_ID = "select computer.id,computer.name,"
+			+ "introduced,discontinued,company_id,company.name from computer "
+			+ "left join company on computer.company_id = company.id where computer.id = ?";
+	private static final String DELETE_BY_ID = "delete from computer where id = ?";
+	private static final String UPDATE_BY_ID = "update computer set name=?,"
+			+ "introduced=?,discontinued=?,company_id=? where id = ?";
+	private static final String INSERT = "insert into computer "
+			+ "(name, introduced, discontinued, company_id) values (?,?,?,?)";
+	private static final String GET_PART = "select computer.id,computer.name,"
+			+ "introduced,discontinued,company_id,company.name from computer "
+			+ "left join company on computer.company_id = company.id LIMIT ?,?";
+	private static final String GET_NUMBER = "select count(*) as elements from computer";
 
 	public static DaoComputer getInstance() {
 		if (daoComputer == null) {
@@ -38,58 +51,51 @@ public class DaoComputer {
 	private DaoComputer() {
 	}
 
-	public LinkedList<Computer> getAllComputers()
-			throws OpenException, ExecuteQueryException, MapperException, CloseException {
+	public LinkedList<Computer> getAllComputers() throws OpenException, MapperException, ExecuteQueryException {
 		Database db = Database.getInstance();
-		Connection con = db.openConnection();
-		Statement statement = db.openStatement(con);
-		String query = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
-				+ "from computer left join company on computer.company_id = company.id";
-		ResultSet resultSet = db.executeQuery(statement, query);
-		LinkedList<Computer> allComputers = MapperComputer.mapToComputer(resultSet);
-		db.closeStatement(statement);
-		db.closeConnection(con);
-		return allComputers;
-	}
-
-	public Optional<Computer> getComputerById(int id)
-			throws OpenException, ExecuteQueryException, MapperException, CloseException {
-		Database db = Database.getInstance();
-		Connection con = db.openConnection();
-		Statement statement = db.openStatement(con);
-		String query = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
-				+ "from computer left join company on computer.company_id = company.id where computer.id = " + id;
-		ResultSet resultSet = db.executeQuery(statement, query);
-		LinkedList<Computer> computer = MapperComputer.mapToComputer(resultSet);
-		db.closeStatement(statement);
-		db.closeConnection(con);
-		if (computer.isEmpty()) {
-			return Optional.empty();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(GET_ALL);) {
+			ResultSet resultSet = preparedStatement.executeQuery();
+			return MapperComputer.mapToComputer(resultSet);
+		} catch (SQLException e) {
+			LOGGER.error("Echec getAllComputers", e);
+			throw new ExecuteQueryException();
 		}
-		return Optional.of(computer.getFirst());
+
 	}
 
-	public int deleteComputerById(int id) throws OpenException, ExecuteQueryException, CloseException {
+	public Optional<Computer> getComputerById(int id) throws OpenException, MapperException, ExecuteQueryException {
 		Database db = Database.getInstance();
-		Connection con = db.openConnection();
-		Statement statement = db.openStatement(con);
-		String query = "delete from computer where id = " + id;
-		int numDelete = db.executeUpdate(statement, query);
-		System.out.println("Nombre de suppression " + numDelete);
-		db.closeStatement(statement);
-		db.closeConnection(con);
-		return numDelete;
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(GET_BY_ID);) {
+			preparedStatement.setInt(1, id);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			LinkedList<Computer> computer = MapperComputer.mapToComputer(resultSet);
+			return (computer.isEmpty()) ? Optional.empty() : Optional.of(computer.getFirst());
+		} catch (SQLException e) {
+			LOGGER.error("Echec getComputerById", e);
+			throw new ExecuteQueryException();
+		}
+	}
+
+	public int deleteComputerById(int id) throws OpenException, ExecuteQueryException {
+		Database db = Database.getInstance();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(DELETE_BY_ID);) {
+			preparedStatement.setInt(1, id);
+			return preparedStatement.executeUpdate();
+		} catch (SQLException e) {
+			LOGGER.error("Echec deleteComputerById", e);
+			throw new ExecuteQueryException();
+		}
 	}
 
 	public int updateComputerById(int id, String newName, Optional<LocalDate> newIntroduced,
-			Optional<LocalDate> newDiscontinued, Optional<String> newCompanyId) throws OpenException, CloseException {
-		Database db = Database.getInstance();
-		Connection con = db.openConnection();
-		PreparedStatement preparedStatement = null;
-		String query = "update computer set name=?,introduced=?,discontinued=?,company_id=? where id = " + id;
+			Optional<LocalDate> newDiscontinued, Optional<String> newCompanyId) throws OpenException {
 		int numUpdate = 0;
-		try {
-			preparedStatement = con.prepareStatement(query);
+		Database db = Database.getInstance();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(UPDATE_BY_ID);) {
 			preparedStatement.setString(1, newName);
 			if (newIntroduced.isPresent()) {
 				preparedStatement.setString(2, newIntroduced.get().toString());
@@ -106,25 +112,20 @@ public class DaoComputer {
 			} else {
 				preparedStatement.setString(4, null);
 			}
+			preparedStatement.setInt(5, id);
 			numUpdate = preparedStatement.executeUpdate();
-			System.out.println("Nombre de update: " + numUpdate);
 		} catch (SQLException e) {
 			System.out.println("Id du fabricant non existant !");
 		}
-		db.closePreparedStatement(preparedStatement);
-		db.closeConnection(con);
 		return numUpdate;
 	}
 
 	public int insertComputer(String name, Optional<LocalDate> introduced, Optional<LocalDate> discontinued,
-			Optional<String> company_id) throws OpenException, CloseException {
-		Database db = Database.getInstance();
-		Connection con = db.openConnection();
-		String query = "insert into computer (name, introduced, discontinued, company_id) values (?,?,?,?)";
-		PreparedStatement preparedStatement = null;
+			Optional<String> company_id) throws OpenException {
 		int numInsert = 0;
-		try {
-			preparedStatement = con.prepareStatement(query);
+		Database db = Database.getInstance();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(INSERT);) {
 			preparedStatement.setString(1, name);
 			if (introduced.isPresent()) {
 				preparedStatement.setString(2, introduced.get().toString());
@@ -142,44 +143,37 @@ public class DaoComputer {
 				preparedStatement.setString(4, null);
 			}
 			numInsert = preparedStatement.executeUpdate();
-			if (numInsert == 1) {
-				System.out.println("Insertion reussis");
-			} else {
-				System.out.println("Echec insertion");
-			}
 		} catch (SQLException e) {
-			LOGGER.info("SQLException lors de l'insertion ", e);
 			System.out.println("Id du fabricant non existant !");
 		}
-		db.closePreparedStatement(preparedStatement);
-		db.closeConnection(con);
 		return numInsert;
 	}
 
 	public LinkedList<Computer> getPartOfComputers(int n, int offset)
-			throws OpenException, ExecuteQueryException, MapperException, CloseException {
+			throws OpenException, MapperException, ExecuteQueryException {
 		Database db = Database.getInstance();
-		Connection con = db.openConnection();
-		Statement statement = db.openStatement(con);
-		String query = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
-				+ "from computer left join company on computer.company_id = company.id LIMIT " + offset + "," + n;
-		ResultSet resultSet = db.executeQuery(statement, query);
-		LinkedList<Computer> computers = MapperComputer.mapToComputer(resultSet);
-		db.closeStatement(statement);
-		db.closeConnection(con);
-		return computers;
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(GET_PART);) {
+			preparedStatement.setInt(1, offset);
+			preparedStatement.setInt(2, n);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			return MapperComputer.mapToComputer(resultSet);
+		} catch (SQLException e) {
+			LOGGER.error("Echec getPartOfComputers", e);
+			throw new ExecuteQueryException();
+		}
 	}
 
-	public int getNumberOfComputer() throws OpenException, ExecuteQueryException, MapperException, CloseException {
+	public int getNumberOfComputer() throws OpenException, MapperException, ExecuteQueryException {
 		Database db = Database.getInstance();
-		Connection con = db.openConnection();
-		Statement statement = db.openStatement(con);
-		String query = "select count(*) as elements from computer";
-		ResultSet resultSet = db.executeQuery(statement, query);
-		int res = MapperComputer.mapToInt(resultSet);
-		db.closeStatement(statement);
-		db.closeConnection(con);
-		return res;
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(GET_NUMBER);) {
+			ResultSet resultSet = preparedStatement.executeQuery();
+			return MapperComputer.mapToInt(resultSet);
+		} catch (SQLException e) {
+			LOGGER.error("Echec getNumberOfComputer", e);
+			throw new ExecuteQueryException();
+		}
 	}
 
 }

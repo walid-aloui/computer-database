@@ -7,7 +7,6 @@ import java.util.Scanner;
 
 import com.excilys.cdb.daos.DaoCompany;
 import com.excilys.cdb.daos.DaoComputer;
-import com.excilys.cdb.exception.CloseException;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
@@ -26,7 +25,7 @@ public class ControllerCli {
 		this.sc = sc;
 	}
 
-	public void executeOption(int opt) throws OpenException, ExecuteQueryException, MapperException, CloseException {
+	public void executeOption(int opt) throws OpenException, MapperException, ExecuteQueryException {
 		ChoixMenu choice = ChoixMenu.values()[opt - 1];
 		switch (choice) {
 		case LIST_COMPANIES:
@@ -58,12 +57,12 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeListCompanies() throws OpenException, ExecuteQueryException, MapperException, CloseException {
+	private void executeListCompanies() throws OpenException, MapperException, ExecuteQueryException {
 		LinkedList<Company> allCompanies = DaoCompany.getInstance().getAllCompanies();
 		viewCli.showCompanies(allCompanies);
 	}
 
-	private void executeListComputers() throws OpenException, ExecuteQueryException, MapperException, CloseException {
+	private void executeListComputers() throws OpenException, MapperException, ExecuteQueryException {
 		int numberOfComputer = DaoComputer.getInstance().getNumberOfComputer();
 		int totalPage = (int) Math.ceil((double) numberOfComputer / Page.getMAX_ELEMENT());
 		int numPage = 1;
@@ -81,7 +80,7 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeShowDetails() throws OpenException, ExecuteQueryException, MapperException, CloseException {
+	private void executeShowDetails() throws OpenException, MapperException, ExecuteQueryException {
 		int id = askComputerId();
 		Optional<Computer> c = DaoComputer.getInstance().getComputerById(id);
 		if (c.isPresent()) {
@@ -91,26 +90,34 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeUpdateComputer() throws OpenException, CloseException {
+	private void executeUpdateComputer() throws OpenException {
 		int id = askComputerId();
 		String newName = askComputerName();
 		Optional<LocalDate> newIntroduced = askComputerIntroduced();
 		Optional<LocalDate> newDiscontinued = askComputerDiscontinued(newIntroduced);
 		Optional<String> newCompanyId = askCompanyId();
-		DaoComputer.getInstance().updateComputerById(id, newName, newIntroduced, newDiscontinued, newCompanyId);
+		int numUpdate = DaoComputer.getInstance().updateComputerById(id, newName, newIntroduced, newDiscontinued,
+				newCompanyId);
+		System.out.println("Nombre de update : " + numUpdate);
 	}
 
-	private void executeInsertComputer() throws OpenException, CloseException {
+	private void executeInsertComputer() throws OpenException {
 		String name = askComputerName();
 		Optional<LocalDate> introduced = askComputerIntroduced();
 		Optional<LocalDate> discontinued = askComputerDiscontinued(introduced);
 		Optional<String> company_id = askCompanyId();
-		DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
+		int numInsert = DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
+		if (numInsert == 1) {
+			System.out.println("Insertion Reussie");
+		} else {
+			System.out.println("Echec Insertion");
+		}
 	}
 
-	private void executeDeleteComputer() throws OpenException, ExecuteQueryException, CloseException {
+	private void executeDeleteComputer() throws OpenException, ExecuteQueryException {
 		int id = askComputerId();
-		DaoComputer.getInstance().deleteComputerById(id);
+		int numDelete = DaoComputer.getInstance().deleteComputerById(id);
+		System.out.println("Nombre de suppression : " + numDelete);
 	}
 
 	private int askComputerId() {
