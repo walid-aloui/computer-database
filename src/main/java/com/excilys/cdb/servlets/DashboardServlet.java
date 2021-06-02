@@ -17,7 +17,7 @@ import com.excilys.cdb.model.Computer;
 
 @SuppressWarnings("serial")
 @WebServlet("/dashboard")
-public class ServletDashBoard extends HttpServlet {
+public class DashboardServlet extends HttpServlet {
 
 	private static final String JSP_DASHBOARD = "/WEB-INF/jsp/dashboard.jsp";
 
@@ -27,7 +27,7 @@ public class ServletDashBoard extends HttpServlet {
 		LinkedList<Computer> listComputers = null;
 		try {
 			numComputers = DaoComputer.getInstance().getNumberOfComputer();
-			listComputers = DaoComputer.getInstance().getPartOfComputers(10, 0);
+			listComputers = DaoComputer.getInstance().getPartOfComputers(10, 550);
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
