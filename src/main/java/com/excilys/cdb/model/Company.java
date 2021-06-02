@@ -5,6 +5,10 @@ public class Company {
 	private int id;
 	private String name;
 
+	public Company() {
+		super();
+	}
+
 	private Company(CompanyBuilder companyBuilder) {
 		this.id = companyBuilder.id;
 		this.name = companyBuilder.name;
@@ -22,25 +26,25 @@ public class Company {
 	public String getName() {
 		return name;
 	}
-	
-	public static class CompanyBuilder{
+
+	public static class CompanyBuilder {
 		private int id;
 		private String name;
-		
+
 		public CompanyBuilder() {
 			super();
 		}
-		
+
 		public CompanyBuilder withId(int id) {
 			this.id = id;
 			return this;
 		}
-		
+
 		public CompanyBuilder withName(String name) {
 			this.name = name;
 			return this;
 		}
-		
+
 		public Company build() {
 			return new Company(this);
 		}

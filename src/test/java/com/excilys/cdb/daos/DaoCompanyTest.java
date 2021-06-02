@@ -37,7 +37,7 @@ class DaoCompanyTest {
 			LinkedList<Company> allcompanies = DaoCompany.getInstance().getAllCompanies();
 			assertEquals(42, allcompanies.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not return an exception");
+			fail("Should not throw an exception");
 		}
 	}
 

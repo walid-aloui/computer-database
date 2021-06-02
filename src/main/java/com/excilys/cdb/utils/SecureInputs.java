@@ -19,18 +19,15 @@ public class SecureInputs {
 		try {
 			LocalDate date = LocalDate.parse(s);
 			return Optional.of(date);
-		} catch (DateTimeParseException e) {
-			return Optional.empty();
-		} catch (NullPointerException e) {
+		} catch (DateTimeParseException | NullPointerException e) {
 			return Optional.empty();
 		}
 	}
 
 	public static boolean isValidPage(String choice, int numPage, int totalPage) {
-		if ("q".equals(choice) || ("a".equals(choice) && numPage > 1) || ("z".equals(choice) && numPage < totalPage)) {
-			return true;
-		}
-		return false;
+		return ("q".equals(choice) || 
+				("a".equals(choice) && numPage > 1) || 
+				("z".equals(choice) && numPage < totalPage));
 	}
 
 }

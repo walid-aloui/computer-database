@@ -16,16 +16,18 @@ public class Database extends BasicDataSource {
 
 	private static Database db;
 	private static final String DB_CONFIG_FILE = "db.properties";
+	private static final String DRIVER_PROP = "jdbc.driverClassName";
 	private static final String URl_PROP = "jdbc.url";
 	private static final String USERNAME_PROP = "jdbc.user";
 	private static final String PASSWORD_PROP = "jdbc.pass";
+	private final String driver;
 	private final String url;
 	private final String username;
 	private final String password;
 	private static final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
 	public static Database getInstance() throws OpenException {
-		if (db == null || db.isClosed()) {
+		if (db == null) {
 			db = new Database();
 		}
 		return db;
@@ -37,6 +39,7 @@ public class Database extends BasicDataSource {
 		InputStream configFile = classLoader.getResourceAsStream(DB_CONFIG_FILE);
 		try {
 			properties.load(configFile);
+			driver = properties.getProperty(DRIVER_PROP);
 			url = properties.getProperty(URl_PROP);
 			username = properties.getProperty(USERNAME_PROP);
 			password = properties.getProperty(PASSWORD_PROP);
@@ -44,6 +47,7 @@ public class Database extends BasicDataSource {
 			LOGGER.error("Echec de l'intéraction avec le fichier " + DB_CONFIG_FILE + " " + e);
 			throw new OpenException();
 		}
+		this.setDriverClassName(driver);
 		this.setUrl(url);
 		this.setUsername(username);
 		this.setPassword(password);

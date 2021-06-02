@@ -10,6 +10,10 @@ public class Computer {
 	private LocalDate discontinued;
 	private Company company;
 
+	public Computer() {
+		super();
+	}
+
 	private Computer(ComputerBuilder computerBuilder) {
 		this.id = computerBuilder.id;
 		this.name = computerBuilder.name;
