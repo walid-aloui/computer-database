@@ -125,6 +125,32 @@ class DaoComputerTest {
 	}
 
 	@Test
+	void testGetComputerByNameShouldReturnListOfComputer() {
+		try {
+			createWr7Computer();
+			createTestComputer();
+			String computerName = "Computer_WR7";
+			LinkedList<Computer> computers = DaoComputer.getInstance().getComputerByName(computerName);
+			assertEquals(1, computers.size());
+			assertEquals(computerName, computers.getFirst().getName());
+		} catch (OpenException | MapperException | ExecuteQueryException e) {
+			fail("Should not throw an exception");
+		}
+	}
+
+	@Test
+	void testGetComputerByNameShouldReturnAnEmptyListOfComputer() {
+		try {
+			createWr7Computer();
+			createTestComputer();
+			LinkedList<Computer> computers = DaoComputer.getInstance().getComputerByName("false_name");
+			assertEquals(0, computers.size());
+		} catch (OpenException | MapperException | ExecuteQueryException e) {
+			fail("Should not throw an exception");
+		}
+	}
+
+	@Test
 	void testDeleteComputerByIdShouldDeleteComputer() {
 		try {
 			createWr7Computer();

@@ -21,21 +21,32 @@ public class DaoComputer {
 
 	private static DaoComputer daoComputer;
 	private static final Logger LOGGER = LoggerFactory.getLogger(DaoComputer.class);
-	private static final String GET_ALL = "select computer.id,computer.name,"
-			+ "introduced,discontinued,company_id,company.name from computer "
-			+ "left join company on computer.company_id = company.id";
-	private static final String GET_BY_ID = "select computer.id,computer.name,"
-			+ "introduced,discontinued,company_id,company.name from computer "
-			+ "left join company on computer.company_id = company.id where computer.id = ?";
-	private static final String DELETE_BY_ID = "delete from computer where id = ?";
-	private static final String UPDATE_BY_ID = "update computer set name=?,"
-			+ "introduced=?,discontinued=?,company_id=? where id = ?";
-	private static final String INSERT = "insert into computer "
-			+ "(name, introduced, discontinued, company_id) values (?,?,?,?)";
-	private static final String GET_PART = "select computer.id,computer.name,"
-			+ "introduced,discontinued,company_id,company.name from computer "
-			+ "left join company on computer.company_id = company.id LIMIT ?,?";
+	private static final String GET_ALL = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
+											+ "from computer "
+											+ "left join company "
+											+ "on company_id = company.id";
+	private static final String GET_BY_ID = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
+											+ "from computer "
+											+ "left join company "
+											+ "on company_id = company.id "
+											+ "where computer.id = ?";
+	private static final String DELETE_BY_ID = "delete from computer "
+											+ "where id = ?";
+	private static final String UPDATE_BY_ID = "update computer set name=?,introduced=?,discontinued=?,company_id=? "
+											+ "where id = ?";
+	private static final String INSERT = "insert into computer (name, introduced, discontinued, company_id) "
+											+ "values (?,?,?,?)";
+	private static final String GET_PART = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
+											+ "from computer "
+											+ "left join company "
+											+ "on company_id = company.id "
+											+ "LIMIT ?,?";
 	private static final String GET_NUMBER = "select count(*) as elements from computer";
+	private static final String GET_BY_NAME = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
+											+ "from computer "
+											+ "left join company "
+											+ "on company_id = company.id "
+											+ "where computer.name = ?";
 
 	public static DaoComputer getInstance() {
 		if (daoComputer == null) {
@@ -74,6 +85,20 @@ public class DaoComputer {
 			return (computer.isEmpty()) ? Optional.empty() : Optional.of(computer.getFirst());
 		} catch (SQLException e) {
 			LOGGER.error("Echec getComputerById", e);
+			throw new ExecuteQueryException();
+		}
+	}
+
+	public LinkedList<Computer> getComputerByName(String computerName)
+			throws OpenException, MapperException, ExecuteQueryException {
+		Database db = Database.getInstance();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(GET_BY_NAME);) {
+			preparedStatement.setString(1, computerName);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			return MapperComputer.mapToComputer(resultSet);
+		} catch (SQLException e) {
+			LOGGER.error("Echec getComputerByName", e);
 			throw new ExecuteQueryException();
 		}
 	}

@@ -20,21 +20,48 @@ import com.excilys.cdb.model.Computer;
 public class DashboardServlet extends HttpServlet {
 
 	private static final String JSP_DASHBOARD = "/WEB-INF/jsp/dashboard.jsp";
+	private static final String JSP_ERROR_500 = "/WEB-INF/jsp/500.jsp";
+
+	private static final String ROUTE_DASHBOARD = "dashboard";
+
+	private static final String NAME_SEARCH = "search";
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		int numComputers = 0;
-		LinkedList<Computer> listComputers = null;
 		try {
-			numComputers = DaoComputer.getInstance().getNumberOfComputer();
-			listComputers = DaoComputer.getInstance().getPartOfComputers(10, 550);
+			updateNumberComputer(req);
+			updateListComputers(req);
+			this.getServletContext().getRequestDispatcher(JSP_DASHBOARD).forward(req, resp);
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		System.out.println("On est la");
+	}
+
+	private void updateNumberComputer(HttpServletRequest req)
+			throws OpenException, MapperException, ExecuteQueryException {
+		int numComputers = DaoComputer.getInstance().getNumberOfComputer();
 		req.setAttribute("numComputers", numComputers);
+	}
+
+	private void updateListComputers(HttpServletRequest req)
+			throws OpenException, MapperException, ExecuteQueryException {
+		String search = getFieldSearch(req);
+		LinkedList<Computer> listComputers = null;
+		if (search == null || "".equals(search)) {
+			listComputers = DaoComputer.getInstance().getPartOfComputers(10, 550);
+		} else {
+			listComputers = DaoComputer.getInstance().getComputerByName(search);
+		}
 		req.setAttribute("listComputers", listComputers);
-		this.getServletContext().getRequestDispatcher(JSP_DASHBOARD).forward(req, resp);
+	}
+
+	private String getFieldSearch(HttpServletRequest req) {
+		return req.getParameter(NAME_SEARCH);
 	}
 
 }
