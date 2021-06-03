@@ -25,6 +25,7 @@ import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
+import com.excilys.cdb.model.Page;
 
 class CliTest {
 
@@ -112,7 +113,7 @@ class CliTest {
 		String userInput = "q";
 		changeNextLineController(userInput);
 
-		final int numElements = 10;
+		final int numElements = Page.getDefaultNumElement();
 		final int offset = 0;
 		DaoComputer mockDaoComputer = mock(DaoComputer.class);
 		LinkedList<Computer> listComputers = createListOfTenComputers();

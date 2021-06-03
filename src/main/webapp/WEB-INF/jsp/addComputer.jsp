@@ -1,4 +1,5 @@
 <%@ page pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -44,6 +45,9 @@
 								<label for="companyId">Company</label> <select
 									class="form-control" id="companyId" name="companyId">
 									<option value="0">--</option>
+									<c:forEach var="company" items="${ listCompanies }">
+										<option value=${ company.id }>${ company.id }</option>
+									</c:forEach>
 								</select>
 							</div>
 						</fieldset>

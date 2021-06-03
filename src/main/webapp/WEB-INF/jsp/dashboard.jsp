@@ -21,7 +21,7 @@
 
 	<section id="main">
 		<div class="container">
-			<h1 id="homeTitle">${ numComputers } Computers found</h1>
+			<h1 id="homeTitle">${ numComputers }Computersfound</h1>
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm" action="#" method="GET" class="form-inline">
@@ -100,9 +100,14 @@
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<button type="button" class="btn btn-default">10</button>
-				<button type="button" class="btn btn-default">50</button>
-				<button type="button" class="btn btn-default">100</button>
+				<form id="numComputerPage" action="#" method="GET">
+					<button type="submit" class="btn btn-default"
+						name="numComputerPage" value="10">10</button>
+					<button type="submit" class="btn btn-default"
+						name="numComputerPage" value="50">50</button>
+					<button type="submit" class="btn btn-default"
+						name="numComputerPage" value="100">100</button>
+				</form>
 			</div>
 	</footer>
 	<script src="././js/jquery.min.js"></script>

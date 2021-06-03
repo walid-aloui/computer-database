@@ -64,19 +64,23 @@ public class ControllerCli {
 	}
 
 	private void executeListComputers() throws OpenException, MapperException, ExecuteQueryException {
-		int numberOfComputer = DaoComputer.getInstance().getNumberOfComputer();
-		int totalPage = (int) Math.ceil((double) numberOfComputer / Page.getMAX_ELEMENT());
+		DaoComputer daoComputer = DaoComputer.getInstance();
+		int numberOfComputer = daoComputer.getNumberOfComputer();
+		int totalPage = (int) Math.ceil((double) numberOfComputer / Page.getDefaultNumElement());
 		int numPage = 1;
+		Page p = new PageBuilder().withNumPage(numPage).withTotalPage(totalPage).build();
 		while (true) {
-			Page p = new PageBuilder().withNumPage(numPage).withTotalPage(totalPage).build();
+			LinkedList<Computer> contenue = daoComputer.getPartOfComputers(Page.getDefaultNumElement(),
+					(p.getNumPage() - 1) * 10);
+			p.setContenue(contenue);
 			viewCli.showPage(p);
 			String choice = askPage(numPage, p.getTotalPage());
 			if ("q".equals(choice)) {
 				break;
 			} else if ("a".equals(choice)) {
-				numPage--;
+				p.setNumPage(p.getNumPage() - 1);
 			} else {
-				numPage++;
+				p.setNumPage(p.getNumPage() + 1);
 			}
 		}
 	}

@@ -2,6 +2,7 @@ package com.excilys.cdb.servlets;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
@@ -10,8 +11,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.excilys.cdb.daos.DaoCompany;
 import com.excilys.cdb.daos.DaoComputer;
+import com.excilys.cdb.exception.ExecuteQueryException;
+import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
+import com.excilys.cdb.model.Company;
 import com.excilys.cdb.utils.SecureInputs;
 
 @SuppressWarnings("serial")
@@ -30,7 +35,12 @@ public class AddComputerServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		this.getServletContext().getRequestDispatcher(JSP_ADD_COMPUTER).forward(req, resp);
+		try {
+			updateCompaniesId(req);
+			this.getServletContext().getRequestDispatcher(JSP_ADD_COMPUTER).forward(req, resp);
+		} catch (OpenException | MapperException | ExecuteQueryException e) {
+			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
+		}
 	}
 
 	@Override
@@ -45,6 +55,12 @@ public class AddComputerServlet extends HttpServlet {
 		} catch (OpenException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
+	}
+
+	private void updateCompaniesId(HttpServletRequest req)
+			throws OpenException, MapperException, ExecuteQueryException {
+		LinkedList<Company> listCompanies = DaoCompany.getInstance().getAllCompanies();
+		req.setAttribute("listCompanies", listCompanies);
 	}
 
 	private String getFieldComputerName(HttpServletRequest req) {

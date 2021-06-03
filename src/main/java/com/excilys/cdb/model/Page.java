@@ -2,22 +2,21 @@ package com.excilys.cdb.model;
 
 import java.util.LinkedList;
 
-import com.excilys.cdb.daos.DaoComputer;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
 
 public class Page {
 
+	private static final int DEFAULT_NUM_ELEMENT = 25;
 	private int numPage;
 	private final int totalPage;
-	private static final int MAX_ELEMENT = 10;
-	private final LinkedList<Computer> contenue;
+	private LinkedList<Computer> contenue;
 
 	private Page(PageBuilder pageBuilder) throws OpenException, ExecuteQueryException, MapperException {
 		this.numPage = pageBuilder.numPage;
 		this.totalPage = pageBuilder.totalPage;
-		this.contenue = DaoComputer.getInstance().getPartOfComputers(MAX_ELEMENT, (numPage - 1) * 10);
+		this.contenue = pageBuilder.contenue;
 	}
 
 	@Override
@@ -30,17 +29,30 @@ public class Page {
 		return res;
 	}
 
-	public static int getMAX_ELEMENT() {
-		return MAX_ELEMENT;
+	public static int getDefaultNumElement() {
+		return DEFAULT_NUM_ELEMENT;
+	}
+
+	public int getNumPage() {
+		return numPage;
+	}
+
+	public void setNumPage(int numPage) {
+		this.numPage = numPage;
 	}
 
 	public int getTotalPage() {
 		return totalPage;
 	}
 
+	public void setContenue(LinkedList<Computer> contenue) {
+		this.contenue = contenue;
+	}
+
 	public static class PageBuilder {
 		private int numPage;
 		private int totalPage;
+		private LinkedList<Computer> contenue;
 
 		public PageBuilder() {
 			super();
@@ -53,6 +65,11 @@ public class Page {
 
 		public PageBuilder withTotalPage(int totalPage) {
 			this.totalPage = totalPage;
+			return this;
+		}
+
+		public PageBuilder withContenue(LinkedList<Computer> contenue) {
+			this.contenue = contenue;
 			return this;
 		}
 

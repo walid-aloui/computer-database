@@ -14,6 +14,8 @@ import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Page;
+import com.excilys.cdb.model.Page.PageBuilder;
 
 @SuppressWarnings("serial")
 @WebServlet("/dashboard")
@@ -25,6 +27,7 @@ public class DashboardServlet extends HttpServlet {
 	private static final String ROUTE_DASHBOARD = "dashboard";
 
 	private static final String NAME_SEARCH = "search";
+	private static final String NUM_COMPUTER_PAGE = "numComputerPage";
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -50,18 +53,16 @@ public class DashboardServlet extends HttpServlet {
 
 	private void updateListComputers(HttpServletRequest req)
 			throws OpenException, MapperException, ExecuteQueryException {
-		String search = getFieldSearch(req);
+		String search = req.getParameter(NAME_SEARCH);
+		String numComputerPage = req.getParameter(NUM_COMPUTER_PAGE);
+		int n = (numComputerPage == null) ? Page.getDefaultNumElement() : Integer.parseInt(numComputerPage);
 		LinkedList<Computer> listComputers = null;
 		if (search == null || "".equals(search)) {
-			listComputers = DaoComputer.getInstance().getPartOfComputers(10, 550);
+			listComputers = DaoComputer.getInstance().getPartOfComputers(n, 500);
 		} else {
 			listComputers = DaoComputer.getInstance().getComputerByName(search);
 		}
 		req.setAttribute("listComputers", listComputers);
-	}
-
-	private String getFieldSearch(HttpServletRequest req) {
-		return req.getParameter(NAME_SEARCH);
 	}
 
 }
