@@ -12,11 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.cdb.daos.DaoCompany;
-import com.excilys.cdb.daos.DaoComputer;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Company.CompanyBuilder;
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Computer.ComputerBuilder;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.utils.SecureInputs;
 
 @SuppressWarnings("serial")
@@ -46,11 +49,14 @@ public class AddComputerServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String name = getFieldComputerName(req);
-		Optional<LocalDate> introduced = getFieldIntroduced(req);
-		Optional<LocalDate> discontinued = getFieldDiscontinued(req);
-		Optional<String> companyId = getFieldCompanyId(req);
+		LocalDate introduced = getFieldIntroduced(req).orElse(null);
+		LocalDate discontinued = getFieldDiscontinued(req).orElse(null);
+		int companyId = getFieldCompanyId(req);
+		Company company = new CompanyBuilder().withId(companyId).build();
+		Computer computer = new ComputerBuilder().withName(name).withIntroduced(introduced)
+				.withDiscontinued(discontinued).withCompany(company).build();
 		try {
-			DaoComputer.getInstance().insertComputer(name, introduced, discontinued, companyId);
+			ComputerService.getInstance().insertComputer(computer);
 			resp.sendRedirect(ROUTE_ADD_COMPUTER);
 		} catch (OpenException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
@@ -75,9 +81,8 @@ public class AddComputerServlet extends HttpServlet {
 		return SecureInputs.toLocalDate(req.getParameter(FIELD_DISCONTINUED));
 	}
 
-	private Optional<String> getFieldCompanyId(HttpServletRequest req) {
-		String companyId = req.getParameter(FIELD_COMPANY_ID);
-		return "0".equals(companyId) ? Optional.empty() : Optional.of(companyId);
+	private int getFieldCompanyId(HttpServletRequest req) {
+		return Integer.parseInt(req.getParameter(FIELD_COMPANY_ID));
 	}
 
 }

@@ -26,6 +26,8 @@ import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.model.Page;
+import com.excilys.cdb.service.CompanyService;
+import com.excilys.cdb.service.ComputerService;
 
 class CliTest {
 
@@ -42,7 +44,7 @@ class CliTest {
 
 	@AfterEach
 	void tearDown() throws Exception {
-		DaoCompany.setDaoCompany(null);
+		CompanyService.setCompanyService(null);
 		System.setIn(oldInputStream);
 		Scanner scanner = new Scanner(System.in);
 		cli.setSc(scanner);
@@ -89,16 +91,16 @@ class CliTest {
 		String choiceMenu = "1\n7";
 		changeNextLineCli(choiceMenu);
 
-		DaoCompany mockDaoCompany = mock(DaoCompany.class);
+		CompanyService mockCompanyService = mock(CompanyService.class);
 		LinkedList<Company> allCompanies = new LinkedList<Company>();
 		allCompanies.add(new CompanyBuilder().withId(1).withName("Company_one").build());
 		allCompanies.add(new CompanyBuilder().withId(2).withName("Company_two").build());
 		allCompanies.add(new CompanyBuilder().withId(3).withName("Company_three").build());
 		try {
-			when(mockDaoCompany.getAllCompanies()).thenReturn(allCompanies);
-			DaoCompany.setDaoCompany(mockDaoCompany);
+			when(mockCompanyService.getAllCompanies()).thenReturn(allCompanies);
+			CompanyService.setCompanyService(mockCompanyService);
 			cli.runCli();
-			verify(mockDaoCompany, times(1)).getAllCompanies();
+			verify(mockCompanyService, times(1)).getAllCompanies();
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -115,15 +117,15 @@ class CliTest {
 
 		final int numElements = Page.getDefaultNumElement();
 		final int offset = 0;
-		DaoComputer mockDaoComputer = mock(DaoComputer.class);
+		ComputerService mockComputerService = mock(ComputerService.class);
 		LinkedList<Computer> listComputers = createListOfTenComputers();
 		try {
-			when(mockDaoComputer.getPartOfComputers(numElements, offset)).thenReturn(listComputers);
-			when(mockDaoComputer.getNumberOfComputer()).thenReturn(numElements);
-			DaoComputer.setDaoComputer(mockDaoComputer);
+			when(mockComputerService.getPartOfComputers(numElements, offset)).thenReturn(listComputers);
+			when(mockComputerService.getNumberOfComputer()).thenReturn(numElements);
+			ComputerService.setComputerService(mockComputerService);
 			cli.runCli();
-			verify(mockDaoComputer, times(1)).getPartOfComputers(numElements, offset);
-			verify(mockDaoComputer, times(1)).getNumberOfComputer();
+			verify(mockComputerService, times(1)).getPartOfComputers(numElements, offset);
+			verify(mockComputerService, times(1)).getNumberOfComputer();
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -138,13 +140,13 @@ class CliTest {
 		int computerId = 1;
 		changeNextLineController(String.valueOf(computerId));
 
-		DaoComputer mockDaoComputer = mock(DaoComputer.class);
+		ComputerService mockComputerService = mock(ComputerService.class);
 		Computer computer = new ComputerBuilder().withId(computerId).withName("Computer_WR7").build();
 		try {
-			when(mockDaoComputer.getComputerById(computerId)).thenReturn(Optional.of(computer));
-			DaoComputer.setDaoComputer(mockDaoComputer);
+			when(mockComputerService.getComputerById(computerId)).thenReturn(Optional.of(computer));
+			ComputerService.setComputerService(mockComputerService);
 			cli.runCli();
-			verify(mockDaoComputer, times(1)).getComputerById(computerId);
+			verify(mockComputerService, times(1)).getComputerById(computerId);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -159,12 +161,12 @@ class CliTest {
 		int computerId = 999;
 		changeNextLineController(String.valueOf(computerId));
 
-		DaoComputer mockDaoComputer = mock(DaoComputer.class);
+		ComputerService mockComputerService = mock(ComputerService.class);
 		try {
-			when(mockDaoComputer.getComputerById(computerId)).thenReturn(Optional.empty());
-			DaoComputer.setDaoComputer(mockDaoComputer);
+			when(mockComputerService.getComputerById(computerId)).thenReturn(Optional.empty());
+			ComputerService.setComputerService(mockComputerService);
 			cli.runCli();
-			verify(mockDaoComputer, times(1)).getComputerById(computerId);
+			verify(mockComputerService, times(1)).getComputerById(computerId);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -185,15 +187,14 @@ class CliTest {
 		String userInputs = computerId + "\n" + name + "\n" + introduced + "\n" + discontinued + "\n" + company_id
 				+ "\n";
 		changeNextLineController(userInputs);
-
-		DaoComputer mockDaoComputer = mock(DaoComputer.class);
+		
+		Computer computer = new ComputerBuilder().withName(name).build();
+		ComputerService mockComputerService = mock(ComputerService.class);
 		try {
-			when(mockDaoComputer.updateComputerById(computerId, name, Optional.empty(), Optional.empty(),
-					Optional.empty())).thenReturn(1);
-			DaoComputer.setDaoComputer(mockDaoComputer);
+			when(mockComputerService.updateComputerById(computerId, computer)).thenReturn(1);
+			ComputerService.setComputerService(mockComputerService);
 			cli.runCli();
-			verify(mockDaoComputer, times(1)).updateComputerById(computerId, name, Optional.empty(), Optional.empty(),
-					Optional.empty());
+			verify(mockComputerService, times(1)).updateComputerById(computerId, computer);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -213,14 +214,13 @@ class CliTest {
 		String userInputs = name + "\n" + introduced + "\n" + discontinued + "\n" + company_id + "\n";
 		changeNextLineController(userInputs);
 
-		DaoComputer mockDaoComputer = mock(DaoComputer.class);
+		ComputerService mockComputerService = mock(ComputerService.class);
 		try {
-			when(mockDaoComputer.insertComputer(name, Optional.empty(), Optional.empty(), Optional.empty()))
-					.thenReturn(1);
-			DaoComputer.setDaoComputer(mockDaoComputer);
+			Computer computer = new ComputerBuilder().withName(name).build();
+			when(mockComputerService.insertComputer(computer)).thenReturn(1);
+			ComputerService.setComputerService(mockComputerService);
 			cli.runCli();
-			verify(mockDaoComputer, times(1)).insertComputer(name, Optional.empty(), Optional.empty(),
-					Optional.empty());
+			verify(mockComputerService, times(1)).insertComputer(computer);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -236,12 +236,12 @@ class CliTest {
 		int computerId = 1;
 		changeNextLineController(String.valueOf(computerId));
 
-		DaoComputer mockDaoComputer = mock(DaoComputer.class);
+		ComputerService mockComputerService = mock(ComputerService.class);
 		try {
-			when(mockDaoComputer.deleteComputerById(computerId)).thenReturn(1);
-			DaoComputer.setDaoComputer(mockDaoComputer);
+			when(mockComputerService.deleteComputerById(computerId)).thenReturn(1);
+			ComputerService.setComputerService(mockComputerService);
 			cli.runCli();
-			verify(mockDaoComputer, times(1)).deleteComputerById(computerId);
+			verify(mockComputerService, times(1)).deleteComputerById(computerId);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}

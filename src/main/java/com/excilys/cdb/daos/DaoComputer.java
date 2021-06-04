@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -53,10 +52,6 @@ public class DaoComputer {
 			daoComputer = new DaoComputer();
 		}
 		return daoComputer;
-	}
-
-	public static void setDaoComputer(DaoComputer daoComputer) {
-		DaoComputer.daoComputer = daoComputer;
 	}
 
 	private DaoComputer() {
@@ -115,27 +110,26 @@ public class DaoComputer {
 		}
 	}
 
-	public int updateComputerById(int id, String newName, Optional<LocalDate> newIntroduced,
-			Optional<LocalDate> newDiscontinued, Optional<String> newCompanyId) throws OpenException {
+	public int updateComputerById(int id, Computer computer) throws OpenException {
 		int numUpdate = 0;
 		Database db = Database.getInstance();
 		try (Connection con = db.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(UPDATE_BY_ID);) {
-			preparedStatement.setString(1, newName);
-			if (newIntroduced.isPresent()) {
-				preparedStatement.setString(2, newIntroduced.get().toString());
-			} else {
+			preparedStatement.setString(1, computer.getName());
+			if (computer.getIntroduced() == null) {
 				preparedStatement.setString(2, null);
-			}
-			if (newDiscontinued.isPresent()) {
-				preparedStatement.setString(3, newDiscontinued.get().toString());
 			} else {
+				preparedStatement.setString(2, computer.getIntroduced().toString());
+			}
+			if (computer.getDiscontinued() == null) {
 				preparedStatement.setString(3, null);
-			}
-			if (newCompanyId.isPresent()) {
-				preparedStatement.setString(4, newCompanyId.get());
 			} else {
+				preparedStatement.setString(3, computer.getDiscontinued().toString());
+			}
+			if (computer.getCompany() == null) {
 				preparedStatement.setString(4, null);
+			} else {
+				preparedStatement.setInt(4, computer.getCompany().getId());
 			}
 			preparedStatement.setInt(5, id);
 			numUpdate = preparedStatement.executeUpdate();
@@ -145,27 +139,26 @@ public class DaoComputer {
 		return numUpdate;
 	}
 
-	public int insertComputer(String name, Optional<LocalDate> introduced, Optional<LocalDate> discontinued,
-			Optional<String> company_id) throws OpenException {
+	public int insertComputer(Computer computer) throws OpenException {
 		int numInsert = 0;
 		Database db = Database.getInstance();
 		try (Connection con = db.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(INSERT);) {
-			preparedStatement.setString(1, name);
-			if (introduced.isPresent()) {
-				preparedStatement.setString(2, introduced.get().toString());
-			} else {
+			preparedStatement.setString(1, computer.getName());
+			if (computer.getIntroduced() == null) {
 				preparedStatement.setString(2, null);
-			}
-			if (discontinued.isPresent()) {
-				preparedStatement.setString(3, discontinued.get().toString());
 			} else {
+				preparedStatement.setString(2, computer.getIntroduced().toString());
+			}
+			if (computer.getDiscontinued() == null) {
 				preparedStatement.setString(3, null);
-			}
-			if (company_id.isPresent()) {
-				preparedStatement.setString(4, company_id.get());
 			} else {
+				preparedStatement.setString(3, computer.getDiscontinued().toString());
+			}
+			if (computer.getCompany() == null) {
 				preparedStatement.setString(4, null);
+			} else {
+				preparedStatement.setInt(4, computer.getCompany().getId());
 			}
 			numInsert = preparedStatement.executeUpdate();
 		} catch (SQLException e) {

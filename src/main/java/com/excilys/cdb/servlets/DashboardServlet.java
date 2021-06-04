@@ -15,7 +15,6 @@ import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
-import com.excilys.cdb.model.Page.PageBuilder;
 
 @SuppressWarnings("serial")
 @WebServlet("/dashboard")

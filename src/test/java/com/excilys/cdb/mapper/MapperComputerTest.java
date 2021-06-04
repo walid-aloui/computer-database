@@ -65,8 +65,7 @@ class MapperComputerTest {
 		assertEquals("WR7", computer.getName());
 		assertEquals(null, computer.getIntroduced());
 		assertEquals(null, computer.getDiscontinued());
-		assertEquals(0, computer.getCompany().getId());
-		assertEquals(null, computer.getCompany().getName());
+		assertEquals(null, computer.getCompany());
 		verify(mockResultSet, times(2)).next();
 		verify(mockResultSet, times(1)).getInt("computer.id");
 		verify(mockResultSet, times(1)).getString("computer.name");

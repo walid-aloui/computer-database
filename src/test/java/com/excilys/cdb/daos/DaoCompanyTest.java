@@ -34,8 +34,9 @@ class DaoCompanyTest {
 	@Test
 	void testGetAllCompaniesShouldReturnListOfCompanies() {
 		try {
+			int numCompanies = 42;
 			LinkedList<Company> allcompanies = DaoCompany.getInstance().getAllCompanies();
-			assertEquals(42, allcompanies.size());
+			assertEquals(numCompanies, allcompanies.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -44,9 +45,10 @@ class DaoCompanyTest {
 	@Test
 	void testGetCompanyByIdShouldReturnCompany() {
 		try {
-			Optional<Company> allcompanies = DaoCompany.getInstance().getCompanyById(1);
+			int id = 1;
+			Optional<Company> allcompanies = DaoCompany.getInstance().getCompanyById(id);
 			if (allcompanies.isPresent()) {
-				assertEquals(1, allcompanies.get().getId());
+				assertEquals(id, allcompanies.get().getId());
 			} else {
 				fail("Should not be empty");
 			}
@@ -58,7 +60,8 @@ class DaoCompanyTest {
 	@Test
 	void testGetCompanyByIdShouldNotReturnCompany() {
 		try {
-			Optional<Company> allcompanies = DaoCompany.getInstance().getCompanyById(999);
+			int falseId = 999;
+			Optional<Company> allcompanies = DaoCompany.getInstance().getCompanyById(falseId);
 			if (allcompanies.isPresent()) {
 				fail("Should be empty");
 			}

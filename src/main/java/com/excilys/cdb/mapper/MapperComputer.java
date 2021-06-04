@@ -37,7 +37,10 @@ public class MapperComputer {
 				}
 				int companyId = resultSet.getInt("company_id");
 				String companyName = resultSet.getString("company.name");
-				Company company = new CompanyBuilder().withId(companyId).withName(companyName).build();
+				Company company = null;
+				if(companyId != 0 && companyName != null) {
+					company = new CompanyBuilder().withId(companyId).withName(companyName).build();
+				}
 				computer.add(new ComputerBuilder().withId(id).withName(computerName).withIntroduced(introduced)
 						.withDiscontinued(discontinued).withCompany(company).build());
 			}

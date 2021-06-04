@@ -5,15 +5,17 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Scanner;
 
-import com.excilys.cdb.daos.DaoCompany;
-import com.excilys.cdb.daos.DaoComputer;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.model.Page;
 import com.excilys.cdb.model.Page.PageBuilder;
+import com.excilys.cdb.service.CompanyService;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.utils.SecureInputs;
 
 public class ControllerCli {
@@ -59,18 +61,18 @@ public class ControllerCli {
 	}
 
 	private void executeListCompanies() throws OpenException, MapperException, ExecuteQueryException {
-		LinkedList<Company> allCompanies = DaoCompany.getInstance().getAllCompanies();
+		LinkedList<Company> allCompanies = CompanyService.getInstance().getAllCompanies();
 		viewCli.showCompanies(allCompanies);
 	}
 
 	private void executeListComputers() throws OpenException, MapperException, ExecuteQueryException {
-		DaoComputer daoComputer = DaoComputer.getInstance();
-		int numberOfComputer = daoComputer.getNumberOfComputer();
+		ComputerService computerService = ComputerService.getInstance();
+		int numberOfComputer = computerService.getNumberOfComputer();
 		int totalPage = (int) Math.ceil((double) numberOfComputer / Page.getDefaultNumElement());
 		int numPage = 1;
 		Page p = new PageBuilder().withNumPage(numPage).withTotalPage(totalPage).build();
 		while (true) {
-			LinkedList<Computer> contenue = daoComputer.getPartOfComputers(Page.getDefaultNumElement(),
+			LinkedList<Computer> contenue = computerService.getPartOfComputers(Page.getDefaultNumElement(),
 					(p.getNumPage() - 1) * 10);
 			p.setContenue(contenue);
 			viewCli.showPage(p);
@@ -87,7 +89,7 @@ public class ControllerCli {
 
 	private void executeShowDetails() throws OpenException, MapperException, ExecuteQueryException {
 		int id = askComputerId();
-		Optional<Computer> c = DaoComputer.getInstance().getComputerById(id);
+		Optional<Computer> c = ComputerService.getInstance().getComputerById(id);
 		if (c.isPresent()) {
 			System.out.println(c.get());
 		} else {
@@ -98,20 +100,35 @@ public class ControllerCli {
 	private void executeUpdateComputer() throws OpenException {
 		int id = askComputerId();
 		String newName = askComputerName();
-		Optional<LocalDate> newIntroduced = askComputerIntroduced();
-		Optional<LocalDate> newDiscontinued = askComputerDiscontinued(newIntroduced);
-		Optional<String> newCompanyId = askCompanyId();
-		int numUpdate = DaoComputer.getInstance().updateComputerById(id, newName, newIntroduced, newDiscontinued,
-				newCompanyId);
+		LocalDate newIntroduced = askComputerIntroduced().orElse(null);
+		LocalDate newDiscontinued = askComputerDiscontinued(newIntroduced).orElse(null);
+		int newCompanyId = askCompanyId();
+
+		Company company = null;
+		if (newCompanyId != 0) {
+			company = new CompanyBuilder().withId(newCompanyId).build();
+		}
+		Computer computer = new ComputerBuilder().withName(newName).withIntroduced(newIntroduced)
+				.withDiscontinued(newDiscontinued).withCompany(company).build();
+
+		int numUpdate = ComputerService.getInstance().updateComputerById(id, computer);
 		System.out.println("Nombre de update : " + numUpdate);
 	}
 
 	private void executeInsertComputer() throws OpenException {
 		String name = askComputerName();
-		Optional<LocalDate> introduced = askComputerIntroduced();
-		Optional<LocalDate> discontinued = askComputerDiscontinued(introduced);
-		Optional<String> company_id = askCompanyId();
-		int numInsert = DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
+		LocalDate introduced = askComputerIntroduced().orElse(null);
+		LocalDate discontinued = askComputerDiscontinued(introduced).orElse(null);
+		int company_id = askCompanyId();
+
+		Company company = null;
+		if (company_id != 0) {
+			company = new CompanyBuilder().withId(company_id).build();
+		}
+		Computer computer = new ComputerBuilder().withName(name).withIntroduced(introduced)
+				.withDiscontinued(discontinued).withCompany(company).build();
+
+		int numInsert = ComputerService.getInstance().insertComputer(computer);
 		if (numInsert == 1) {
 			System.out.println("Insertion Reussie");
 		} else {
@@ -121,7 +138,7 @@ public class ControllerCli {
 
 	private void executeDeleteComputer() throws OpenException, ExecuteQueryException {
 		int id = askComputerId();
-		int numDelete = DaoComputer.getInstance().deleteComputerById(id);
+		int numDelete = ComputerService.getInstance().deleteComputerById(id);
 		System.out.println("Nombre de suppression : " + numDelete);
 	}
 
@@ -135,17 +152,17 @@ public class ControllerCli {
 		return Integer.parseInt(input);
 	}
 
-	private Optional<String> askCompanyId() {
+	private int askCompanyId() {
 		System.out.println("Veuillez entrer l'id du fabricant");
 		String input = sc.nextLine();
 		if ("".equals(input)) {
-			return Optional.empty();
+			return 0;
 		}
 		if (!SecureInputs.isInteger(input)) {
 			System.out.println("Veuillez entrer un entier !");
 			return askCompanyId();
 		}
-		return Optional.of(input);
+		return Integer.parseInt(input);
 	}
 
 	private String askComputerName() {
@@ -176,10 +193,10 @@ public class ControllerCli {
 		return askComputerDate();
 	}
 
-	private Optional<LocalDate> askComputerDiscontinued(Optional<LocalDate> introduced) {
+	private Optional<LocalDate> askComputerDiscontinued(LocalDate introduced) {
 		System.out.println("Veuillez entrer la date d'arret");
 		Optional<LocalDate> discontinued = askComputerDate();
-		if (!introduced.isPresent() || !discontinued.isPresent() || discontinued.get().isAfter(introduced.get())) {
+		if (introduced == null || !discontinued.isPresent() || discontinued.get().isAfter(introduced)) {
 			return discontinued;
 		}
 		System.out.println("La date d'arret doit etre plus grande que la date d'introduction !");

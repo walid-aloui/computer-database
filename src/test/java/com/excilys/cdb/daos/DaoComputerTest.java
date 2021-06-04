@@ -18,7 +18,10 @@ import org.junit.jupiter.api.Test;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.utils.SecureInputs;
 
 class DaoComputerTest {
@@ -34,29 +37,38 @@ class DaoComputerTest {
 		}
 	}
 
-	private int createWr7Computer() throws OpenException {
+	private Computer createWr7Computer() throws OpenException {
+		int id = 1;
 		String name = "Computer_WR7";
-		Optional<LocalDate> introduced = SecureInputs.toLocalDate(null);
-		Optional<LocalDate> discontinued = SecureInputs.toLocalDate(null);
-		Optional<String> company_id = Optional.empty();
-		return DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
+		Computer computer = new ComputerBuilder().withName(name).withId(id).build();
+		DaoComputer.getInstance().insertComputer(computer);
+		return computer;
 	}
 
-	private int createTestComputer() throws OpenException {
+	private Computer createTestComputer() throws OpenException {
+		int id = 2;
 		String name = "Computer_test";
-		Optional<LocalDate> introduced = SecureInputs.toLocalDate("2021-05-11");
-		Optional<LocalDate> discontinued = SecureInputs.toLocalDate("2022-05-11");
-		Optional<String> company_id = Optional.of("1");
-		return DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
+		LocalDate introduced = SecureInputs.toLocalDate("2021-05-11").orElse(null);
+		LocalDate discontinued = SecureInputs.toLocalDate("2022-05-11").orElse(null);
+		int company_id = 1;
+		String companyName = "Apple Inc.";
+
+		Company company = new CompanyBuilder().withId(company_id).withName(companyName).build();
+		Computer computer = new ComputerBuilder().withId(id).withName(name).withIntroduced(introduced)
+				.withDiscontinued(discontinued).withCompany(company).build();
+
+		DaoComputer.getInstance().insertComputer(computer);
+
+		return computer;
 	}
 
 	private void createComputers() {
 		DaoComputer daoComputer = DaoComputer.getInstance();
 		try {
 			for (int k = 0; k < 25; k++) {
-				daoComputer.insertComputer("test" + k, Optional.empty(), Optional.empty(), Optional.empty());
+				Computer computer = new ComputerBuilder().withName("test" + k).build();
+				daoComputer.insertComputer(computer);
 			}
-
 		} catch (OpenException e) {
 			fail("Should not throw an exception");
 		}
@@ -65,11 +77,8 @@ class DaoComputerTest {
 	@Test
 	void testGetAllComputersShouldReturnListOfComputers() {
 		try {
-			int numInsert1 = createWr7Computer();
-			assertEquals(1, numInsert1);
-
-			int numInsert2 = createTestComputer();
-			assertEquals(1, numInsert2);
+			createWr7Computer();
+			createTestComputer();
 
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
 			assertEquals(2, allComputers.size());
@@ -92,15 +101,12 @@ class DaoComputerTest {
 	void testGetComputerByIdShouldReturnComputer() {
 		try {
 			createWr7Computer();
-			createTestComputer();
+			Computer test = createTestComputer();
 
-			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(2);
+			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(test.getId());
 			if (computer.isPresent()) {
 				Computer c = computer.get();
-				assertEquals(2, c.getId());
-				assertEquals(SecureInputs.toLocalDate("2021-05-11").get(), c.getIntroduced());
-				assertEquals(SecureInputs.toLocalDate("2022-05-11").get(), c.getDiscontinued());
-				assertEquals(1, c.getCompany().getId());
+				assertEquals(test, c);
 			} else {
 				fail("Should not be empty");
 			}
@@ -114,8 +120,9 @@ class DaoComputerTest {
 		try {
 			createWr7Computer();
 			createTestComputer();
+			int falseId = 5;
 
-			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(5);
+			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(falseId);
 			if (computer.isPresent()) {
 				fail("Should be empty");
 			}
@@ -127,12 +134,13 @@ class DaoComputerTest {
 	@Test
 	void testGetComputerByNameShouldReturnListOfComputer() {
 		try {
-			createWr7Computer();
+			Computer wr7 = createWr7Computer();
 			createTestComputer();
 			String computerName = "Computer_WR7";
+
 			LinkedList<Computer> computers = DaoComputer.getInstance().getComputerByName(computerName);
 			assertEquals(1, computers.size());
-			assertEquals(computerName, computers.getFirst().getName());
+			assertEquals(wr7, computers.getFirst());
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
 			fail("Should not throw an exception");
 		}
@@ -143,7 +151,9 @@ class DaoComputerTest {
 		try {
 			createWr7Computer();
 			createTestComputer();
-			LinkedList<Computer> computers = DaoComputer.getInstance().getComputerByName("false_name");
+			String computerName = "false_name";
+
+			LinkedList<Computer> computers = DaoComputer.getInstance().getComputerByName(computerName);
 			assertEquals(0, computers.size());
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
 			fail("Should not throw an exception");
@@ -155,9 +165,10 @@ class DaoComputerTest {
 		try {
 			createWr7Computer();
 			createTestComputer();
+			int id = 1;
 
-			int numDelete = DaoComputer.getInstance().deleteComputerById(1);
-			assertEquals(1, numDelete);
+			int numDelete = DaoComputer.getInstance().deleteComputerById(id);
+			assertEquals(id, numDelete);
 
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
 			assertEquals(1, allComputers.size());
@@ -171,8 +182,9 @@ class DaoComputerTest {
 		try {
 			createWr7Computer();
 			createTestComputer();
+			int falseId = 5;
 
-			int numDelete = DaoComputer.getInstance().deleteComputerById(5);
+			int numDelete = DaoComputer.getInstance().deleteComputerById(falseId);
 			assertEquals(0, numDelete);
 
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
@@ -186,10 +198,12 @@ class DaoComputerTest {
 	void testInsertComputerShouldNotInsertComputer() {
 		try {
 			String name = "Computer_WR7";
-			Optional<LocalDate> introduced = SecureInputs.toLocalDate(null);
-			Optional<LocalDate> discontinued = SecureInputs.toLocalDate(null);
-			Optional<String> company_id = Optional.of("999");
-			int numInsert = DaoComputer.getInstance().insertComputer(name, introduced, discontinued, company_id);
+			int company_id = 999;
+
+			Company company = new CompanyBuilder().withId(company_id).build();
+			Computer computer = new ComputerBuilder().withName(name).withCompany(company).build();
+
+			int numInsert = DaoComputer.getInstance().insertComputer(computer);
 			assertEquals(0, numInsert);
 
 			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
@@ -202,21 +216,19 @@ class DaoComputerTest {
 	@Test
 	void testUpdateComputerByIdShouldUpdateComputer() {
 		try {
-			createWr7Computer();
-			String newName = "test";
-			Optional<LocalDate> newIntroduced = SecureInputs.toLocalDate("2021-05-11");
-			Optional<LocalDate> newDiscontinued = SecureInputs.toLocalDate("2022-05-11");
-			Optional<String> newCompanyId = Optional.of("1");
-			int numUpdate = DaoComputer.getInstance().updateComputerById(1, newName, newIntroduced, newDiscontinued,
-					newCompanyId);
+			Computer wr7 = createWr7Computer();
+			Computer test = createTestComputer();
+
+			int numUpdate = DaoComputer.getInstance().updateComputerById(wr7.getId(), test);
 			assertEquals(1, numUpdate);
 
-			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(1);
+			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(wr7.getId());
 			if (computer.isPresent()) {
-				assertEquals(newName, computer.get().getName());
-				assertEquals(newIntroduced.get(), computer.get().getIntroduced());
-				assertEquals(newDiscontinued.get(), computer.get().getDiscontinued());
-				assertEquals(1, computer.get().getCompany().getId());
+				Computer computerUpdate = new ComputerBuilder().withId(wr7.getId()).withName(test.getName())
+						.withIntroduced(test.getIntroduced()).withDiscontinued(test.getDiscontinued())
+						.withCompany(test.getCompany()).build();
+
+				assertEquals(computerUpdate, computer.get());
 			} else {
 				fail("Should not be empty");
 			}
@@ -229,13 +241,19 @@ class DaoComputerTest {
 	void testUpdateComputerByIdShouldNotUpdateComputer() {
 		try {
 			createWr7Computer();
-			createTestComputer();
-			int numUpdate = DaoComputer.getInstance().updateComputerById(5, "test", Optional.empty(), Optional.empty(),
-					Optional.empty());
+			Computer test = createTestComputer();
+			int falseId = 5;
+
+			int numUpdate = DaoComputer.getInstance().updateComputerById(falseId, test);
 			assertEquals(0, numUpdate);
 
-			int numUpdate2 = DaoComputer.getInstance().updateComputerById(1, "test", Optional.empty(), Optional.empty(),
-					Optional.of("999"));
+			int falseCompanyId = 999;
+			Company falseCompany = new CompanyBuilder().withId(falseCompanyId).build();
+			Computer computer = new ComputerBuilder().withId(test.getId()).withName(test.getName())
+					.withIntroduced(test.getIntroduced()).withDiscontinued(test.getDiscontinued())
+					.withCompany(falseCompany).build();
+
+			int numUpdate2 = DaoComputer.getInstance().updateComputerById(1, computer);
 			assertEquals(0, numUpdate2);
 		} catch (OpenException e) {
 			fail("Should not throw an exception");
