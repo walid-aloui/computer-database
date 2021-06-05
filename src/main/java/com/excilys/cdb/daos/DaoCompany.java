@@ -38,7 +38,7 @@ public class DaoCompany {
 		try (Connection con = db.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(GET_ALL);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			LinkedList<Company> allCompanies = MapperCompany.mapToCompany(resultSet);
+			LinkedList<Company> allCompanies = MapperCompany.getInstance().fromResultSetToCompany(resultSet);
 			return allCompanies;
 		} catch (SQLException e) {
 			LOGGER.error("Echec getAllCompanies", e);
@@ -52,7 +52,7 @@ public class DaoCompany {
 				PreparedStatement preparedStatement = con.prepareStatement(GET_BY_ID);) {
 			preparedStatement.setInt(1, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			LinkedList<Company> company = MapperCompany.mapToCompany(resultSet);
+			LinkedList<Company> company = MapperCompany.getInstance().fromResultSetToCompany(resultSet);
 			if (company.isEmpty()) {
 				return Optional.empty();
 			}

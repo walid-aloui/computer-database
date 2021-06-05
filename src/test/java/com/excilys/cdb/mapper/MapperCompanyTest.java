@@ -24,7 +24,7 @@ class MapperCompanyTest {
 			when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 			when(mockResultSet.getInt("id")).thenReturn(1);
 			when(mockResultSet.getString("name")).thenReturn("WR7");
-			LinkedList<Company> company = MapperCompany.mapToCompany(mockResultSet);
+			LinkedList<Company> company = MapperCompany.getInstance().fromResultSetToCompany(mockResultSet);
 			assertEquals(1, company.size());
 			assertEquals(1, company.getFirst().getId());
 			assertEquals("WR7", company.getFirst().getName());
@@ -41,7 +41,7 @@ class MapperCompanyTest {
 		ResultSet mockResultSet = mock(ResultSet.class);
 		try {
 			when(mockResultSet.next()).thenReturn(false);
-			LinkedList<Company> company = MapperCompany.mapToCompany(mockResultSet);
+			LinkedList<Company> company = MapperCompany.getInstance().fromResultSetToCompany(mockResultSet);
 			assertEquals(0, company.size());
 			verify(mockResultSet, times(1)).next();
 		} catch (SQLException | MapperException e) {
@@ -52,7 +52,7 @@ class MapperCompanyTest {
 	@Test
 	void testMapToCompanyShouldThrowAnException() {
 		assertThrows(MapperException.class, () -> {
-			MapperCompany.mapToCompany(null);
+			MapperCompany.getInstance().fromResultSetToCompany(null);
 		});
 	}
 
