@@ -21,7 +21,7 @@
 
 	<section id="main">
 		<div class="container">
-			<h1 id="homeTitle">${ numComputers }Computersfound</h1>
+			<h1 id="homeTitle">${ numComputers } Computers found</h1>
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm" action="#" method="GET" class="form-inline">
@@ -69,14 +69,14 @@
 				</thead>
 				<!-- Browse attribute computers -->
 				<tbody id="results">
-					<c:forEach var="computer" items="${ listComputers }">
+					<c:forEach var="computerDto" items="${ listDtoComputers }">
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
 								class="cb" value="0"></td>
-							<td><a href="editComputer.html" onclick="">${ computer.name }</a></td>
-							<td>${ computer.introduced }</td>
-							<td>${ computer.discontinued }</td>
-							<td>${ computer.company.name }</td>
+							<td><a href="editComputer.html" onclick="">${ computerDto.name }</a></td>
+							<td>${ computerDto.introduced }</td>
+							<td>${ computerDto.discontinued }</td>
+							<td>${ computerDto.companyId }</td>
 						</tr>
 					</c:forEach>
 				</tbody>

@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,30 +90,47 @@ public class MapperComputer {
 
 	public Computer fromComputerDtoToComputer(ComputerDto computerDto) throws MapperException {
 		if (ValidatorComputerDto.getInstance().isValid(computerDto)) {
-			Company company = new CompanyBuilder()
-					.withId(Integer.parseInt(computerDto.getCompanyId()))
-					.build();
+			Company company = null;
+			int companyId = Integer.parseInt(computerDto.getCompanyId());
+			if (companyId != 0) {
+				company = new CompanyBuilder()
+						.withId(companyId)
+						.build();
+			}
 			return new ComputerBuilder()
 					.withId(Integer.parseInt(computerDto.getId()))
 					.withName(computerDto.getName())
-					.withIntroduced(SecureInputs.toLocalDate(computerDto.getIntroduced()).get())
-					.withDiscontinued(SecureInputs.toLocalDate(computerDto.getDiscontinued()).get())
+					.withIntroduced(SecureInputs.toLocalDate(computerDto.getIntroduced()).orElse(null))
+					.withDiscontinued(SecureInputs.toLocalDate(computerDto.getDiscontinued()).orElse(null))
 					.withCompany(company)
 					.build();
 		}
 		LOGGER.error("Echec fromComputerDtoToComputer : ComputerDto pas valide");
 		throw new MapperException();
 	}
-	
+
 	public ComputerDto fromComputerToComputerDto(Computer computer) {
-		String companyId = (computer.getCompany() == null) ? "0" : String.valueOf(computer.getCompany().getId());
-		return  new ComputerDtoBuilder()
+		ComputerDtoBuilder computerDtoBuilder = new ComputerDtoBuilder()
 				.withId(String.valueOf(computer.getId()))
-				.withName(computer.getName())
-				.withIntroduced(computer.getIntroduced().toString())
-				.withDiscontinued(computer.getDiscontinued().toString())
-				.withCompanyId(companyId)
-				.build();
+				.withName(computer.getName());
+		if (computer.getIntroduced() != null) {
+			computerDtoBuilder.withIntroduced(computer.getIntroduced().toString());
+		}
+		if (computer.getDiscontinued() != null) {
+			computerDtoBuilder.withDiscontinued(computer.getDiscontinued().toString());
+		}
+		if (computer.getCompany() == null) {
+			computerDtoBuilder.withCompanyId("0");
+		} else {
+			computerDtoBuilder.withCompanyId(String.valueOf(computer.getCompany().getId()));
+		}
+		return computerDtoBuilder.build();
+	}
+
+	public LinkedList<ComputerDto> fromComputerListToComputerDtoList(LinkedList<Computer> computers) {
+		return computers.stream()
+				.map(computer -> fromComputerToComputerDto(computer))
+				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
 }

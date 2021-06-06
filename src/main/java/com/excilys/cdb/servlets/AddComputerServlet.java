@@ -1,9 +1,7 @@
 package com.excilys.cdb.servlets;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.LinkedList;
-import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,16 +9,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.excilys.cdb.daos.DaoCompany;
+import com.excilys.cdb.dtos.CompanyDto;
+import com.excilys.cdb.dtos.ComputerDto;
+import com.excilys.cdb.dtos.ComputerDto.ComputerDtoBuilder;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
+import com.excilys.cdb.mapper.MapperCompany;
+import com.excilys.cdb.mapper.MapperComputer;
 import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.model.Computer.ComputerBuilder;
+import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.utils.SecureInputs;
+
 
 @SuppressWarnings("serial")
 @WebServlet("/addComputer")
@@ -48,41 +49,35 @@ public class AddComputerServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String name = getFieldComputerName(req);
-		LocalDate introduced = getFieldIntroduced(req).orElse(null);
-		LocalDate discontinued = getFieldDiscontinued(req).orElse(null);
-		int companyId = getFieldCompanyId(req);
-		Company company = new CompanyBuilder().withId(companyId).build();
-		Computer computer = new ComputerBuilder().withName(name).withIntroduced(introduced)
-				.withDiscontinued(discontinued).withCompany(company).build();
+		ComputerService computerService = ComputerService.getInstance();
+		MapperComputer mapperComputer = MapperComputer.getInstance();
+		ComputerDto computerDto = new ComputerDtoBuilder()
+				.withId("0")
+				.withName(req.getParameter(FIELD_NAME))
+				.withIntroduced(req.getParameter(FIELD_INTRODUCED))
+				.withDiscontinued(req.getParameter(FIELD_DISCONTINUED))
+				.withCompanyId(req.getParameter(FIELD_COMPANY_ID))
+				.build();
 		try {
-			ComputerService.getInstance().insertComputer(computer);
+			System.out.println(req.getParameter(FIELD_NAME));
+			System.out.println(req.getParameter(FIELD_INTRODUCED));
+			System.out.println(req.getParameter(FIELD_DISCONTINUED));
+			System.out.println(req.getParameter(FIELD_COMPANY_ID));
+			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
+			computerService.insertComputer(computer);
 			resp.sendRedirect(ROUTE_ADD_COMPUTER);
-		} catch (OpenException e) {
+		} catch (MapperException | OpenException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
 	}
 
 	private void updateCompaniesId(HttpServletRequest req)
 			throws OpenException, MapperException, ExecuteQueryException {
-		LinkedList<Company> listCompanies = DaoCompany.getInstance().getAllCompanies();
-		req.setAttribute("listCompanies", listCompanies);
-	}
-
-	private String getFieldComputerName(HttpServletRequest req) {
-		return req.getParameter(FIELD_NAME);
-	}
-
-	private Optional<LocalDate> getFieldIntroduced(HttpServletRequest req) {
-		return SecureInputs.toLocalDate(req.getParameter(FIELD_INTRODUCED));
-	}
-
-	private Optional<LocalDate> getFieldDiscontinued(HttpServletRequest req) {
-		return SecureInputs.toLocalDate(req.getParameter(FIELD_DISCONTINUED));
-	}
-
-	private int getFieldCompanyId(HttpServletRequest req) {
-		return Integer.parseInt(req.getParameter(FIELD_COMPANY_ID));
+		CompanyService companyService = CompanyService.getInstance();
+		MapperCompany mapperCompany = MapperCompany.getInstance();
+		LinkedList<Company> listCompanies = companyService.getAllCompanies();
+		LinkedList<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
+		req.setAttribute("listDtoCompanies", listDtoCompanies);
 	}
 
 }

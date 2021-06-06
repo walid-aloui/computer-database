@@ -3,10 +3,13 @@ package com.excilys.cdb.mapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.dtos.CompanyDto;
+import com.excilys.cdb.dtos.CompanyDto.CompanyDtoBuilder;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
@@ -43,6 +46,19 @@ public class MapperCompany {
 			throw new MapperException();
 		}
 		return company;
+	}
+
+	public CompanyDto fromCompanyToCompanyDto(Company company) {
+		return new CompanyDtoBuilder()
+				.withId(String.valueOf(company.getId()))
+				.withName(company.getName())
+				.build();
+	}
+
+	public LinkedList<CompanyDto> fromCompanyListToCompanyDtoList(LinkedList<Company> companies) {
+		return companies.stream()
+				.map(company -> fromCompanyToCompanyDto(company))
+				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
 }

@@ -9,12 +9,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.excilys.cdb.daos.DaoComputer;
+import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
+import com.excilys.cdb.mapper.MapperComputer;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
+import com.excilys.cdb.service.ComputerService;
 
 @SuppressWarnings("serial")
 @WebServlet("/dashboard")
@@ -46,22 +48,25 @@ public class DashboardServlet extends HttpServlet {
 
 	private void updateNumberComputer(HttpServletRequest req)
 			throws OpenException, MapperException, ExecuteQueryException {
-		int numComputers = DaoComputer.getInstance().getNumberOfComputer();
+		int numComputers = ComputerService.getInstance().getNumberOfComputer();
 		req.setAttribute("numComputers", numComputers);
 	}
 
 	private void updateListComputers(HttpServletRequest req)
 			throws OpenException, MapperException, ExecuteQueryException {
+		ComputerService computerService = ComputerService.getInstance();
+		MapperComputer mapperComputer = MapperComputer.getInstance();
 		String search = req.getParameter(NAME_SEARCH);
 		String numComputerPage = req.getParameter(NUM_COMPUTER_PAGE);
 		int n = (numComputerPage == null) ? Page.getDefaultNumElement() : Integer.parseInt(numComputerPage);
-		LinkedList<Computer> listComputers = null;
+		LinkedList<Computer> computers = null;
 		if (search == null || "".equals(search)) {
-			listComputers = DaoComputer.getInstance().getPartOfComputers(n, 500);
+			computers = computerService.getPartOfComputers(n, 500);
 		} else {
-			listComputers = DaoComputer.getInstance().getComputerByName(search);
+			computers = computerService.getComputerByName(search);
 		}
-		req.setAttribute("listComputers", listComputers);
+		LinkedList<ComputerDto> listDtoComputers = mapperComputer.fromComputerListToComputerDtoList(computers);
+		req.setAttribute("listDtoComputers", listDtoComputers);
 	}
 
 }

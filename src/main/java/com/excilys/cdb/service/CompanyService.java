@@ -35,4 +35,5 @@ public class CompanyService {
 	public Optional<Company> getCompanyById(int id) throws OpenException, MapperException, ExecuteQueryException {
 		return DaoCompany.getInstance().getCompanyById(id);
 	}
+
 }

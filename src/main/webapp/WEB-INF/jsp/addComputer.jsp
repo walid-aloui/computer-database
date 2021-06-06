@@ -45,8 +45,8 @@
 								<label for="companyId">Company</label> <select
 									class="form-control" id="companyId" name="companyId">
 									<option value="0">--</option>
-									<c:forEach var="company" items="${ listCompanies }">
-										<option value=${ company.id }>${ company.id }</option>
+									<c:forEach var="companyDto" items="${ listDtoCompanies }">
+										<option value=${ companyDto.id }>${ companyDto.id }</option>
 									</c:forEach>
 								</select>
 							</div>
