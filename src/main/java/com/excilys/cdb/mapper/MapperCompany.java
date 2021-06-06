@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.dtos.CompanyDto;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
@@ -44,10 +43,6 @@ public class MapperCompany {
 			throw new MapperException();
 		}
 		return company;
-	}
-
-	public Company fromCompanyDtoToCompany(CompanyDto companyDto) {
-		return null;
 	}
 
 }

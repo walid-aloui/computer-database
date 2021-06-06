@@ -62,7 +62,7 @@ public class DaoComputer {
 		try (Connection con = db.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(GET_ALL);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToComputer(resultSet);
+			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getAllComputers", e);
 			throw new ExecuteQueryException();
@@ -76,7 +76,7 @@ public class DaoComputer {
 				PreparedStatement preparedStatement = con.prepareStatement(GET_BY_ID);) {
 			preparedStatement.setInt(1, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			LinkedList<Computer> computer = MapperComputer.getInstance().fromResultSetToComputer(resultSet);
+			LinkedList<Computer> computer = MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
 			return (computer.isEmpty()) ? Optional.empty() : Optional.of(computer.getFirst());
 		} catch (SQLException e) {
 			LOGGER.error("Echec getComputerById", e);
@@ -91,7 +91,7 @@ public class DaoComputer {
 				PreparedStatement preparedStatement = con.prepareStatement(GET_BY_NAME);) {
 			preparedStatement.setString(1, computerName);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToComputer(resultSet);
+			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getComputerByName", e);
 			throw new ExecuteQueryException();
@@ -175,7 +175,7 @@ public class DaoComputer {
 			preparedStatement.setInt(1, offset);
 			preparedStatement.setInt(2, n);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToComputer(resultSet);
+			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getPartOfComputers", e);
 			throw new ExecuteQueryException();

@@ -10,11 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.dtos.ComputerDto;
+import com.excilys.cdb.dtos.ComputerDto.ComputerDtoBuilder;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
+import com.excilys.cdb.utils.SecureInputs;
+import com.excilys.cdb.validator.ValidatorComputerDto;
 
 public class MapperComputer {
 
@@ -32,7 +35,7 @@ public class MapperComputer {
 		super();
 	}
 
-	public LinkedList<Computer> fromResultSetToComputer(ResultSet resultSet) throws MapperException {
+	public LinkedList<Computer> fromResultSetToComputerList(ResultSet resultSet) throws MapperException {
 		LinkedList<Computer> computer = new LinkedList<Computer>();
 		try {
 			while (resultSet.next()) {
@@ -84,8 +87,32 @@ public class MapperComputer {
 		}
 	}
 
-	public Computer fromComputerDtoToComputer(ComputerDto computerDto) {
-		return null;
+	public Computer fromComputerDtoToComputer(ComputerDto computerDto) throws MapperException {
+		if (ValidatorComputerDto.getInstance().isValid(computerDto)) {
+			Company company = new CompanyBuilder()
+					.withId(Integer.parseInt(computerDto.getCompanyId()))
+					.build();
+			return new ComputerBuilder()
+					.withId(Integer.parseInt(computerDto.getId()))
+					.withName(computerDto.getName())
+					.withIntroduced(SecureInputs.toLocalDate(computerDto.getIntroduced()).get())
+					.withDiscontinued(SecureInputs.toLocalDate(computerDto.getDiscontinued()).get())
+					.withCompany(company)
+					.build();
+		}
+		LOGGER.error("Echec fromComputerDtoToComputer : ComputerDto pas valide");
+		throw new MapperException();
+	}
+	
+	public ComputerDto fromComputerToComputerDto(Computer computer) {
+		String companyId = (computer.getCompany() == null) ? "0" : String.valueOf(computer.getCompany().getId());
+		return  new ComputerDtoBuilder()
+				.withId(String.valueOf(computer.getId()))
+				.withName(computer.getName())
+				.withIntroduced(computer.getIntroduced().toString())
+				.withDiscontinued(computer.getDiscontinued().toString())
+				.withCompanyId(companyId)
+				.build();
 	}
 
 }
