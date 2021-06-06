@@ -44,7 +44,7 @@ public class ValidatorComputerDto {
 		if ("".equals(introduced) || "".equals(discontinued)) {
 			return true;
 		}
-		return SecureInputs.toLocalDate(introduced).get().isAfter(SecureInputs.toLocalDate(discontinued).get());
+		return SecureInputs.toLocalDate(discontinued).get().isAfter(SecureInputs.toLocalDate(introduced).get());
 
 	}
 

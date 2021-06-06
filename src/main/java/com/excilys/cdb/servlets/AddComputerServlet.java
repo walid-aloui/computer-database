@@ -59,10 +59,6 @@ public class AddComputerServlet extends HttpServlet {
 				.withCompanyId(req.getParameter(FIELD_COMPANY_ID))
 				.build();
 		try {
-			System.out.println(req.getParameter(FIELD_NAME));
-			System.out.println(req.getParameter(FIELD_INTRODUCED));
-			System.out.println(req.getParameter(FIELD_DISCONTINUED));
-			System.out.println(req.getParameter(FIELD_COMPANY_ID));
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
 			computerService.insertComputer(computer);
 			resp.sendRedirect(ROUTE_ADD_COMPUTER);
