@@ -52,7 +52,6 @@ public class AddComputerServlet extends HttpServlet {
 		ComputerService computerService = ComputerService.getInstance();
 		MapperComputer mapperComputer = MapperComputer.getInstance();
 		ComputerDto computerDto = new ComputerDtoBuilder()
-				.withId("0")
 				.withName(req.getParameter(FIELD_NAME))
 				.withIntroduced(req.getParameter(FIELD_INTRODUCED))
 				.withDiscontinued(req.getParameter(FIELD_DISCONTINUED))
@@ -73,7 +72,7 @@ public class AddComputerServlet extends HttpServlet {
 		MapperCompany mapperCompany = MapperCompany.getInstance();
 		LinkedList<Company> listCompanies = companyService.getAllCompanies();
 		LinkedList<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
-		req.setAttribute("listDtoCompanies", listDtoCompanies);
+		req.setAttribute("listCompanies", listDtoCompanies);
 	}
 
 }

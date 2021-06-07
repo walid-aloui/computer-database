@@ -46,6 +46,12 @@ public class DaoComputer {
 											+ "left join company "
 											+ "on company_id = company.id "
 											+ "where computer.name = ?";
+	private static final String GET_PART_BY_NAME = "select computer.id,computer.name,introduced,discontinued,company_id,company.name "
+											+ "from computer "
+											+ "left join company "
+											+ "on company_id = company.id "
+											+ "where computer.name = ?"
+											+ "LIMIT ?,?";
 
 	public static DaoComputer getInstance() {
 		if (daoComputer == null) {
@@ -94,6 +100,49 @@ public class DaoComputer {
 			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getComputerByName", e);
+			throw new ExecuteQueryException();
+		}
+	}
+	
+	public LinkedList<Computer> getPartOfComputers(int n, int offset)
+			throws OpenException, MapperException, ExecuteQueryException {
+		Database db = Database.getInstance();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(GET_PART);) {
+			preparedStatement.setInt(1, offset);
+			preparedStatement.setInt(2, n);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
+		} catch (SQLException e) {
+			LOGGER.error("Echec getPartOfComputers", e);
+			throw new ExecuteQueryException();
+		}
+	}
+	
+	public LinkedList<Computer> getPartOfComputersByName(String name, int n, int offset)
+			throws OpenException, MapperException, ExecuteQueryException {
+		Database db = Database.getInstance();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(GET_PART_BY_NAME);) {
+			preparedStatement.setString(1, name);
+			preparedStatement.setInt(2, offset);
+			preparedStatement.setInt(3, n);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
+		} catch (SQLException e) {
+			LOGGER.error("Echec getComputerByName", e);
+			throw new ExecuteQueryException();
+		}
+	}
+
+	public int getNumberOfComputer() throws OpenException, MapperException, ExecuteQueryException {
+		Database db = Database.getInstance();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(GET_NUMBER);) {
+			ResultSet resultSet = preparedStatement.executeQuery();
+			return MapperComputer.getInstance().fromResultSetToInt(resultSet);
+		} catch (SQLException e) {
+			LOGGER.error("Echec getNumberOfComputer", e);
 			throw new ExecuteQueryException();
 		}
 	}
@@ -165,33 +214,6 @@ public class DaoComputer {
 			System.out.println("Id du fabricant non existant !");
 		}
 		return numInsert;
-	}
-
-	public LinkedList<Computer> getPartOfComputers(int n, int offset)
-			throws OpenException, MapperException, ExecuteQueryException {
-		Database db = Database.getInstance();
-		try (Connection con = db.openConnection();
-				PreparedStatement preparedStatement = con.prepareStatement(GET_PART);) {
-			preparedStatement.setInt(1, offset);
-			preparedStatement.setInt(2, n);
-			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
-		} catch (SQLException e) {
-			LOGGER.error("Echec getPartOfComputers", e);
-			throw new ExecuteQueryException();
-		}
-	}
-
-	public int getNumberOfComputer() throws OpenException, MapperException, ExecuteQueryException {
-		Database db = Database.getInstance();
-		try (Connection con = db.openConnection();
-				PreparedStatement preparedStatement = con.prepareStatement(GET_NUMBER);) {
-			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToInt(resultSet);
-		} catch (SQLException e) {
-			LOGGER.error("Echec getNumberOfComputer", e);
-			throw new ExecuteQueryException();
-		}
 	}
 
 }

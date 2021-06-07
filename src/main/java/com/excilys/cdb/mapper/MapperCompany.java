@@ -48,9 +48,9 @@ public class MapperCompany {
 		return company;
 	}
 
-	public CompanyDto fromCompanyToCompanyDto(Company company) {
+	private CompanyDto fromCompanyToCompanyDto(Company company) {
 		return new CompanyDtoBuilder()
-				.withId(String.valueOf(company.getId()))
+				.withId(company.getId())
 				.withName(company.getName())
 				.build();
 	}

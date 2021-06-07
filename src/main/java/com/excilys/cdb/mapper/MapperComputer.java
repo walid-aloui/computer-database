@@ -98,7 +98,7 @@ public class MapperComputer {
 						.build();
 			}
 			return new ComputerBuilder()
-					.withId(Integer.parseInt(computerDto.getId()))
+					.withId(computerDto.getId())
 					.withName(computerDto.getName())
 					.withIntroduced(SecureInputs.toLocalDate(computerDto.getIntroduced()).orElse(null))
 					.withDiscontinued(SecureInputs.toLocalDate(computerDto.getDiscontinued()).orElse(null))
@@ -109,9 +109,9 @@ public class MapperComputer {
 		throw new MapperException();
 	}
 
-	public ComputerDto fromComputerToComputerDto(Computer computer) {
+	private ComputerDto fromComputerToComputerDto(Computer computer) {
 		ComputerDtoBuilder computerDtoBuilder = new ComputerDtoBuilder()
-				.withId(String.valueOf(computer.getId()))
+				.withId(computer.getId())
 				.withName(computer.getName());
 		if (computer.getIntroduced() != null) {
 			computerDtoBuilder.withIntroduced(computer.getIntroduced().toString());

@@ -3,7 +3,6 @@ package com.excilys.cdb.ui;
 import java.util.LinkedList;
 
 import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
 
 public class ViewCli {
@@ -21,12 +20,6 @@ public class ViewCli {
 
 	void showCompanies(LinkedList<Company> companies) {
 		for (Company c : companies) {
-			System.out.println(c);
-		}
-	}
-
-	void showComputers(LinkedList<Computer> computers) {
-		for (Computer c : computers) {
 			System.out.println(c);
 		}
 	}

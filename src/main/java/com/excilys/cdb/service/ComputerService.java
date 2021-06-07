@@ -41,6 +41,20 @@ public class ComputerService {
 		return DaoComputer.getInstance().getComputerByName(computerName);
 	}
 
+	public LinkedList<Computer> getPartOfComputers(int n, int offset)
+			throws OpenException, MapperException, ExecuteQueryException {
+		return DaoComputer.getInstance().getPartOfComputers(n, offset);
+	}
+
+	public LinkedList<Computer> getPartOfComputersByName(String name, int n, int offset)
+			throws OpenException, MapperException, ExecuteQueryException {
+		return DaoComputer.getInstance().getPartOfComputersByName(name, n, offset);
+	}
+
+	public int getNumberOfComputer() throws OpenException, MapperException, ExecuteQueryException {
+		return DaoComputer.getInstance().getNumberOfComputer();
+	}
+
 	public int deleteComputerById(int id) throws OpenException, ExecuteQueryException {
 		return DaoComputer.getInstance().deleteComputerById(id);
 	}
@@ -51,15 +65,6 @@ public class ComputerService {
 
 	public int insertComputer(Computer computer) throws OpenException {
 		return DaoComputer.getInstance().insertComputer(computer);
-	}
-
-	public LinkedList<Computer> getPartOfComputers(int n, int offset)
-			throws OpenException, MapperException, ExecuteQueryException {
-		return DaoComputer.getInstance().getPartOfComputers(n, offset);
-	}
-
-	public int getNumberOfComputer() throws OpenException, MapperException, ExecuteQueryException {
-		return DaoComputer.getInstance().getNumberOfComputer();
 	}
 
 }

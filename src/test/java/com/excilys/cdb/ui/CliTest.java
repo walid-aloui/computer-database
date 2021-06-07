@@ -16,8 +16,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.excilys.cdb.daos.DaoCompany;
-import com.excilys.cdb.daos.DaoComputer;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
@@ -68,7 +66,10 @@ class CliTest {
 	private LinkedList<Computer> createListOfTenComputers() {
 		LinkedList<Computer> listComputers = new LinkedList<Computer>();
 		for (int k = 0; k < 10; k++) {
-			listComputers.add(new ComputerBuilder().withId(k).withName("computer_" + k).build());
+			listComputers.add(new ComputerBuilder()
+					.withId(k)
+					.withName("computer_" + k)
+					.build());
 		}
 		return listComputers;
 	}
@@ -93,9 +94,18 @@ class CliTest {
 
 		CompanyService mockCompanyService = mock(CompanyService.class);
 		LinkedList<Company> allCompanies = new LinkedList<Company>();
-		allCompanies.add(new CompanyBuilder().withId(1).withName("Company_one").build());
-		allCompanies.add(new CompanyBuilder().withId(2).withName("Company_two").build());
-		allCompanies.add(new CompanyBuilder().withId(3).withName("Company_three").build());
+		allCompanies.add(new CompanyBuilder()
+				.withId(1)
+				.withName("Company_one")
+				.build());
+		allCompanies.add(new CompanyBuilder()
+				.withId(2)
+				.withName("Company_two")
+				.build());
+		allCompanies.add(new CompanyBuilder()
+				.withId(3)
+				.withName("Company_three")
+				.build());
 		try {
 			when(mockCompanyService.getAllCompanies()).thenReturn(allCompanies);
 			CompanyService.setCompanyService(mockCompanyService);
@@ -141,7 +151,10 @@ class CliTest {
 		changeNextLineController(String.valueOf(computerId));
 
 		ComputerService mockComputerService = mock(ComputerService.class);
-		Computer computer = new ComputerBuilder().withId(computerId).withName("Computer_WR7").build();
+		Computer computer = new ComputerBuilder()
+				.withId(computerId)
+				.withName("Computer_WR7")
+				.build();
 		try {
 			when(mockComputerService.getComputerById(computerId)).thenReturn(Optional.of(computer));
 			ComputerService.setComputerService(mockComputerService);
@@ -187,8 +200,10 @@ class CliTest {
 		String userInputs = computerId + "\n" + name + "\n" + introduced + "\n" + discontinued + "\n" + company_id
 				+ "\n";
 		changeNextLineController(userInputs);
-		
-		Computer computer = new ComputerBuilder().withName(name).build();
+
+		Computer computer = new ComputerBuilder()
+				.withName(name)
+				.build();
 		ComputerService mockComputerService = mock(ComputerService.class);
 		try {
 			when(mockComputerService.updateComputerById(computerId, computer)).thenReturn(1);
@@ -216,7 +231,9 @@ class CliTest {
 
 		ComputerService mockComputerService = mock(ComputerService.class);
 		try {
-			Computer computer = new ComputerBuilder().withName(name).build();
+			Computer computer = new ComputerBuilder()
+					.withName(name)
+					.build();
 			when(mockComputerService.insertComputer(computer)).thenReturn(1);
 			ComputerService.setComputerService(mockComputerService);
 			cli.runCli();

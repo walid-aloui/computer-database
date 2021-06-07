@@ -40,7 +40,10 @@ class DaoComputerTest {
 	private Computer createWr7Computer() throws OpenException {
 		int id = 1;
 		String name = "Computer_WR7";
-		Computer computer = new ComputerBuilder().withName(name).withId(id).build();
+		Computer computer = new ComputerBuilder()
+				.withName(name)
+				.withId(id)
+				.build();
 		DaoComputer.getInstance().insertComputer(computer);
 		return computer;
 	}
@@ -53,9 +56,17 @@ class DaoComputerTest {
 		int company_id = 1;
 		String companyName = "Apple Inc.";
 
-		Company company = new CompanyBuilder().withId(company_id).withName(companyName).build();
-		Computer computer = new ComputerBuilder().withId(id).withName(name).withIntroduced(introduced)
-				.withDiscontinued(discontinued).withCompany(company).build();
+		Company company = new CompanyBuilder()
+				.withId(company_id)
+				.withName(companyName)
+				.build();
+		Computer computer = new ComputerBuilder()
+				.withId(id)
+				.withName(name)
+				.withIntroduced(introduced)
+				.withDiscontinued(discontinued)
+				.withCompany(company)
+				.build();
 
 		DaoComputer.getInstance().insertComputer(computer);
 
@@ -66,7 +77,9 @@ class DaoComputerTest {
 		DaoComputer daoComputer = DaoComputer.getInstance();
 		try {
 			for (int k = 0; k < 25; k++) {
-				Computer computer = new ComputerBuilder().withName("test" + k).build();
+				Computer computer = new ComputerBuilder()
+						.withName("test" + k)
+						.build();
 				daoComputer.insertComputer(computer);
 			}
 		} catch (OpenException e) {
@@ -158,6 +171,36 @@ class DaoComputerTest {
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
 			fail("Should not throw an exception");
 		}
+	}
+
+	@Test
+	void testGetPartOfComputersByNameShouldReturnListOfComputers() {
+		int n = 10;
+		int offset = 0;
+		try {
+			Computer wr7 = createWr7Computer();
+			createWr7Computer();
+			createTestComputer();
+			LinkedList<Computer> computers = DaoComputer.getInstance().getPartOfComputersByName(wr7.getName(), n,
+					offset);
+			assertEquals(2, computers.size());
+		} catch (OpenException | MapperException | ExecuteQueryException e) {
+			fail("Should not throw and exception");
+		}
+	}
+
+	@Test
+	void testGetPartOfComputersByNameShouldReturnAnEmptyListOfComputers() {
+		String name = "false_name";
+		int n = 10;
+		int offset = 0;
+		try {
+			LinkedList<Computer> computers = DaoComputer.getInstance().getPartOfComputersByName(name, n, offset);
+			assertEquals(0, computers.size());
+		} catch (OpenException | MapperException | ExecuteQueryException e) {
+			fail("Should not throw and exception");
+		}
+
 	}
 
 	@Test

@@ -12,8 +12,10 @@ import java.util.LinkedList;
 
 import org.junit.jupiter.api.Test;
 
+import com.excilys.cdb.dtos.CompanyDto;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Company.CompanyBuilder;
 
 class MapperCompanyTest {
 
@@ -54,6 +56,33 @@ class MapperCompanyTest {
 		assertThrows(MapperException.class, () -> {
 			MapperCompany.getInstance().fromResultSetToCompany(null);
 		});
+	}
+
+	@Test
+	void testFromCompanyListToCompanyDtoListShouldReturnListOfCompanyDto() {
+		LinkedList<Company> companies = new LinkedList<>();
+		Company wr7Company = new CompanyBuilder()
+				.withId(1)
+				.withName("WR7-Company")
+				.build();
+		Company testCompany = new CompanyBuilder()
+				.withId(2)
+				.withName("test")
+				.build();
+		companies.add(wr7Company);
+		companies.add(testCompany);
+		LinkedList<CompanyDto> companiesDto = MapperCompany.getInstance().fromCompanyListToCompanyDtoList(companies);
+		assertEquals(2, companiesDto.size());
+		CompanyDto companyDto = companiesDto.getFirst();
+		assertEquals(wr7Company.getId(), companyDto.getId());
+		assertEquals(wr7Company.getName(), companyDto.getName());
+	}
+
+	@Test
+	void testFromCompanyListToCompanyDtoListShouldReturnAnEmptyListOfCompanyDto() {
+		LinkedList<Company> companies = new LinkedList<>();
+		LinkedList<CompanyDto> companiesDto = MapperCompany.getInstance().fromCompanyListToCompanyDtoList(companies);
+		assertEquals(0, companiesDto.size());
 	}
 
 }

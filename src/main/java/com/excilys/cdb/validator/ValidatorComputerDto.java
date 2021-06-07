@@ -20,13 +20,17 @@ public class ValidatorComputerDto {
 
 	public boolean isValid(ComputerDto computerDto) {
 		return validatorId(computerDto.getId()) && 
-				validatorId(computerDto.getCompanyId()) && 
+				validatorCompanyId(computerDto.getCompanyId()) && 
 				validatorName(computerDto.getName()) && 
 				validatorDate(computerDto.getIntroduced(), computerDto.getDiscontinued());
 	}
 
-	private boolean validatorId(String id) {
-		return SecureInputs.isInteger(id) && Integer.parseInt(id) >= 0;
+	private boolean validatorId(int id) {
+		return id >= 0;
+	}
+
+	private boolean validatorCompanyId(String id) {
+		return SecureInputs.isInteger(id) && validatorId(Integer.parseInt(id));
 	}
 
 	private boolean validatorName(String name) {

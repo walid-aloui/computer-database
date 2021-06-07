@@ -45,7 +45,8 @@
 								<label for="companyId">Company</label> <select
 									class="form-control" id="companyId" name="companyId">
 									<option value="0">--</option>
-									<c:forEach var="companyDto" items="${ listDtoCompanies }">
+									<c:forEach var="companyDto"
+										items="${ requestScope.listCompanies }">
 										<option value=${ companyDto.id }>${ companyDto.id }</option>
 									</c:forEach>
 								</select>

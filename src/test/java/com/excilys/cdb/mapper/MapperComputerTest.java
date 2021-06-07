@@ -13,8 +13,12 @@ import java.util.LinkedList;
 
 import org.junit.jupiter.api.Test;
 
+import com.excilys.cdb.dtos.ComputerDto;
+import com.excilys.cdb.dtos.ComputerDto.ComputerDtoBuilder;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Computer.ComputerBuilder;
+import com.excilys.cdb.utils.SecureInputs;
 
 class MapperComputerTest {
 
@@ -144,6 +148,74 @@ class MapperComputerTest {
 		assertThrows(MapperException.class, () -> {
 			MapperComputer.getInstance().fromResultSetToInt(null);
 		});
+	}
+	
+	@Test
+	void testFromComputerDtoToComputerShouldReturnComputer() {
+		ComputerDto computerDto = new ComputerDtoBuilder()
+				.withId(1)
+				.withName("test")
+				.withIntroduced("")
+				.withDiscontinued("")
+				.withCompanyId("0")
+				.build();
+		try {
+			Computer computer = MapperComputer.getInstance().fromComputerDtoToComputer(computerDto);
+			String companyId = (computer.getCompany() == null) ? "0" : String.valueOf(computer.getCompany().getId());
+			assertEquals(computerDto.getId(), computer.getId());
+			assertEquals(computerDto.getName(), computer.getName());
+			assertEquals(null, computer.getIntroduced());
+			assertEquals(null, computer.getDiscontinued());
+			assertEquals(computerDto.getCompanyId(), companyId);
+		} catch (MapperException e) {
+			fail("Should not throw an exception");
+		}
+	}
+	
+	@Test
+	void testFromComputerDtoToComputerShouldThrowAnException() {
+		assertThrows(MapperException.class, () -> {
+			ComputerDto computerDto = new ComputerDtoBuilder()
+					.withId(1)
+					.withName("test")
+					.withIntroduced("2021-05-11")
+					.withDiscontinued("2021-05-11")
+					.withCompanyId("0")
+					.build();
+			MapperComputer.getInstance().fromComputerDtoToComputer(computerDto);
+		});
+	}
+	
+	@Test
+	void testFromComputerListToComputerDtoListShouldReturnListOfComputerDto() {
+		LinkedList<Computer> computers = new LinkedList<>();
+		Computer wr7 = new ComputerBuilder()
+				.withId(1)
+				.withName("Computer_WR7")
+				.build();
+		Computer test = new ComputerBuilder()
+				.withId(2)
+				.withName("test")
+				.withIntroduced(SecureInputs.toLocalDate("2021-05-11").get())
+				.withDiscontinued(SecureInputs.toLocalDate("2022-05-11").get())
+				.build();
+		computers.add(wr7);
+		computers.add(test);
+		LinkedList<ComputerDto> computersDto = MapperComputer.getInstance().fromComputerListToComputerDtoList(computers);
+		assertEquals(2, computersDto.size());
+		ComputerDto computerDto = computersDto.getFirst();
+		assertEquals(wr7.getId(), computerDto.getId());
+		assertEquals(wr7.getName(), computerDto.getName());
+		assertEquals(null, computerDto.getIntroduced());
+		assertEquals(null, computerDto.getDiscontinued());
+		assertEquals("0", computerDto.getCompanyId());
+	}
+	
+	@Test
+	void testFromComputerListToComputerDtoListShouldReturnAnEmptyListOfComputerDto() {
+		LinkedList<Computer> computers = new LinkedList<>();
+		LinkedList<ComputerDto> computersDto = MapperComputer.getInstance().fromComputerListToComputerDtoList(computers);
+		assertEquals(0, computersDto.size());
 	}
 
 }
