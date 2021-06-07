@@ -69,5 +69,27 @@ class DaoCompanyTest {
 			fail("Should not return an exception");
 		}
 	}
+	
+	@Test
+	void testDeleteCompanyByIdShouldDeleteCompany() {
+		try {
+			int companyId = 1;
+			int numDelete = DaoCompany.getInstance().deleteCompanyById(companyId);
+			assertEquals(companyId, numDelete);
+		} catch (OpenException | ExecuteQueryException e) {
+			fail("Should not throw an exception");
+		}
+	}
+	
+	@Test
+	void testDeleteCompanyByIdShouldNotDeleteCompany() {
+		try {
+			int falseId = 999;
+			int numDelete = DaoCompany.getInstance().deleteCompanyById(falseId);
+			assertEquals(0, numDelete);
+		} catch (OpenException | ExecuteQueryException e) {
+			fail("Should not throw an exception");
+		}
+	}
 
 }

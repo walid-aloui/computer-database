@@ -29,7 +29,7 @@ public class ControllerCli {
 	}
 
 	public void executeOption(int opt) throws OpenException, MapperException, ExecuteQueryException {
-		ChoixMenu choice = ChoixMenu.values()[opt - 1];
+		ChoixMenu choice = ChoixMenu.toChoixMenu(opt);
 		switch (choice) {
 		case LIST_COMPANIES:
 			executeListCompanies();
@@ -53,6 +53,10 @@ public class ControllerCli {
 
 		case DELETE_COMPUTER:
 			executeDeleteComputer();
+			break;
+
+		case DELETE_COMPANY:
+			executeDeleteCompany();
 			break;
 
 		default:
@@ -139,6 +143,12 @@ public class ControllerCli {
 	private void executeDeleteComputer() throws OpenException, ExecuteQueryException {
 		int id = askComputerId();
 		int numDelete = ComputerService.getInstance().deleteComputerById(id);
+		System.out.println("Nombre de suppression : " + numDelete);
+	}
+
+	private void executeDeleteCompany() throws OpenException, ExecuteQueryException {
+		int id = askCompanyId();
+		int numDelete = CompanyService.getInstance().deleteCompanyById(id);
 		System.out.println("Nombre de suppression : " + numDelete);
 	}
 

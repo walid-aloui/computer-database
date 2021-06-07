@@ -22,6 +22,7 @@ public class DaoCompany {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DaoCompany.class);
 	private static final String GET_ALL = "select id,name from company";
 	private static final String GET_BY_ID = "select id,name from company where id = ?";
+	private static final String DELETE_BY_ID = "delete from company where id = ?";
 
 	public static DaoCompany getInstance() {
 		if (daoCompany == null) {
@@ -59,6 +60,19 @@ public class DaoCompany {
 			return Optional.of(company.getFirst());
 		} catch (SQLException e) {
 			LOGGER.error("Echec getCompanyById", e);
+			throw new ExecuteQueryException();
+		}
+	}
+
+	public int deleteCompanyById(int id) throws OpenException, ExecuteQueryException {
+		DaoComputer.getInstance().deleteComputersByCompanyId(id);
+		Database db = Database.getInstance();
+		try(Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(DELETE_BY_ID);){
+			preparedStatement.setInt(1, id);
+			return preparedStatement.executeUpdate();
+		} catch (SQLException e) {
+			LOGGER.error("Echec deleteCompanyById", e);
 			throw new ExecuteQueryException();
 		}
 	}

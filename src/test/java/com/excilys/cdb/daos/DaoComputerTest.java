@@ -236,6 +236,40 @@ class DaoComputerTest {
 			fail("Should not throw an exception");
 		}
 	}
+	
+	@Test
+	void testDeleteComputersByCompanyIdShouldDeleteComputer() {
+		try {
+			createWr7Computer();
+			Computer test = createTestComputer();
+			int companyId = test.getCompany().getId();
+
+			int numDelete = DaoComputer.getInstance().deleteComputersByCompanyId(companyId);
+			assertEquals(companyId, numDelete);
+
+			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			assertEquals(1, allComputers.size());
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
+			fail("Should not throw an exception");
+		}
+	}
+	
+	@Test
+	void testDeleteComputersByCompanyIdShouldNotDeleteComputer() {
+		try {
+			createWr7Computer();
+			createTestComputer();
+			int falseId = 999;
+
+			int numDelete = DaoComputer.getInstance().deleteComputersByCompanyId(falseId);
+			assertEquals(0, numDelete);
+
+			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			assertEquals(2, allComputers.size());
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
+			fail("Should not throw an exception");
+		}
+	}
 
 	@Test
 	void testInsertComputerShouldNotInsertComputer() {

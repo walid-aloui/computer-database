@@ -15,7 +15,8 @@ public class ViewCli {
 		System.out.println("4- Mettre a jour un ordinateur");
 		System.out.println("5- Creer un ordinateur");
 		System.out.println("6- Supprimer un ordinateur");
-		System.out.println("7- Quitter\n");
+		System.out.println("7- Supprimer un fabriquant");
+		System.out.println("8- Quitter\n");
 	}
 
 	void showCompanies(LinkedList<Company> companies) {

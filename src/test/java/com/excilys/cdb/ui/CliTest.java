@@ -76,7 +76,7 @@ class CliTest {
 
 	@Test
 	void testRunCliShouldQuitApplication() {
-		String choiceMenu = "7";
+		String choiceMenu = "8";
 		changeNextLineCli(choiceMenu);
 		try {
 			cli.runCli();
@@ -89,7 +89,7 @@ class CliTest {
 
 	@Test
 	void testRunCliShouldDisplayListOfCompanies() {
-		String choiceMenu = "1\n7";
+		String choiceMenu = "1\n8";
 		changeNextLineCli(choiceMenu);
 
 		CompanyService mockCompanyService = mock(CompanyService.class);
@@ -120,7 +120,7 @@ class CliTest {
 
 	@Test
 	void testRunCliShouldDisplayListOfComputers() {
-		String choiceMenu = "2\n7";
+		String choiceMenu = "2\n8";
 		changeNextLineCli(choiceMenu);
 		String userInput = "q";
 		changeNextLineController(userInput);
@@ -145,7 +145,7 @@ class CliTest {
 
 	@Test
 	void testRunCliShouldDisplayDetailsOfComputer() {
-		String choiceMenu = "3\n7";
+		String choiceMenu = "3\n8";
 		changeNextLineCli(choiceMenu);
 		int computerId = 1;
 		changeNextLineController(String.valueOf(computerId));
@@ -169,7 +169,7 @@ class CliTest {
 
 	@Test
 	void testRunCliShouldDisplayIdDoesntExist() {
-		String choiceMenu = "3\n7";
+		String choiceMenu = "3\n8";
 		changeNextLineCli(choiceMenu);
 		int computerId = 999;
 		changeNextLineController(String.valueOf(computerId));
@@ -189,7 +189,7 @@ class CliTest {
 
 	@Test
 	void testRunCliWithUpdateChoice() {
-		String choiceMenu = "4\n7";
+		String choiceMenu = "4\n8";
 		changeNextLineCli(choiceMenu);
 
 		int computerId = 1;
@@ -219,7 +219,7 @@ class CliTest {
 
 	@Test
 	void testRunCliWithInsertChoice() {
-		String choiceMenu = "5\n7";
+		String choiceMenu = "5\n8";
 		changeNextLineCli(choiceMenu);
 
 		String name = "test";
@@ -246,8 +246,8 @@ class CliTest {
 	}
 
 	@Test
-	void testRunCliWithDeleteChoice() {
-		String choiceMenu = "6\n7";
+	void testRunCliWithDeleteComputerChoice() {
+		String choiceMenu = "6\n8";
 		changeNextLineCli(choiceMenu);
 
 		int computerId = 1;
@@ -259,6 +259,27 @@ class CliTest {
 			ComputerService.setComputerService(mockComputerService);
 			cli.runCli();
 			verify(mockComputerService, times(1)).deleteComputerById(computerId);
+		} catch (OpenException | ExecuteQueryException | MapperException e) {
+			fail("Should not throw an exception");
+		}
+
+		// TODO : Verifier la sortit sur console
+	}
+	
+	@Test
+	void testRunCliWithDeleteCompanyChoice() {
+		String choiceMenu = "7\n8";
+		changeNextLineCli(choiceMenu);
+
+		int companyId = 1;
+		changeNextLineController(String.valueOf(companyId));
+
+		CompanyService mockCompanyService = mock(CompanyService.class);
+		try {
+			when(mockCompanyService.deleteCompanyById(companyId)).thenReturn(1);
+			CompanyService.setCompanyService(mockCompanyService);
+			cli.runCli();
+			verify(mockCompanyService, times(1)).deleteCompanyById(companyId);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}

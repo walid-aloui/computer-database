@@ -36,4 +36,8 @@ public class CompanyService {
 		return DaoCompany.getInstance().getCompanyById(id);
 	}
 
+	public int deleteCompanyById(int id) throws OpenException, ExecuteQueryException {
+		return DaoCompany.getInstance().deleteCompanyById(id);
+	}
+
 }

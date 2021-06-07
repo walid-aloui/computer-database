@@ -31,6 +31,8 @@ public class DaoComputer {
 											+ "where computer.id = ?";
 	private static final String DELETE_BY_ID = "delete from computer "
 											+ "where id = ?";
+	private static final String DELETE_BY_COMPANY_ID = "delete from computer "
+											+ "where company_id = ?";
 	private static final String UPDATE_BY_ID = "update computer set name=?,introduced=?,discontinued=?,company_id=? "
 											+ "where id = ?";
 	private static final String INSERT = "insert into computer (name, introduced, discontinued, company_id) "
@@ -155,6 +157,18 @@ public class DaoComputer {
 			return preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			LOGGER.error("Echec deleteComputerById", e);
+			throw new ExecuteQueryException();
+		}
+	}
+	
+	public int deleteComputersByCompanyId(int id) throws OpenException, ExecuteQueryException {
+		Database db = Database.getInstance();
+		try (Connection con = db.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(DELETE_BY_COMPANY_ID);) {
+			preparedStatement.setInt(1, id);
+			return preparedStatement.executeUpdate();
+		} catch (SQLException e) {
+			LOGGER.error("Echec deleteComputersByCompanyId", e);
 			throw new ExecuteQueryException();
 		}
 	}
