@@ -8,6 +8,7 @@ public class PageDto {
 	private int numPage;
 	private int totalPage;
 	private int numElementPerPage;
+	private int numElementTotal;
 	private LinkedList<ComputerDto> contenue;
 
 	public PageDto() {
@@ -19,6 +20,7 @@ public class PageDto {
 		this.totalPage = builder.totalPage;
 		this.numElementPerPage = builder.numElementPerPage;
 		this.contenue = builder.contenue;
+		this.numElementTotal = builder.numElementTotal;
 	}
 
 	@Override
@@ -50,6 +52,14 @@ public class PageDto {
 		this.numElementPerPage = numElementPerPage;
 	}
 
+	public int getNumElementTotal() {
+		return numElementTotal;
+	}
+
+	public void setNumElementTotal(int numElementTotal) {
+		this.numElementTotal = numElementTotal;
+	}
+
 	public LinkedList<ComputerDto> getContenue() {
 		return contenue;
 	}
@@ -67,6 +77,7 @@ public class PageDto {
 		private int numPage;
 		private int totalPage;
 		private int numElementPerPage;
+		private int numElementTotal;
 		private LinkedList<ComputerDto> contenue;
 
 		public PageDtoBuilder() {
@@ -85,6 +96,11 @@ public class PageDto {
 
 		public PageDtoBuilder withNumElementPerPage(int numElementPerPage) {
 			this.numElementPerPage = numElementPerPage;
+			return this;
+		}
+
+		public PageDtoBuilder withNumElementTotal(int numElementTotal) {
+			this.numElementTotal = numElementTotal;
 			return this;
 		}
 
