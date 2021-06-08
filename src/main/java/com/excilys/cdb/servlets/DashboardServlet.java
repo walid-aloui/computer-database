@@ -23,8 +23,8 @@ import com.excilys.cdb.service.ComputerService;
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
 
-	private static final String JSP_DASHBOARD = "/WEB-INF/jsp/dashboard.jsp";
-	private static final String JSP_ERROR_500 = "/WEB-INF/jsp/500.jsp";
+	private static final String JSP_DASHBOARD = "/WEB-INF/views/dashboard.jsp";
+	private static final String JSP_ERROR_500 = "/WEB-INF/views/500.jsp";
 
 	private static final String NAME_SEARCH = "search";
 	private static final String NUM_COMPUTER_PER_PAGE = "numComputerPerPage";
@@ -45,6 +45,7 @@ public class DashboardServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		System.out.println(req.getParameter("selection"));
 		System.out.println("doPost !!!!!");
 	}
 

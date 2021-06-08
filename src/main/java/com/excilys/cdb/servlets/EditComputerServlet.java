@@ -22,16 +22,16 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
-
 @SuppressWarnings("serial")
-@WebServlet("/addComputer")
-public class AddComputerServlet extends HttpServlet {
+@WebServlet("/editComputer")
+public class EditComputerServlet extends HttpServlet {
 
-	private static final String JSP_ADD_COMPUTER = "/WEB-INF/views/addComputer.jsp";
+	private static final String JSP_EDIT_COMPUTER = "/WEB-INF/views/editComputer.jsp";
 	private static final String JSP_ERROR_500 = "/WEB-INF/views/500.jsp";
-
-	private static final String ROUTE_ADD_COMPUTER = "addComputer";
-
+	
+	private static final String ROUTE_EDIT_COMPUTER = "editComputer";
+	
+	private static final String FIELD_ID = "id";
 	private static final String FIELD_NAME = "computerName";
 	private static final String FIELD_INTRODUCED = "introduced";
 	private static final String FIELD_DISCONTINUED = "discontinued";
@@ -41,10 +41,12 @@ public class AddComputerServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			updateCompaniesId(req);
-			this.getServletContext().getRequestDispatcher(JSP_ADD_COMPUTER).forward(req, resp);
+			updateComputerId(req);
+			this.getServletContext().getRequestDispatcher(JSP_EDIT_COMPUTER).forward(req, resp);
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
+
 	}
 
 	@Override
@@ -57,10 +59,11 @@ public class AddComputerServlet extends HttpServlet {
 				.withDiscontinued(req.getParameter(FIELD_DISCONTINUED))
 				.withCompanyId(req.getParameter(FIELD_COMPANY_ID))
 				.build();
+		int computerId = Integer.parseInt(req.getParameter(FIELD_ID));
 		try {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
-			computerService.insertComputer(computer);
-			resp.sendRedirect(ROUTE_ADD_COMPUTER);
+			computerService.updateComputerById(computerId, computer);
+			resp.sendRedirect(ROUTE_EDIT_COMPUTER);
 		} catch (MapperException | OpenException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
@@ -73,6 +76,10 @@ public class AddComputerServlet extends HttpServlet {
 		LinkedList<Company> listCompanies = companyService.getAllCompanies();
 		LinkedList<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
 		req.setAttribute("listCompanies", listDtoCompanies);
+	}
+	
+	private void updateComputerId(HttpServletRequest req) {
+		req.setAttribute("computerId", req.getParameter(FIELD_ID));
 	}
 
 }
