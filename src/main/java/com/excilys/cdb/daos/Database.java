@@ -1,66 +1,113 @@
 package com.excilys.cdb.daos;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSchema;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSpec;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class Database {
 
-import com.excilys.cdb.exception.OpenException;
-import org.apache.commons.dbcp2.BasicDataSource;
+	private static final String TABLE_COMPANY = "company";
+	private static final String COLUMN_COMPANY_NAME = "name";
+	private static final String COLUMN_COMPANY_ID = "id";
 
-public class Database extends BasicDataSource {
+	private static final String TABLE_COMPUTER = "computer";
+	private static final String COLUMN_COMPUTER_ID = "id";
+	private static final String COLUMN_COMPUTER_NAME = "name";
+	private static final String COLUMN_INTRODUCED = "introduced";
+	private static final String COLUMN_DISCONTINUED = "discontinued";
+	private static final String COLUMN_COMPUTER_COMPANY_ID = "company_id";
+
+	private static DbSchema schemaObj;
+	private static DbSpec specficationObj;
+
+	private DbTable tableCompany;
+	private DbColumn columnCompanyId;
+	private DbColumn columnCompanyName;
+
+	private DbTable tableComputer;
+	private DbColumn columnComputerId;
+	private DbColumn columnComputerName;
+	private DbColumn columnComputerIntroduced;
+	private DbColumn columnComputerDiscontinued;
+	private DbColumn columnComputerCompanyId;
 
 	private static Database db;
-	private static final String DB_CONFIG_FILE = "db.properties";
-	private static final String DRIVER_PROP = "jdbc.driverClassName";
-	private static final String URl_PROP = "jdbc.url";
-	private static final String USERNAME_PROP = "jdbc.user";
-	private static final String PASSWORD_PROP = "jdbc.pass";
-	private final String driver;
-	private final String url;
-	private final String username;
-	private final String password;
-	private static final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
-	public static Database getInstance() throws OpenException {
+	public static Database getInstance() {
 		if (db == null) {
 			db = new Database();
 		}
 		return db;
 	}
 
-	private Database() throws OpenException {
-		Properties properties = new Properties();
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		InputStream configFile = classLoader.getResourceAsStream(DB_CONFIG_FILE);
-		try {
-			properties.load(configFile);
-			driver = properties.getProperty(DRIVER_PROP);
-			url = properties.getProperty(URl_PROP);
-			username = properties.getProperty(USERNAME_PROP);
-			password = properties.getProperty(PASSWORD_PROP);
-		} catch (IOException e) {
-			LOGGER.error("Echec de l'intéraction avec le fichier " + DB_CONFIG_FILE + " " + e);
-			throw new OpenException();
-		}
-		this.setDriverClassName(driver);
-		this.setUrl(url);
-		this.setUsername(username);
-		this.setPassword(password);
+	private Database() {
+		super();
+		loadSQLBuilderSchema();
+		createTables();
 	}
 
-	Connection openConnection() throws OpenException {
-		try {
-			LOGGER.info("Connection to database : " + url);
-			return this.getConnection();
-		} catch (SQLException e) {
-			LOGGER.error("Echec openConnection", e);
-			throw new OpenException();
-		}
+	private void loadSQLBuilderSchema() {
+		specficationObj = new DbSpec();
+		schemaObj = specficationObj.addDefaultSchema();
+	}
+
+	private void createTables() {
+		createTableCompany();
+		createTableComputer();
+	}
+
+	private void createTableCompany() {
+		tableCompany = new DbTable(schemaObj, TABLE_COMPANY, TABLE_COMPANY);
+		// tableCompany = schemaObj.addTable(TABLE_COMPANY);
+		columnCompanyId = tableCompany.addColumn(COLUMN_COMPANY_ID);
+		columnCompanyName = tableCompany.addColumn(COLUMN_COMPANY_NAME);
+	}
+
+	private void createTableComputer() {
+		tableComputer = new DbTable(schemaObj, TABLE_COMPUTER, TABLE_COMPUTER);
+		// tableComputer = schemaObj.addTable(TABLE_COMPUTER);
+		columnComputerId = tableComputer.addColumn(COLUMN_COMPUTER_ID);
+		columnComputerName = tableComputer.addColumn(COLUMN_COMPUTER_NAME);
+		columnComputerIntroduced = tableComputer.addColumn(COLUMN_INTRODUCED);
+		columnComputerDiscontinued = tableComputer.addColumn(COLUMN_DISCONTINUED);
+		columnComputerCompanyId = tableComputer.addColumn(COLUMN_COMPUTER_COMPANY_ID);
+	}
+
+	public DbTable getTableCompany() {
+		return tableCompany;
+	}
+
+	public DbColumn getColumnCompanyId() {
+		return columnCompanyId;
+	}
+
+	public DbColumn getColumnCompanyName() {
+		return columnCompanyName;
+	}
+
+	public DbTable getTableComputer() {
+		return tableComputer;
+	}
+
+	public DbColumn getColumnComputerId() {
+		return columnComputerId;
+	}
+
+	public DbColumn getColumnComputerName() {
+		return columnComputerName;
+	}
+
+	public DbColumn getColumnComputerIntroduced() {
+		return columnComputerIntroduced;
+	}
+
+	public DbColumn getColumnComputerDiscontinued() {
+		return columnComputerDiscontinued;
+	}
+
+	public DbColumn getColumnComputerCompanyId() {
+		return columnComputerCompanyId;
 	}
 
 }

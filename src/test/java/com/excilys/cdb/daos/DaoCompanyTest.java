@@ -22,8 +22,8 @@ class DaoCompanyTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		Database db = Database.getInstance();
-		try (Connection con = db.openConnection();) {
+		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
+		try (Connection con = dbConnection.openConnection();) {
 			ScriptRunner sr = new ScriptRunner(con);
 			Reader reader = new BufferedReader(
 					new FileReader("/home/aloui/Bureau/computer-database/src/test/resources/test-db.sql"));

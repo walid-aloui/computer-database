@@ -80,7 +80,7 @@ public class ControllerCli {
 					(p.getNumPage() - 1) * 10);
 			p.setContenue(contenue);
 			viewCli.showPage(p);
-			String choice = askPage(numPage, p.getTotalPage());
+			String choice = askPage(p.getNumPage(), p.getTotalPage());
 			if ("q".equals(choice)) {
 				break;
 			} else if ("a".equals(choice)) {

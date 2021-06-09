@@ -11,10 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.excilys.cdb.daos.DaoComputer;
 import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.dtos.PageDto;
 import com.excilys.cdb.exception.ExecuteQueryException;

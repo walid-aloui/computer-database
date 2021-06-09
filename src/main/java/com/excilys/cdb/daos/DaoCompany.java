@@ -20,10 +20,8 @@ public class DaoCompany {
 
 	private static DaoCompany daoCompany;
 	private static final Logger LOGGER = LoggerFactory.getLogger(DaoCompany.class);
-	private static final String GET_ALL = "select id,name from company";
-	private static final String GET_BY_ID = "select id,name from company where id = ?";
-	private static final String DELETE_BY_ID = "delete from company where id = ?";
-
+	private CompanyQueryBuilder companyQueryBuilder;
+	
 	public static DaoCompany getInstance() {
 		if (daoCompany == null) {
 			daoCompany = new DaoCompany();
@@ -32,15 +30,16 @@ public class DaoCompany {
 	}
 
 	private DaoCompany() {
+		companyQueryBuilder = CompanyQueryBuilder.getInstance();
 	}
 
 	public LinkedList<Company> getAllCompanies() throws OpenException, MapperException, ExecuteQueryException {
-		Database db = Database.getInstance();
-		try (Connection con = db.openConnection();
-				PreparedStatement preparedStatement = con.prepareStatement(GET_ALL);) {
+		String query = companyQueryBuilder.selectAllCompanies();
+		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
+		try (Connection con = dbConnection.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			LinkedList<Company> allCompanies = MapperCompany.getInstance().fromResultSetToCompany(resultSet);
-			return allCompanies;
+			return MapperCompany.getInstance().fromResultSetToCompany(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getAllCompanies", e);
 			throw new ExecuteQueryException();
@@ -48,10 +47,10 @@ public class DaoCompany {
 	}
 
 	public Optional<Company> getCompanyById(int id) throws OpenException, MapperException, ExecuteQueryException {
-		Database db = Database.getInstance();
-		try (Connection con = db.openConnection();
-				PreparedStatement preparedStatement = con.prepareStatement(GET_BY_ID);) {
-			preparedStatement.setInt(1, id);
+		String query = companyQueryBuilder.selectCompanyById(id);
+		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
+		try (Connection con = dbConnection.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			LinkedList<Company> company = MapperCompany.getInstance().fromResultSetToCompany(resultSet);
 			if (company.isEmpty()) {
@@ -65,11 +64,11 @@ public class DaoCompany {
 	}
 
 	public int deleteCompanyById(int id) throws OpenException, ExecuteQueryException {
+		String query = companyQueryBuilder.deleteCompanyById(id);
 		DaoComputer.getInstance().deleteComputersByCompanyId(id);
-		Database db = Database.getInstance();
-		try(Connection con = db.openConnection();
-				PreparedStatement preparedStatement = con.prepareStatement(DELETE_BY_ID);){
-			preparedStatement.setInt(1, id);
+		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
+		try (Connection con = dbConnection.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			return preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			LOGGER.error("Echec deleteCompanyById", e);
