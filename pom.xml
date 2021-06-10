@@ -21,7 +21,14 @@
 			<version>8.0.24</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
+		<!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>4.0.3</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.healthmarketscience.sqlbuilder/sqlbuilder -->
 		<dependency>
 			<groupId>com.healthmarketscience.sqlbuilder</groupId>
@@ -40,12 +47,6 @@
 			<artifactId>javax.servlet-api</artifactId>
 			<version>4.0.1</version>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-dbcp2</artifactId>
-			<version>2.8.0</version>
 		</dependency>
 
 		<dependency>

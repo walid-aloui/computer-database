@@ -25,7 +25,12 @@ public class PageDto {
 
 	@Override
 	public String toString() {
-		return "PageDto [numPage=" + numPage + ", totalPage=" + totalPage + ", contenue=" + contenue + "]";
+		String res = "\n";
+		for (ComputerDto c : contenue) {
+			res += (c.toString() + "\n");
+		}
+		res += ("\nPage " + numPage + "/" + totalPage + "\n");
+		return res;
 	}
 
 	public int getNumPage() {

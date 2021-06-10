@@ -10,20 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.exception.OpenException;
-import org.apache.commons.dbcp2.BasicDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-public class DatabaseConnection extends BasicDataSource {
+public class DatabaseConnection {
+
+	private static final String HIKARY_CONFIG_FILE = "datasource.properties";
+
+	private static HikariConfig config;
+	private static HikariDataSource ds;
 
 	private static DatabaseConnection dbConnection;
-	private static final String DB_CONFIG_FILE = "db.properties";
-	private static final String DRIVER_PROP = "jdbc.driverClassName";
-	private static final String URl_PROP = "jdbc.url";
-	private static final String USERNAME_PROP = "jdbc.user";
-	private static final String PASSWORD_PROP = "jdbc.pass";
-	private final String driver;
-	private final String url;
-	private final String username;
-	private final String password;
 	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConnection.class);
 
 	public static DatabaseConnection getInstance() throws OpenException {
@@ -36,27 +33,22 @@ public class DatabaseConnection extends BasicDataSource {
 	private DatabaseConnection() throws OpenException {
 		Properties properties = new Properties();
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		InputStream configFile = classLoader.getResourceAsStream(DB_CONFIG_FILE);
+		InputStream configFile = classLoader.getResourceAsStream(HIKARY_CONFIG_FILE);
+
 		try {
 			properties.load(configFile);
-			driver = properties.getProperty(DRIVER_PROP);
-			url = properties.getProperty(URl_PROP);
-			username = properties.getProperty(USERNAME_PROP);
-			password = properties.getProperty(PASSWORD_PROP);
 		} catch (IOException e) {
-			LOGGER.error("Echec de l'intéraction avec le fichier " + DB_CONFIG_FILE + " " + e);
+			LOGGER.error("Echec de l'intéraction avec le fichier " + HIKARY_CONFIG_FILE + " " + e);
 			throw new OpenException();
 		}
-		this.setDriverClassName(driver);
-		this.setUrl(url);
-		this.setUsername(username);
-		this.setPassword(password);
+
+		config = new HikariConfig(properties);
+		ds = new HikariDataSource(config);
 	}
 
 	Connection openConnection() throws OpenException {
 		try {
-			LOGGER.info("Connection to database : " + url);
-			return this.getConnection();
+			return ds.getConnection();
 		} catch (SQLException e) {
 			LOGGER.error("Echec openConnection", e);
 			throw new OpenException();
