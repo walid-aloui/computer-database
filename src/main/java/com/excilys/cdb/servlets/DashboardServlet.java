@@ -2,8 +2,10 @@ package com.excilys.cdb.servlets;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -30,10 +32,20 @@ public class DashboardServlet extends HttpServlet {
 
 	private static final String ROUTE_DASHBOARD = "dashboard";
 
+	private static final String ATTR_PAGE = "page";
+
 	private static final String PARAM_SEARCH = "search";
 	private static final String PARAM_COMPUTER_PER_PAGE = "numComputerPerPage";
 	private static final String PARAM_NUM_PAGE = "page";
 	private static final String PARAM_SELECTION = "selection";
+	private static final String PARAM_ORDER_BY = "orderBy";
+	private static final String PARAM_MODE = "mode";
+
+	private static final String KEY_NAME = "computerName";
+	private static final String KEY_ORDER = "orderBy";
+	private static final String KEY_MODE = "mode";
+	private static final String KEY_LIMIT = "limit";
+	private static final String KEY_OFFSET = "offset";
 
 	private PageDto pageDto = new PageDto();
 
@@ -67,7 +79,7 @@ public class DashboardServlet extends HttpServlet {
 		initNumElementPerPage(req);
 		initTotalPage(req);
 		initContenuePage(req);
-		req.setAttribute("page", pageDto);
+		req.setAttribute(ATTR_PAGE, pageDto);
 	}
 
 	private void initNumElementPage(HttpServletRequest req)
@@ -78,7 +90,7 @@ public class DashboardServlet extends HttpServlet {
 
 	private void initNumPage(HttpServletRequest req) {
 		String nPage = req.getParameter(PARAM_NUM_PAGE);
-		int numPage = (nPage == null) ? 1 : Integer.parseInt(nPage);
+		int numPage = (nPage == null || "".equals(nPage)) ? 1 : Integer.parseInt(nPage);
 		pageDto.setNumPage(numPage);
 	}
 
@@ -103,13 +115,16 @@ public class DashboardServlet extends HttpServlet {
 		int numComputerPerPage = pageDto.getNumElementPerPage();
 		int offset = (numPage - 1) * numComputerPerPage;
 		String search = req.getParameter(PARAM_SEARCH);
-		LinkedList<Computer> computers = null;
+		String orderBy = req.getParameter(PARAM_ORDER_BY);
+		String mode = req.getParameter(PARAM_MODE);
 
-		if (search == null || "".equals(search)) {
-			computers = computerService.getPartOfComputers(numComputerPerPage, offset);
-		} else {
-			computers = computerService.getPartOfComputersByName(search, numComputerPerPage, offset);
-		}
+		Map<String, String> criteria = new HashMap<>();
+		criteria.put(KEY_NAME, search);
+		criteria.put(KEY_LIMIT, String.valueOf(numComputerPerPage));
+		criteria.put(KEY_OFFSET, String.valueOf(offset));
+		criteria.put(KEY_ORDER, orderBy);
+		criteria.put(KEY_MODE, mode);
+		LinkedList<Computer> computers = computerService.getComputersByCriteria(criteria);
 		LinkedList<ComputerDto> listDtoComputers = mapperComputer.fromComputerListToComputerDtoList(computers);
 		pageDto.setContenue(listDtoComputers);
 	}

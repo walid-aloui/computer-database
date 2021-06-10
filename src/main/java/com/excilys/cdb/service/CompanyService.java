@@ -12,6 +12,7 @@ import com.excilys.cdb.model.Company;
 public class CompanyService {
 
 	private static CompanyService companyService;
+	private DaoCompany daoCompany;
 
 	public static CompanyService getInstance() {
 		if (companyService == null) {
@@ -26,18 +27,19 @@ public class CompanyService {
 
 	private CompanyService() {
 		super();
+		daoCompany = DaoCompany.getInstance();
 	}
 
 	public LinkedList<Company> getAllCompanies() throws OpenException, MapperException, ExecuteQueryException {
-		return DaoCompany.getInstance().getAllCompanies();
+		return daoCompany.getAllCompanies();
 	}
 
 	public Optional<Company> getCompanyById(int id) throws OpenException, MapperException, ExecuteQueryException {
-		return DaoCompany.getInstance().getCompanyById(id);
+		return daoCompany.getCompanyById(id);
 	}
 
 	public int deleteCompanyById(int id) throws OpenException, ExecuteQueryException {
-		return DaoCompany.getInstance().deleteCompanyById(id);
+		return daoCompany.deleteCompanyById(id);
 	}
 
 }

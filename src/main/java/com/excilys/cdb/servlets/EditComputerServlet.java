@@ -31,11 +31,14 @@ public class EditComputerServlet extends HttpServlet {
 	
 	private static final String ROUTE_EDIT_COMPUTER = "editComputer";
 	
-	private static final String FIELD_ID = "id";
-	private static final String FIELD_NAME = "computerName";
-	private static final String FIELD_INTRODUCED = "introduced";
-	private static final String FIELD_DISCONTINUED = "discontinued";
-	private static final String FIELD_COMPANY_ID = "companyId";
+	private static final String ATTR_LIST_COMPANY = "listCompanies";
+	private static final String ATTR_COMPANY_ID = "computerId";
+	
+	private static final String PARAM_ID = "id";
+	private static final String PARAM_NAME = "computerName";
+	private static final String PARAM_INTRODUCED = "introduced";
+	private static final String PARAM_DISCONTINUED = "discontinued";
+	private static final String PARAM_COMPANY_ID = "companyId";
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -54,12 +57,12 @@ public class EditComputerServlet extends HttpServlet {
 		ComputerService computerService = ComputerService.getInstance();
 		MapperComputer mapperComputer = MapperComputer.getInstance();
 		ComputerDto computerDto = new ComputerDtoBuilder()
-				.withName(req.getParameter(FIELD_NAME))
-				.withIntroduced(req.getParameter(FIELD_INTRODUCED))
-				.withDiscontinued(req.getParameter(FIELD_DISCONTINUED))
-				.withCompanyId(req.getParameter(FIELD_COMPANY_ID))
+				.withName(req.getParameter(PARAM_NAME))
+				.withIntroduced(req.getParameter(PARAM_INTRODUCED))
+				.withDiscontinued(req.getParameter(PARAM_DISCONTINUED))
+				.withCompanyId(req.getParameter(PARAM_COMPANY_ID))
 				.build();
-		int computerId = Integer.parseInt(req.getParameter(FIELD_ID));
+		int computerId = Integer.parseInt(req.getParameter(PARAM_ID));
 		try {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
 			computerService.updateComputerById(computerId, computer);
@@ -75,11 +78,11 @@ public class EditComputerServlet extends HttpServlet {
 		MapperCompany mapperCompany = MapperCompany.getInstance();
 		LinkedList<Company> listCompanies = companyService.getAllCompanies();
 		LinkedList<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
-		req.setAttribute("listCompanies", listDtoCompanies);
+		req.setAttribute(ATTR_LIST_COMPANY, listDtoCompanies);
 	}
 	
 	private void updateComputerId(HttpServletRequest req) {
-		req.setAttribute("computerId", req.getParameter(FIELD_ID));
+		req.setAttribute(ATTR_COMPANY_ID, req.getParameter(PARAM_ID));
 	}
 
 }

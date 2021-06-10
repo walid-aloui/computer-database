@@ -19,8 +19,9 @@ import com.excilys.cdb.model.Company;
 public class DaoCompany {
 
 	private static DaoCompany daoCompany;
-	private static final Logger LOGGER = LoggerFactory.getLogger(DaoCompany.class);
 	private CompanyQueryBuilder companyQueryBuilder;
+	private MapperCompany mapperCompany;
+	private static final Logger LOGGER = LoggerFactory.getLogger(DaoCompany.class);
 	
 	public static DaoCompany getInstance() {
 		if (daoCompany == null) {
@@ -31,6 +32,7 @@ public class DaoCompany {
 
 	private DaoCompany() {
 		companyQueryBuilder = CompanyQueryBuilder.getInstance();
+		mapperCompany = MapperCompany.getInstance();
 	}
 
 	public LinkedList<Company> getAllCompanies() throws OpenException, MapperException, ExecuteQueryException {
@@ -39,7 +41,7 @@ public class DaoCompany {
 		try (Connection con = dbConnection.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperCompany.getInstance().fromResultSetToCompany(resultSet);
+			return mapperCompany.fromResultSetToCompany(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getAllCompanies", e);
 			throw new ExecuteQueryException();
@@ -52,7 +54,7 @@ public class DaoCompany {
 		try (Connection con = dbConnection.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			LinkedList<Company> company = MapperCompany.getInstance().fromResultSetToCompany(resultSet);
+			LinkedList<Company> company = mapperCompany.fromResultSetToCompany(resultSet);
 			if (company.isEmpty()) {
 				return Optional.empty();
 			}

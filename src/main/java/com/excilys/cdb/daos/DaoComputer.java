@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ public class DaoComputer {
 
 	private static DaoComputer daoComputer;
 	private ComputerQueryBuilder computerQueryBuilder;
+	private MapperComputer mapperComputer;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DaoComputer.class);
 	
@@ -32,6 +34,20 @@ public class DaoComputer {
 
 	private DaoComputer() {
 		computerQueryBuilder = ComputerQueryBuilder.getInstance();
+		mapperComputer = MapperComputer.getInstance();
+	}
+	
+	public LinkedList<Computer> getComputersByCriteria(Map<String,String> criteria) throws OpenException, MapperException, ExecuteQueryException{
+		String query = computerQueryBuilder.selectComputerByCriteria(criteria);
+		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
+		try(Connection con = dbConnection.openConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(query)){
+			ResultSet resultSet = preparedStatement.executeQuery();
+			return mapperComputer.fromResultSetToComputerList(resultSet);
+		} catch (SQLException e) {
+			LOGGER.error("Echec getComputersByCriteria", e);
+			throw new ExecuteQueryException();
+		}
 	}
 
 	public LinkedList<Computer> getAllComputers() throws OpenException, MapperException, ExecuteQueryException {
@@ -39,7 +55,7 @@ public class DaoComputer {
 		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 		try (Connection con = dbConnection.openConnection(); PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
+			return mapperComputer.fromResultSetToComputerList(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getAllComputers", e);
 			throw new ExecuteQueryException();
@@ -53,7 +69,7 @@ public class DaoComputer {
 		try (Connection con = dbConnection.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			LinkedList<Computer> computer = MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
+			LinkedList<Computer> computer = mapperComputer.fromResultSetToComputerList(resultSet);
 			return (computer.isEmpty()) ? Optional.empty() : Optional.of(computer.getFirst());
 		} catch (SQLException e) {
 			LOGGER.error("Echec getComputerById", e);
@@ -68,7 +84,7 @@ public class DaoComputer {
 		try (Connection con = dbConnection.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
+			return mapperComputer.fromResultSetToComputerList(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getComputerByName", e);
 			throw new ExecuteQueryException();
@@ -82,7 +98,7 @@ public class DaoComputer {
 		try (Connection con = dbConnection.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
+			return mapperComputer.fromResultSetToComputerList(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getPartOfComputers", e);
 			throw new ExecuteQueryException();
@@ -96,7 +112,7 @@ public class DaoComputer {
 		try (Connection con = dbConnection.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToComputerList(resultSet);
+			return mapperComputer.fromResultSetToComputerList(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getComputerByName", e);
 			throw new ExecuteQueryException();
@@ -108,7 +124,7 @@ public class DaoComputer {
 		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 		try (Connection con = dbConnection.openConnection(); PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
-			return MapperComputer.getInstance().fromResultSetToInt(resultSet);
+			return mapperComputer.fromResultSetToInt(resultSet);
 		} catch (SQLException e) {
 			LOGGER.error("Echec getNumberOfComputer", e);
 			throw new ExecuteQueryException();

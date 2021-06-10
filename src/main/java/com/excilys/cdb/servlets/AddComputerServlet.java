@@ -31,11 +31,13 @@ public class AddComputerServlet extends HttpServlet {
 	private static final String JSP_ERROR_500 = "/WEB-INF/views/500.jsp";
 
 	private static final String ROUTE_ADD_COMPUTER = "addComputer";
+	
+	private static final String ATTR_LIST_COMPANY = "listCompanies";
 
-	private static final String FIELD_NAME = "computerName";
-	private static final String FIELD_INTRODUCED = "introduced";
-	private static final String FIELD_DISCONTINUED = "discontinued";
-	private static final String FIELD_COMPANY_ID = "companyId";
+	private static final String PARAM_NAME = "computerName";
+	private static final String PARAM_INTRODUCED = "introduced";
+	private static final String PARAM_DISCONTINUED = "discontinued";
+	private static final String PARAM_COMPANY_ID = "companyId";
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -52,10 +54,10 @@ public class AddComputerServlet extends HttpServlet {
 		ComputerService computerService = ComputerService.getInstance();
 		MapperComputer mapperComputer = MapperComputer.getInstance();
 		ComputerDto computerDto = new ComputerDtoBuilder()
-				.withName(req.getParameter(FIELD_NAME))
-				.withIntroduced(req.getParameter(FIELD_INTRODUCED))
-				.withDiscontinued(req.getParameter(FIELD_DISCONTINUED))
-				.withCompanyId(req.getParameter(FIELD_COMPANY_ID))
+				.withName(req.getParameter(PARAM_NAME))
+				.withIntroduced(req.getParameter(PARAM_INTRODUCED))
+				.withDiscontinued(req.getParameter(PARAM_DISCONTINUED))
+				.withCompanyId(req.getParameter(PARAM_COMPANY_ID))
 				.build();
 		try {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
@@ -72,7 +74,7 @@ public class AddComputerServlet extends HttpServlet {
 		MapperCompany mapperCompany = MapperCompany.getInstance();
 		LinkedList<Company> listCompanies = companyService.getAllCompanies();
 		LinkedList<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
-		req.setAttribute("listCompanies", listDtoCompanies);
+		req.setAttribute(ATTR_LIST_COMPANY, listDtoCompanies);
 	}
 
 }

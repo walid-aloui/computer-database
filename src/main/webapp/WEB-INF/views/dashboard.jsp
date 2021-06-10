@@ -54,12 +54,20 @@
 								</a>
 							</span>
 						</th>
-						<th>Computer name</th>
-						<th>Introduced date</th>
+						
+						<c:url var="url" value="${ request.getRequestURI() }">
+							<c:param name="search" value="${ param.search }"></c:param>
+							<c:param name="numComputerPerPage" value="${ param.numComputerPerPage }"></c:param>
+							<c:param name="page" value="${ param.page }"></c:param>
+						</c:url>
+						<c:set var="mode" value="${ ((empty param.mode) || param.mode eq 'desc' ) ? 'asc' : 'desc' }"></c:set>
+						
+						<th><a href="${ url }&orderBy=name&mode=${ mode }">Computer name</a></th>
+						<th><a href="${ url }&orderBy=introduced&mode=${ mode }">Introduced date</a></th>
 						<!-- Table header for Discontinued Date -->
-						<th>Discontinued date</th>
+						<th><a href="${ url }&orderBy=discontinued&mode=${ mode }">Discontinued date</a></th>
 						<!-- Table header for Company -->
-						<th>Company</th>
+						<th><a href="${ url }&orderBy=company&mode=${ mode }">Company</a></th>
 
 					</tr>
 				</thead>
@@ -84,7 +92,11 @@
 	<footer class="navbar-fixed-bottom">
 		<div class="container text-center">
 			<ul class="pagination">
-				<c:set var="url" value="${ request.getRequestURI() }?search=${ param.search }&numComputerPerPage=${ param.numComputerPerPage }"></c:set>
+				<c:url var="url" value="${ request.getRequestURI() }">
+					<c:param name="search" value="${ param.search }"></c:param>
+					<c:param name="orderBy" value="${ param.orderBy }"></c:param>
+					<c:param name="numComputerPerPage" value="${ param.numComputerPerPage }"></c:param>
+				</c:url>
 				<c:set var="firstPage" value="1"></c:set>
 				<c:set var="lastPage" value="${ requestScope.page.totalPage }"></c:set>
 				<c:set var="actual" value="${ requestScope.page.numPage }"></c:set>
