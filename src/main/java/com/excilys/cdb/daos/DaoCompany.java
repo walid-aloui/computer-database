@@ -22,7 +22,7 @@ public class DaoCompany {
 	private CompanyQueryBuilder companyQueryBuilder;
 	private MapperCompany mapperCompany;
 	private static final Logger LOGGER = LoggerFactory.getLogger(DaoCompany.class);
-	
+
 	public static DaoCompany getInstance() {
 		if (daoCompany == null) {
 			daoCompany = new DaoCompany();
@@ -67,15 +67,40 @@ public class DaoCompany {
 
 	public int deleteCompanyById(int id) throws OpenException, ExecuteQueryException {
 		String query = companyQueryBuilder.deleteCompanyById(id);
-		DaoComputer.getInstance().deleteComputersByCompanyId(id);
 		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
-		try (Connection con = dbConnection.openConnection();
-				PreparedStatement preparedStatement = con.prepareStatement(query);) {
+		try (Connection con = dbConnection.openConnection()) {
+			con.setAutoCommit(false);
+			deleteComputersByCompanyId(id, con);
+			try (PreparedStatement preparedStatement = con.prepareStatement(query);) {
+				int numDelete = preparedStatement.executeUpdate();
+				con.commit();
+				return numDelete;
+			} catch (SQLException e) {
+				LOGGER.error("Echec deleteCompanyById", e);
+				try {
+					con.rollback();
+				} catch (SQLException e1) {
+					LOGGER.error("Echec deleteCompanyById : rollback", e1);
+				}
+				throw new ExecuteQueryException();
+			}
+		} catch (SQLException e2) {
+			LOGGER.error("Echec deleteCompanyById : openConnection", e2);
+			throw new OpenException();
+		}
+	}
+	
+	private int deleteComputersByCompanyId(int id, Connection con) throws ExecuteQueryException {
+		ComputerQueryBuilder computerQueryBuilder = ComputerQueryBuilder.getInstance();
+		String query = computerQueryBuilder.deleteComputerByCompanyId(id);
+		try {
+			PreparedStatement preparedStatement = con.prepareStatement(query);
 			return preparedStatement.executeUpdate();
 		} catch (SQLException e) {
-			LOGGER.error("Echec deleteCompanyById", e);
+			LOGGER.error("Echec deleteComputersByCompanyId durant transaction", e);
 			throw new ExecuteQueryException();
 		}
+		
 	}
 
 }
