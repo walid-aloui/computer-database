@@ -13,6 +13,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Controller;
+
 import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.dtos.PageDto;
 import com.excilys.cdb.exception.ExecuteQueryException;
@@ -23,6 +27,7 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
 import com.excilys.cdb.service.ComputerService;
 
+@Controller
 @SuppressWarnings("serial")
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
@@ -35,7 +40,7 @@ public class DashboardServlet extends HttpServlet {
 	private static final String ATTR_PAGE = "page";
 
 	private static final String PARAM_SEARCH = "search";
-	private static final String PARAM_COMPUTER_PER_PAGE = "numComputerPerPage";
+	private static final String PARAM_LIMIT = "limit";
 	private static final String PARAM_NUM_PAGE = "page";
 	private static final String PARAM_SELECTION = "selection";
 	private static final String PARAM_ORDER_BY = "orderBy";
@@ -47,12 +52,24 @@ public class DashboardServlet extends HttpServlet {
 	private static final String KEY_LIMIT = "limit";
 	private static final String KEY_OFFSET = "offset";
 
-	private PageDto pageDto = new PageDto();
+	private PageDto pageDto;
+	private ComputerService computerService;
+	private MapperComputer mapperComputer;
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		this.pageDto = new PageDto();
+		@SuppressWarnings("resource")
+		ApplicationContext context = new AnnotationConfigApplicationContext(com.excilys.cdb.MainApp.class);
+		computerService = context.getBean(ComputerService.class);
+		mapperComputer = context.getBean(MapperComputer.class);
+	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			updatePage(req);
+			initPage(req);
 			this.getServletContext().getRequestDispatcher(JSP_DASHBOARD).forward(req, resp);
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
@@ -61,7 +78,6 @@ public class DashboardServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		ComputerService computerService = ComputerService.getInstance();
 		List<String> selection = Arrays.asList(req.getParameter(PARAM_SELECTION).split(","));
 		selection.stream().forEach(id -> {
 			try {
@@ -73,7 +89,7 @@ public class DashboardServlet extends HttpServlet {
 		resp.sendRedirect(ROUTE_DASHBOARD);
 	}
 
-	private void updatePage(HttpServletRequest req) throws OpenException, MapperException, ExecuteQueryException {
+	private void initPage(HttpServletRequest req) throws OpenException, MapperException, ExecuteQueryException {
 		initNumElementPage(req);
 		initNumPage(req);
 		initNumElementPerPage(req);
@@ -84,43 +100,41 @@ public class DashboardServlet extends HttpServlet {
 
 	private void initNumElementPage(HttpServletRequest req)
 			throws OpenException, MapperException, ExecuteQueryException {
-		int numComputers = ComputerService.getInstance().getNumberOfComputer();
+		int numComputers = computerService.getNumberOfComputer();
 		pageDto.setNumElementTotal(numComputers);
 	}
 
 	private void initNumPage(HttpServletRequest req) {
-		String nPage = req.getParameter(PARAM_NUM_PAGE);
-		int numPage = (nPage == null || "".equals(nPage)) ? 1 : Integer.parseInt(nPage);
+		String numPageParam = req.getParameter(PARAM_NUM_PAGE);
+		int numPage = (numPageParam == null || "".equals(numPageParam)) ? 1 : Integer.parseInt(numPageParam);
 		pageDto.setNumPage(numPage);
 	}
 
 	private void initNumElementPerPage(HttpServletRequest req) {
-		String nComputerPerPage = req.getParameter(PARAM_COMPUTER_PER_PAGE);
-		int numComputerPerPage = (nComputerPerPage == null || "".equals(nComputerPerPage)) ? Page.getDefaultNumElement()
-				: Integer.parseInt(nComputerPerPage);
-		pageDto.setNumElementPerPage(numComputerPerPage);
+		String limitParam = req.getParameter(PARAM_LIMIT);
+		int limit = (limitParam == null || "".equals(limitParam)) ? Page.getDefaultNumElement()
+				: Integer.parseInt(limitParam);
+		pageDto.setNumElementPerPage(limit);
 	}
 
 	private void initTotalPage(HttpServletRequest req) {
 		int numComputer = pageDto.getNumElementTotal();
-		int numComputerPerPage = pageDto.getNumElementPerPage();
-		int totalPage = (int) Math.ceil((double) numComputer / numComputerPerPage);
+		int limit = pageDto.getNumElementPerPage();
+		int totalPage = (int) Math.ceil((double) numComputer / limit);
 		pageDto.setTotalPage(totalPage);
 	}
 
 	private void initContenuePage(HttpServletRequest req) throws OpenException, MapperException, ExecuteQueryException {
-		ComputerService computerService = ComputerService.getInstance();
-		MapperComputer mapperComputer = MapperComputer.getInstance();
 		int numPage = pageDto.getNumPage();
-		int numComputerPerPage = pageDto.getNumElementPerPage();
-		int offset = (numPage - 1) * numComputerPerPage;
+		int limit = pageDto.getNumElementPerPage();
+		int offset = (numPage - 1) * limit;
 		String search = req.getParameter(PARAM_SEARCH);
 		String orderBy = req.getParameter(PARAM_ORDER_BY);
 		String mode = req.getParameter(PARAM_MODE);
 
 		Map<String, String> criteria = new HashMap<>();
 		criteria.put(KEY_NAME, search);
-		criteria.put(KEY_LIMIT, String.valueOf(numComputerPerPage));
+		criteria.put(KEY_LIMIT, String.valueOf(limit));
 		criteria.put(KEY_OFFSET, String.valueOf(offset));
 		criteria.put(KEY_ORDER, orderBy);
 		criteria.put(KEY_MODE, mode);

@@ -57,7 +57,7 @@
 						
 						<c:url var="url" value="${ request.getRequestURI() }">
 							<c:param name="search" value="${ param.search }"></c:param>
-							<c:param name="numComputerPerPage" value="${ param.numComputerPerPage }"></c:param>
+							<c:param name="limit" value="${ param.limit }"></c:param>
 							<c:param name="page" value="${ param.page }"></c:param>
 						</c:url>
 						<c:set var="mode" value="${ ((empty param.mode) || param.mode eq 'desc' ) ? 'asc' : 'desc' }"></c:set>
@@ -95,7 +95,7 @@
 				<c:url var="url" value="${ request.getRequestURI() }">
 					<c:param name="search" value="${ param.search }"></c:param>
 					<c:param name="orderBy" value="${ param.orderBy }"></c:param>
-					<c:param name="numComputerPerPage" value="${ param.numComputerPerPage }"></c:param>
+					<c:param name="limit" value="${ param.limit }"></c:param>
 				</c:url>
 				<c:set var="firstPage" value="1"></c:set>
 				<c:set var="lastPage" value="${ requestScope.page.totalPage }"></c:set>
@@ -133,10 +133,10 @@
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<form id="numComputerPerPage" action="#" method="GET">
-					<button type="submit" class="btn btn-default" name="numComputerPerPage" value="10">10</button>
-					<button type="submit" class="btn btn-default" name="numComputerPerPage" value="50">50</button>
-					<button type="submit" class="btn btn-default" name="numComputerPerPage" value="100">100</button>
+				<form id="limit" action="#" method="GET">
+					<button type="submit" class="btn btn-default" name="limit" value="10">10</button>
+					<button type="submit" class="btn btn-default" name="limit" value="50">50</button>
+					<button type="submit" class="btn btn-default" name="limit" value="100">100</button>
 				</form>
 			</div>
 		</div>

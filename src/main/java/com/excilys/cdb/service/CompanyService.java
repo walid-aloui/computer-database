@@ -3,31 +3,21 @@ package com.excilys.cdb.service;
 import java.util.LinkedList;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.excilys.cdb.daos.DaoCompany;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
 
+@Service
 public class CompanyService {
 
-	private static CompanyService companyService;
 	private DaoCompany daoCompany;
 
-	public static CompanyService getInstance() {
-		if (companyService == null) {
-			companyService = new CompanyService();
-		}
-		return companyService;
-	}
-
-	public static void setCompanyService(CompanyService companyService) {
-		CompanyService.companyService = companyService;
-	}
-
-	private CompanyService() {
-		super();
-		daoCompany = DaoCompany.getInstance();
+	public CompanyService(DaoCompany daoCompany) {
+		this.daoCompany = daoCompany;
 	}
 
 	public LinkedList<Company> getAllCompanies() throws OpenException, MapperException, ExecuteQueryException {

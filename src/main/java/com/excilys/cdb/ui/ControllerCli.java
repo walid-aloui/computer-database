@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Scanner;
 
+import org.springframework.stereotype.Controller;
+
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
@@ -18,14 +20,19 @@ import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.utils.SecureInputs;
 
+@Controller
 public class ControllerCli {
 
-	private ViewCli viewCli;
 	private Scanner sc;
+	private ViewCli viewCli;
+	private ComputerService computerService;
+	private CompanyService companyService;
 
-	public ControllerCli(Scanner sc) {
-		this.viewCli = new ViewCli();
-		this.sc = sc;
+	public ControllerCli(ViewCli viewCli, ComputerService computerService, CompanyService companyService) {
+		this.sc = new Scanner(System.in);
+		this.viewCli = viewCli;
+		this.computerService = computerService;
+		this.companyService = companyService;
 	}
 
 	public void executeOption(int opt) throws OpenException, MapperException, ExecuteQueryException {
@@ -65,19 +72,19 @@ public class ControllerCli {
 	}
 
 	private void executeListCompanies() throws OpenException, MapperException, ExecuteQueryException {
-		LinkedList<Company> allCompanies = CompanyService.getInstance().getAllCompanies();
+		LinkedList<Company> allCompanies = companyService.getAllCompanies();
 		viewCli.showCompanies(allCompanies);
 	}
 
 	private void executeListComputers() throws OpenException, MapperException, ExecuteQueryException {
-		ComputerService computerService = ComputerService.getInstance();
 		int numberOfComputer = computerService.getNumberOfComputer();
-		int totalPage = (int) Math.ceil((double) numberOfComputer / Page.getDefaultNumElement());
+		int numComputerPerPage = Page.getDefaultNumElement();
+		int totalPage = (int) Math.ceil((double) numberOfComputer / numComputerPerPage);
 		int numPage = 1;
 		Page p = new PageBuilder().withNumPage(numPage).withTotalPage(totalPage).build();
 		while (true) {
 			LinkedList<Computer> contenue = computerService.getPartOfComputers(Page.getDefaultNumElement(),
-					(p.getNumPage() - 1) * 10);
+					(p.getNumPage() - 1) * numComputerPerPage);
 			p.setContenue(contenue);
 			viewCli.showPage(p);
 			String choice = askPage(p.getNumPage(), p.getTotalPage());
@@ -93,7 +100,7 @@ public class ControllerCli {
 
 	private void executeShowDetails() throws OpenException, MapperException, ExecuteQueryException {
 		int id = askComputerId();
-		Optional<Computer> c = ComputerService.getInstance().getComputerById(id);
+		Optional<Computer> c = computerService.getComputerById(id);
 		if (c.isPresent()) {
 			System.out.println(c.get());
 		} else {
@@ -115,7 +122,7 @@ public class ControllerCli {
 		Computer computer = new ComputerBuilder().withName(newName).withIntroduced(newIntroduced)
 				.withDiscontinued(newDiscontinued).withCompany(company).build();
 
-		int numUpdate = ComputerService.getInstance().updateComputerById(id, computer);
+		int numUpdate = computerService.updateComputerById(id, computer);
 		System.out.println("Nombre de update : " + numUpdate);
 	}
 
@@ -132,7 +139,7 @@ public class ControllerCli {
 		Computer computer = new ComputerBuilder().withName(name).withIntroduced(introduced)
 				.withDiscontinued(discontinued).withCompany(company).build();
 
-		int numInsert = ComputerService.getInstance().insertComputer(computer);
+		int numInsert = computerService.insertComputer(computer);
 		if (numInsert == 1) {
 			System.out.println("Insertion Reussie");
 		} else {
@@ -142,13 +149,13 @@ public class ControllerCli {
 
 	private void executeDeleteComputer() throws OpenException, ExecuteQueryException {
 		int id = askComputerId();
-		int numDelete = ComputerService.getInstance().deleteComputerById(id);
+		int numDelete = computerService.deleteComputerById(id);
 		System.out.println("Nombre de suppression : " + numDelete);
 	}
 
 	private void executeDeleteCompany() throws OpenException, ExecuteQueryException {
 		int id = askCompanyId();
-		int numDelete = CompanyService.getInstance().deleteCompanyById(id);
+		int numDelete = companyService.deleteCompanyById(id);
 		System.out.println("Nombre de suppression : " + numDelete);
 	}
 
@@ -230,7 +237,7 @@ public class ControllerCli {
 		return choice;
 	}
 
-	public ViewCli getView() {
+	public ViewCli getViewCli() {
 		return viewCli;
 	}
 

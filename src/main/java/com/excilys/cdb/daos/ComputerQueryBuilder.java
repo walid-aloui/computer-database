@@ -2,6 +2,8 @@ package com.excilys.cdb.daos;
 
 import java.util.Map;
 
+import org.springframework.stereotype.Repository;
+
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.healthmarketscience.sqlbuilder.BinaryCondition;
@@ -16,6 +18,7 @@ import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.healthmarketscience.sqlbuilder.custom.mysql.MysLimitClause;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
 
+@Repository
 public class ComputerQueryBuilder {
 
 	private static final String KEY_COMPUTER_ID = "computerId";
@@ -26,19 +29,10 @@ public class ComputerQueryBuilder {
 	private static final String KEY_LIMIT = "limit";
 	private static final String KEY_OFFSET = "offset";
 
-	private static ComputerQueryBuilder computerQueryBuilder;
 	private Database db;
-
-	public static ComputerQueryBuilder getInstance() {
-		if (computerQueryBuilder == null) {
-			computerQueryBuilder = new ComputerQueryBuilder();
-		}
-		return computerQueryBuilder;
-	}
-
-	private ComputerQueryBuilder() {
-		super();
-		db = Database.getInstance();
+	
+	public ComputerQueryBuilder(Database db) {
+		this.db = db;
 	}
 
 	private SelectQuery buildSelect() {
@@ -271,4 +265,5 @@ public class ComputerQueryBuilder {
 		}
 		return query;
 	}
+
 }

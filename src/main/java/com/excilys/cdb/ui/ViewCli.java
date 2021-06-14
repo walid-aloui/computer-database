@@ -2,10 +2,17 @@ package com.excilys.cdb.ui;
 
 import java.util.LinkedList;
 
+import org.springframework.stereotype.Component;
+
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Page;
 
+@Component
 public class ViewCli {
+	
+	public ViewCli() {
+		super();
+	}
 
 	void showMenu() {
 		System.out.println("\nVeuillez selectionner l'option souhaite");

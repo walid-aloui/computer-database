@@ -8,11 +8,13 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.exception.OpenException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+@Repository
 public class DatabaseConnection {
 
 	private static final String HIKARY_CONFIG_FILE = "datasource.properties";
@@ -20,17 +22,9 @@ public class DatabaseConnection {
 	private static HikariConfig config;
 	private static HikariDataSource ds;
 
-	private static DatabaseConnection dbConnection;
 	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConnection.class);
 
-	public static DatabaseConnection getInstance() throws OpenException {
-		if (dbConnection == null) {
-			dbConnection = new DatabaseConnection();
-		}
-		return dbConnection;
-	}
-
-	private DatabaseConnection() throws OpenException {
+	public DatabaseConnection() throws OpenException {
 		Properties properties = new Properties();
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream configFile = classLoader.getResourceAsStream(HIKARY_CONFIG_FILE);

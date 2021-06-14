@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.dtos.ComputerDto.ComputerDtoBuilder;
@@ -20,20 +21,16 @@ import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.utils.SecureInputs;
 import com.excilys.cdb.validator.ValidatorComputerDto;
 
+@Component
 public class MapperComputer {
 
-	private static MapperComputer mapperComputer;
 	private static final Logger LOGGER = LoggerFactory.getLogger(MapperComputer.class);
 
-	public static MapperComputer getInstance() {
-		if (mapperComputer == null) {
-			mapperComputer = new MapperComputer();
-		}
-		return mapperComputer;
-	}
-
-	private MapperComputer() {
+	private ValidatorComputerDto validatorComputerDto;
+	
+	public MapperComputer(ValidatorComputerDto validatorComputerDto) {
 		super();
+		this.validatorComputerDto = validatorComputerDto;
 	}
 
 	public LinkedList<Computer> fromResultSetToComputerList(ResultSet resultSet) throws MapperException {
@@ -58,8 +55,13 @@ public class MapperComputer {
 				if (companyId != 0 && companyName != null) {
 					company = new CompanyBuilder().withId(companyId).withName(companyName).build();
 				}
-				computer.add(new ComputerBuilder().withId(id).withName(computerName).withIntroduced(introduced)
-						.withDiscontinued(discontinued).withCompany(company).build());
+				computer.add(new ComputerBuilder()
+						.withId(id)
+						.withName(computerName)
+						.withIntroduced(introduced)
+						.withDiscontinued(discontinued)
+						.withCompany(company)
+						.build());
 			}
 		} catch (SQLException e) {
 			LOGGER.error("Echec fromResultSetToComputer", e);
@@ -89,7 +91,7 @@ public class MapperComputer {
 	}
 
 	public Computer fromComputerDtoToComputer(ComputerDto computerDto) throws MapperException {
-		if (ValidatorComputerDto.getInstance().isValid(computerDto)) {
+		if (validatorComputerDto.isValid(computerDto)) {
 			Company company = null;
 			int companyId = Integer.parseInt(computerDto.getCompanyId());
 			if (companyId != 0) {
@@ -128,7 +130,8 @@ public class MapperComputer {
 	}
 
 	public LinkedList<ComputerDto> fromComputerListToComputerDtoList(LinkedList<Computer> computers) {
-		return computers.stream()
+		return computers
+				.stream()
 				.map(computer -> fromComputerToComputerDto(computer))
 				.collect(Collectors.toCollection(LinkedList::new));
 	}

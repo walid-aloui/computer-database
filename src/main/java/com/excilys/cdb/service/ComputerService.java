@@ -4,31 +4,21 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.excilys.cdb.daos.DaoComputer;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Computer;
 
+@Service
 public class ComputerService {
 
-	private static ComputerService computerService;
 	private DaoComputer daoComputer;
-
-	public static ComputerService getInstance() {
-		if (computerService == null) {
-			computerService = new ComputerService();
-		}
-		return computerService;
-	}
-
-	public static void setComputerService(ComputerService computerService) {
-		ComputerService.computerService = computerService;
-	}
-
-	private ComputerService() {
-		super();
-		daoComputer = DaoComputer.getInstance();
+	
+	public ComputerService(DaoComputer daoComputer) {
+		this.daoComputer = daoComputer;
 	}
 
 	public LinkedList<Computer> getComputersByCriteria(Map<String, String> criteria)

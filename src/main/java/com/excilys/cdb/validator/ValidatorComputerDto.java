@@ -1,22 +1,12 @@
 package com.excilys.cdb.validator;
 
+import org.springframework.stereotype.Component;
+
 import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.utils.SecureInputs;
 
+@Component
 public class ValidatorComputerDto {
-
-	private static ValidatorComputerDto validatorComputerDto;
-
-	public static ValidatorComputerDto getInstance() {
-		if (validatorComputerDto == null) {
-			validatorComputerDto = new ValidatorComputerDto();
-		}
-		return validatorComputerDto;
-	}
-
-	private ValidatorComputerDto() {
-		super();
-	}
 
 	public boolean isValid(ComputerDto computerDto) {
 		return validatorId(computerDto.getId()) && 

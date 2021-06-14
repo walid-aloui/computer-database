@@ -1,10 +1,13 @@
 package com.excilys.cdb.daos;
 
+import org.springframework.stereotype.Repository;
+
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSchema;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSpec;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 
+@Repository
 public class Database {
 
 	private static final String TABLE_COMPANY = "company";
@@ -32,16 +35,7 @@ public class Database {
 	private DbColumn columnComputerDiscontinued;
 	private DbColumn columnComputerCompanyId;
 
-	private static Database db;
-
-	public static Database getInstance() {
-		if (db == null) {
-			db = new Database();
-		}
-		return db;
-	}
-
-	private Database() {
+	public Database() {
 		super();
 		loadSQLBuilderSchema();
 		createTables();

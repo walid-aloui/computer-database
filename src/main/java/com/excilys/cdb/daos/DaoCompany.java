@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
@@ -16,28 +17,26 @@ import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.mapper.MapperCompany;
 import com.excilys.cdb.model.Company;
 
+@Repository
 public class DaoCompany {
 
-	private static DaoCompany daoCompany;
 	private CompanyQueryBuilder companyQueryBuilder;
+	private ComputerQueryBuilder computerQueryBuilder;
 	private MapperCompany mapperCompany;
+	private DatabaseConnection dbConnection;
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DaoCompany.class);
 
-	public static DaoCompany getInstance() {
-		if (daoCompany == null) {
-			daoCompany = new DaoCompany();
-		}
-		return daoCompany;
-	}
-
-	private DaoCompany() {
-		companyQueryBuilder = CompanyQueryBuilder.getInstance();
-		mapperCompany = MapperCompany.getInstance();
+	public DaoCompany(CompanyQueryBuilder companyQueryBuilder, ComputerQueryBuilder computerQueryBuilder,
+			MapperCompany mapperCompany, DatabaseConnection dbConnection) {
+		this.companyQueryBuilder = companyQueryBuilder;
+		this.computerQueryBuilder = computerQueryBuilder;
+		this.mapperCompany = mapperCompany;
+		this.dbConnection = dbConnection;
 	}
 
 	public LinkedList<Company> getAllCompanies() throws OpenException, MapperException, ExecuteQueryException {
 		String query = companyQueryBuilder.selectAllCompanies();
-		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 		try (Connection con = dbConnection.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -50,7 +49,6 @@ public class DaoCompany {
 
 	public Optional<Company> getCompanyById(int id) throws OpenException, MapperException, ExecuteQueryException {
 		String query = companyQueryBuilder.selectCompanyById(id);
-		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 		try (Connection con = dbConnection.openConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(query);) {
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -67,7 +65,6 @@ public class DaoCompany {
 
 	public int deleteCompanyById(int id) throws OpenException, ExecuteQueryException {
 		String query = companyQueryBuilder.deleteCompanyById(id);
-		DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 		try (Connection con = dbConnection.openConnection()) {
 			con.setAutoCommit(false);
 			deleteComputersByCompanyId(id, con);
@@ -91,7 +88,6 @@ public class DaoCompany {
 	}
 	
 	private int deleteComputersByCompanyId(int id, Connection con) throws ExecuteQueryException {
-		ComputerQueryBuilder computerQueryBuilder = ComputerQueryBuilder.getInstance();
 		String query = computerQueryBuilder.deleteComputerByCompanyId(id);
 		try {
 			PreparedStatement preparedStatement = con.prepareStatement(query);
