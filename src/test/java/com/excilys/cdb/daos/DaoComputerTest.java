@@ -14,7 +14,10 @@ import java.util.Optional;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.excilys.cdb.ConfigTest;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.OpenException;
@@ -24,12 +27,21 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.utils.SecureInputs;
 
+@SpringJUnitConfig(ConfigTest.class)
 class DaoComputerTest {
+	
+	private DatabaseConnection dbConnection;
+	private DaoComputer daoComputer;
+	
+	@Autowired
+	public DaoComputerTest(DatabaseConnection dbConnection, DaoComputer daoComputer) {
+		this.dbConnection = dbConnection;
+		this.daoComputer = daoComputer;
+	}
 
 	@BeforeEach
 	void setUp() throws Exception {
-		DatabaseConnection db = DatabaseConnection.getInstance();
-		try (Connection con = db.openConnection();) {
+		try (Connection con = dbConnection.openConnection();) {
 			ScriptRunner sr = new ScriptRunner(con);
 			Reader reader = new BufferedReader(
 					new FileReader("/home/aloui/Bureau/computer-database/src/test/resources/test-db.sql"));
@@ -44,7 +56,7 @@ class DaoComputerTest {
 				.withName(name)
 				.withId(id)
 				.build();
-		DaoComputer.getInstance().insertComputer(computer);
+		daoComputer.insertComputer(computer);
 		return computer;
 	}
 
@@ -68,13 +80,12 @@ class DaoComputerTest {
 				.withCompany(company)
 				.build();
 
-		DaoComputer.getInstance().insertComputer(computer);
+		daoComputer.insertComputer(computer);
 
 		return computer;
 	}
 
 	private void createComputers() {
-		DaoComputer daoComputer = DaoComputer.getInstance();
 		try {
 			for (int k = 0; k < 25; k++) {
 				Computer computer = new ComputerBuilder()
@@ -93,7 +104,7 @@ class DaoComputerTest {
 			createWr7Computer();
 			createTestComputer();
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			LinkedList<Computer> allComputers = daoComputer.getAllComputers();
 			assertEquals(2, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -103,7 +114,7 @@ class DaoComputerTest {
 	@Test
 	void testGetAllComputersShouldReturnAnEmptyListOfComputers() {
 		try {
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			LinkedList<Computer> allComputers = daoComputer.getAllComputers();
 			assertEquals(0, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -116,7 +127,7 @@ class DaoComputerTest {
 			createWr7Computer();
 			Computer test = createTestComputer();
 
-			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(test.getId());
+			Optional<Computer> computer = daoComputer.getComputerById(test.getId());
 			if (computer.isPresent()) {
 				Computer c = computer.get();
 				assertEquals(test, c);
@@ -135,7 +146,7 @@ class DaoComputerTest {
 			createTestComputer();
 			int falseId = 5;
 
-			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(falseId);
+			Optional<Computer> computer = daoComputer.getComputerById(falseId);
 			if (computer.isPresent()) {
 				fail("Should be empty");
 			}
@@ -151,7 +162,7 @@ class DaoComputerTest {
 			createTestComputer();
 			String computerName = "Computer_WR7";
 
-			LinkedList<Computer> computers = DaoComputer.getInstance().getComputerByName(computerName);
+			LinkedList<Computer> computers = daoComputer.getComputerByName(computerName);
 			assertEquals(1, computers.size());
 			assertEquals(wr7, computers.getFirst());
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
@@ -166,7 +177,7 @@ class DaoComputerTest {
 			createTestComputer();
 			String computerName = "false_name";
 
-			LinkedList<Computer> computers = DaoComputer.getInstance().getComputerByName(computerName);
+			LinkedList<Computer> computers = daoComputer.getComputerByName(computerName);
 			assertEquals(0, computers.size());
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
 			fail("Should not throw an exception");
@@ -181,7 +192,7 @@ class DaoComputerTest {
 			Computer wr7 = createWr7Computer();
 			createWr7Computer();
 			createTestComputer();
-			LinkedList<Computer> computers = DaoComputer.getInstance().getPartOfComputersByName(wr7.getName(), n,
+			LinkedList<Computer> computers = daoComputer.getPartOfComputersByName(wr7.getName(), n,
 					offset);
 			assertEquals(2, computers.size());
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
@@ -195,7 +206,7 @@ class DaoComputerTest {
 		int n = 10;
 		int offset = 0;
 		try {
-			LinkedList<Computer> computers = DaoComputer.getInstance().getPartOfComputersByName(name, n, offset);
+			LinkedList<Computer> computers = daoComputer.getPartOfComputersByName(name, n, offset);
 			assertEquals(0, computers.size());
 		} catch (OpenException | MapperException | ExecuteQueryException e) {
 			fail("Should not throw and exception");
@@ -210,10 +221,10 @@ class DaoComputerTest {
 			createTestComputer();
 			int id = 1;
 
-			int numDelete = DaoComputer.getInstance().deleteComputerById(id);
+			int numDelete = daoComputer.deleteComputerById(id);
 			assertEquals(id, numDelete);
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			LinkedList<Computer> allComputers = daoComputer.getAllComputers();
 			assertEquals(1, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -227,10 +238,10 @@ class DaoComputerTest {
 			createTestComputer();
 			int falseId = 5;
 
-			int numDelete = DaoComputer.getInstance().deleteComputerById(falseId);
+			int numDelete = daoComputer.deleteComputerById(falseId);
 			assertEquals(0, numDelete);
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			LinkedList<Computer> allComputers = daoComputer.getAllComputers();
 			assertEquals(2, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -244,10 +255,10 @@ class DaoComputerTest {
 			Computer test = createTestComputer();
 			int companyId = test.getCompany().getId();
 
-			int numDelete = DaoComputer.getInstance().deleteComputersByCompanyId(companyId);
+			int numDelete = daoComputer.deleteComputersByCompanyId(companyId);
 			assertEquals(companyId, numDelete);
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			LinkedList<Computer> allComputers = daoComputer.getAllComputers();
 			assertEquals(1, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -261,10 +272,10 @@ class DaoComputerTest {
 			createTestComputer();
 			int falseId = 999;
 
-			int numDelete = DaoComputer.getInstance().deleteComputersByCompanyId(falseId);
+			int numDelete = daoComputer.deleteComputersByCompanyId(falseId);
 			assertEquals(0, numDelete);
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			LinkedList<Computer> allComputers = daoComputer.getAllComputers();
 			assertEquals(2, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -280,10 +291,10 @@ class DaoComputerTest {
 			Company company = new CompanyBuilder().withId(company_id).build();
 			Computer computer = new ComputerBuilder().withName(name).withCompany(company).build();
 
-			int numInsert = DaoComputer.getInstance().insertComputer(computer);
+			int numInsert = daoComputer.insertComputer(computer);
 			assertEquals(0, numInsert);
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getAllComputers();
+			LinkedList<Computer> allComputers = daoComputer.getAllComputers();
 			assertEquals(0, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -296,10 +307,10 @@ class DaoComputerTest {
 			Computer wr7 = createWr7Computer();
 			Computer test = createTestComputer();
 
-			int numUpdate = DaoComputer.getInstance().updateComputerById(wr7.getId(), test);
+			int numUpdate = daoComputer.updateComputerById(wr7.getId(), test);
 			assertEquals(1, numUpdate);
 
-			Optional<Computer> computer = DaoComputer.getInstance().getComputerById(wr7.getId());
+			Optional<Computer> computer = daoComputer.getComputerById(wr7.getId());
 			if (computer.isPresent()) {
 				Computer computerUpdate = new ComputerBuilder().withId(wr7.getId()).withName(test.getName())
 						.withIntroduced(test.getIntroduced()).withDiscontinued(test.getDiscontinued())
@@ -321,7 +332,7 @@ class DaoComputerTest {
 			Computer test = createTestComputer();
 			int falseId = 5;
 
-			int numUpdate = DaoComputer.getInstance().updateComputerById(falseId, test);
+			int numUpdate = daoComputer.updateComputerById(falseId, test);
 			assertEquals(0, numUpdate);
 
 			int falseCompanyId = 999;
@@ -330,7 +341,7 @@ class DaoComputerTest {
 					.withIntroduced(test.getIntroduced()).withDiscontinued(test.getDiscontinued())
 					.withCompany(falseCompany).build();
 
-			int numUpdate2 = DaoComputer.getInstance().updateComputerById(1, computer);
+			int numUpdate2 = daoComputer.updateComputerById(1, computer);
 			assertEquals(0, numUpdate2);
 		} catch (OpenException e) {
 			fail("Should not throw an exception");
@@ -342,7 +353,7 @@ class DaoComputerTest {
 		try {
 			createComputers();
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 0);
+			LinkedList<Computer> allComputers = daoComputer.getPartOfComputers(10, 0);
 			assertEquals(10, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -354,7 +365,7 @@ class DaoComputerTest {
 		try {
 			createComputers();
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 10);
+			LinkedList<Computer> allComputers = daoComputer.getPartOfComputers(10, 10);
 			assertEquals(10, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -366,7 +377,7 @@ class DaoComputerTest {
 		try {
 			createComputers();
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 20);
+			LinkedList<Computer> allComputers = daoComputer.getPartOfComputers(10, 20);
 			assertEquals(5, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -379,7 +390,7 @@ class DaoComputerTest {
 			createWr7Computer();
 			createTestComputer();
 
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 0);
+			LinkedList<Computer> allComputers = daoComputer.getPartOfComputers(10, 0);
 			assertEquals(2, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -389,7 +400,7 @@ class DaoComputerTest {
 	@Test
 	void testGetPartOfComputersShouldReturnAnEmptyListOfComputers() {
 		try {
-			LinkedList<Computer> allComputers = DaoComputer.getInstance().getPartOfComputers(10, 0);
+			LinkedList<Computer> allComputers = daoComputer.getPartOfComputers(10, 0);
 			assertEquals(0, allComputers.size());
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -402,7 +413,7 @@ class DaoComputerTest {
 			createWr7Computer();
 			createTestComputer();
 
-			int numComputer = DaoComputer.getInstance().getNumberOfComputer();
+			int numComputer = daoComputer.getNumberOfComputer();
 			assertEquals(2, numComputer);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
@@ -412,7 +423,7 @@ class DaoComputerTest {
 	@Test
 	void testGetNumberOfComputerShouldReturn0() {
 		try {
-			int numComputer = DaoComputer.getInstance().getNumberOfComputer();
+			int numComputer = daoComputer.getNumberOfComputer();
 			assertEquals(0, numComputer);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");

@@ -12,7 +12,10 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.excilys.cdb.ConfigTest;
 import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.dtos.ComputerDto.ComputerDtoBuilder;
 import com.excilys.cdb.exception.MapperException;
@@ -20,7 +23,15 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.utils.SecureInputs;
 
+@SpringJUnitConfig(ConfigTest.class)
 class MapperComputerTest {
+	
+	private MapperComputer mapperComputer;
+	
+	@Autowired
+	public MapperComputerTest(MapperComputer mapperComputer) {
+		this.mapperComputer = mapperComputer;
+	}
 
 	@Test
 	void testMapToComputerShouldReturnListOfComputers() throws SQLException, MapperException {
@@ -34,7 +45,7 @@ class MapperComputerTest {
 		when(mockResultSet.getDate("discontinued")).thenReturn(discontinued);
 		when(mockResultSet.getInt("company_id")).thenReturn(2);
 		when(mockResultSet.getString("company.name")).thenReturn("companyWR7");
-		LinkedList<Computer> computerList = MapperComputer.getInstance().fromResultSetToComputerList(mockResultSet);
+		LinkedList<Computer> computerList = mapperComputer.fromResultSetToComputerList(mockResultSet);
 		assertEquals(1, computerList.size());
 		Computer computer = computerList.getFirst();
 		assertEquals(1, computer.getId());
@@ -62,7 +73,7 @@ class MapperComputerTest {
 		when(mockResultSet.getDate("discontinued")).thenReturn(null);
 		when(mockResultSet.getInt("company_id")).thenReturn(0);
 		when(mockResultSet.getString("company.name")).thenReturn(null);
-		LinkedList<Computer> computerList = MapperComputer.getInstance().fromResultSetToComputerList(mockResultSet);
+		LinkedList<Computer> computerList = mapperComputer.fromResultSetToComputerList(mockResultSet);
 		assertEquals(1, computerList.size());
 		Computer computer = computerList.getFirst();
 		assertEquals(1, computer.getId());
@@ -84,7 +95,7 @@ class MapperComputerTest {
 		ResultSet mockResultSet = mock(ResultSet.class);
 		try {
 			when(mockResultSet.next()).thenReturn(false);
-			LinkedList<Computer> computerList = MapperComputer.getInstance().fromResultSetToComputerList(mockResultSet);
+			LinkedList<Computer> computerList = mapperComputer.fromResultSetToComputerList(mockResultSet);
 			assertEquals(0, computerList.size());
 			verify(mockResultSet, times(1)).next();
 		} catch (SQLException | MapperException e) {
@@ -95,7 +106,7 @@ class MapperComputerTest {
 	@Test
 	void testMapToComputerShouldThrowAnException() {
 		assertThrows(MapperException.class, () -> {
-			MapperComputer.getInstance().fromResultSetToComputerList(null);
+			mapperComputer.fromResultSetToComputerList(null);
 		});
 	}
 
@@ -105,7 +116,7 @@ class MapperComputerTest {
 		try {
 			when(mockResultSet.next()).thenReturn(true);
 			when(mockResultSet.getInt("elements")).thenReturn(0);
-			int numComputer = MapperComputer.getInstance().fromResultSetToInt(mockResultSet);
+			int numComputer = mapperComputer.fromResultSetToInt(mockResultSet);
 			assertEquals(0, numComputer);
 			verify(mockResultSet, times(1)).next();
 			verify(mockResultSet, times(1)).getInt("elements");
@@ -120,7 +131,7 @@ class MapperComputerTest {
 		try {
 			when(mockResultSet.next()).thenReturn(true);
 			when(mockResultSet.getInt("elements")).thenReturn(50);
-			int numComputer = MapperComputer.getInstance().fromResultSetToInt(mockResultSet);
+			int numComputer = mapperComputer.fromResultSetToInt(mockResultSet);
 			assertEquals(50, numComputer);
 			verify(mockResultSet, times(1)).next();
 			verify(mockResultSet, times(1)).getInt("elements");
@@ -135,7 +146,7 @@ class MapperComputerTest {
 		try {
 			when(mockResultSet.next()).thenReturn(false);
 			assertThrows(MapperException.class, () -> {
-				MapperComputer.getInstance().fromResultSetToInt(mockResultSet);
+				mapperComputer.fromResultSetToInt(mockResultSet);
 			});
 			verify(mockResultSet, times(1)).next();
 		} catch (SQLException e) {
@@ -146,7 +157,7 @@ class MapperComputerTest {
 	@Test
 	void test2MapToIntShouldThrowAnException() {
 		assertThrows(MapperException.class, () -> {
-			MapperComputer.getInstance().fromResultSetToInt(null);
+			mapperComputer.fromResultSetToInt(null);
 		});
 	}
 	
@@ -160,7 +171,7 @@ class MapperComputerTest {
 				.withCompanyId("0")
 				.build();
 		try {
-			Computer computer = MapperComputer.getInstance().fromComputerDtoToComputer(computerDto);
+			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
 			String companyId = (computer.getCompany() == null) ? "0" : String.valueOf(computer.getCompany().getId());
 			assertEquals(computerDto.getId(), computer.getId());
 			assertEquals(computerDto.getName(), computer.getName());
@@ -182,7 +193,7 @@ class MapperComputerTest {
 					.withDiscontinued("2021-05-11")
 					.withCompanyId("0")
 					.build();
-			MapperComputer.getInstance().fromComputerDtoToComputer(computerDto);
+			mapperComputer.fromComputerDtoToComputer(computerDto);
 		});
 	}
 	
@@ -201,7 +212,7 @@ class MapperComputerTest {
 				.build();
 		computers.add(wr7);
 		computers.add(test);
-		LinkedList<ComputerDto> computersDto = MapperComputer.getInstance().fromComputerListToComputerDtoList(computers);
+		LinkedList<ComputerDto> computersDto = mapperComputer.fromComputerListToComputerDtoList(computers);
 		assertEquals(2, computersDto.size());
 		ComputerDto computerDto = computersDto.getFirst();
 		assertEquals(wr7.getId(), computerDto.getId());
@@ -214,7 +225,7 @@ class MapperComputerTest {
 	@Test
 	void testFromComputerListToComputerDtoListShouldReturnAnEmptyListOfComputerDto() {
 		LinkedList<Computer> computers = new LinkedList<>();
-		LinkedList<ComputerDto> computersDto = MapperComputer.getInstance().fromComputerListToComputerDtoList(computers);
+		LinkedList<ComputerDto> computersDto = mapperComputer.fromComputerListToComputerDtoList(computers);
 		assertEquals(0, computersDto.size());
 	}
 

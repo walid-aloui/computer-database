@@ -11,13 +11,24 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.excilys.cdb.ConfigTest;
 import com.excilys.cdb.dtos.CompanyDto;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
 
+@SpringJUnitConfig(ConfigTest.class)
 class MapperCompanyTest {
+	
+	private MapperCompany mapperCompany;
+	
+	@Autowired
+	public MapperCompanyTest(MapperCompany mapperCompany) {
+		this.mapperCompany = mapperCompany;
+	}
 
 	@Test
 	void testMapToCompanyShouldReturnListOfCompanies() {
@@ -26,7 +37,7 @@ class MapperCompanyTest {
 			when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 			when(mockResultSet.getInt("id")).thenReturn(1);
 			when(mockResultSet.getString("name")).thenReturn("WR7");
-			LinkedList<Company> company = MapperCompany.getInstance().fromResultSetToCompany(mockResultSet);
+			LinkedList<Company> company = mapperCompany.fromResultSetToCompany(mockResultSet);
 			assertEquals(1, company.size());
 			assertEquals(1, company.getFirst().getId());
 			assertEquals("WR7", company.getFirst().getName());
@@ -43,7 +54,7 @@ class MapperCompanyTest {
 		ResultSet mockResultSet = mock(ResultSet.class);
 		try {
 			when(mockResultSet.next()).thenReturn(false);
-			LinkedList<Company> company = MapperCompany.getInstance().fromResultSetToCompany(mockResultSet);
+			LinkedList<Company> company = mapperCompany.fromResultSetToCompany(mockResultSet);
 			assertEquals(0, company.size());
 			verify(mockResultSet, times(1)).next();
 		} catch (SQLException | MapperException e) {
@@ -54,7 +65,7 @@ class MapperCompanyTest {
 	@Test
 	void testMapToCompanyShouldThrowAnException() {
 		assertThrows(MapperException.class, () -> {
-			MapperCompany.getInstance().fromResultSetToCompany(null);
+			mapperCompany.fromResultSetToCompany(null);
 		});
 	}
 
@@ -71,7 +82,7 @@ class MapperCompanyTest {
 				.build();
 		companies.add(wr7Company);
 		companies.add(testCompany);
-		LinkedList<CompanyDto> companiesDto = MapperCompany.getInstance().fromCompanyListToCompanyDtoList(companies);
+		LinkedList<CompanyDto> companiesDto = mapperCompany.fromCompanyListToCompanyDtoList(companies);
 		assertEquals(2, companiesDto.size());
 		CompanyDto companyDto = companiesDto.getFirst();
 		assertEquals(wr7Company.getId(), companyDto.getId());
@@ -81,7 +92,7 @@ class MapperCompanyTest {
 	@Test
 	void testFromCompanyListToCompanyDtoListShouldReturnAnEmptyListOfCompanyDto() {
 		LinkedList<Company> companies = new LinkedList<>();
-		LinkedList<CompanyDto> companiesDto = MapperCompany.getInstance().fromCompanyListToCompanyDtoList(companies);
+		LinkedList<CompanyDto> companiesDto = mapperCompany.fromCompanyListToCompanyDtoList(companies);
 		assertEquals(0, companiesDto.size());
 	}
 
