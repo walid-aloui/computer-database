@@ -1,7 +1,7 @@
 package com.excilys.cdb.ui;
 
 import java.time.LocalDate;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -35,7 +35,7 @@ public class ControllerCli {
 		this.companyService = companyService;
 	}
 
-	public void executeOption(int opt) throws OpenException, MapperException, ExecuteQueryException {
+	public void executeOption(int opt) throws ExecuteQueryException, OpenException, MapperException {
 		ChoixMenu choice = ChoixMenu.toChoixMenu(opt);
 		switch (choice) {
 		case LIST_COMPANIES:
@@ -71,20 +71,23 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeListCompanies() throws OpenException, MapperException, ExecuteQueryException {
-		LinkedList<Company> allCompanies = companyService.getAllCompanies();
+	private void executeListCompanies() throws ExecuteQueryException {
+		List<Company> allCompanies = companyService.selectAllCompanies();
 		viewCli.showCompanies(allCompanies);
 	}
 
-	private void executeListComputers() throws OpenException, MapperException, ExecuteQueryException {
-		int numberOfComputer = computerService.getNumberOfComputer();
-		int numComputerPerPage = Page.getDefaultNumElement();
-		int totalPage = (int) Math.ceil((double) numberOfComputer / numComputerPerPage);
+	private void executeListComputers() throws ExecuteQueryException, OpenException, MapperException {
+		int numberOfComputer = computerService.selectNumberOfComputer();
+		int limit = Page.getDefaultNumElement();
+		int totalPage = (int) Math.ceil((double) numberOfComputer / limit);
 		int numPage = 1;
-		Page p = new PageBuilder().withNumPage(numPage).withTotalPage(totalPage).build();
+		Page p = new PageBuilder()
+				.withNumPage(numPage)
+				.withTotalPage(totalPage)
+				.build();
 		while (true) {
-			LinkedList<Computer> contenue = computerService.getPartOfComputers(Page.getDefaultNumElement(),
-					(p.getNumPage() - 1) * numComputerPerPage);
+			int offset = (p.getNumPage() - 1) * limit;
+			List<Computer> contenue = computerService.selectPartOfComputers(limit, offset);
 			p.setContenue(contenue);
 			viewCli.showPage(p);
 			String choice = askPage(p.getNumPage(), p.getTotalPage());
@@ -98,9 +101,9 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeShowDetails() throws OpenException, MapperException, ExecuteQueryException {
+	private void executeShowDetails() throws ExecuteQueryException {
 		int id = askComputerId();
-		Optional<Computer> c = computerService.getComputerById(id);
+		Optional<Computer> c = computerService.selectComputerById(id);
 		if (c.isPresent()) {
 			System.out.println(c.get());
 		} else {
@@ -108,7 +111,7 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeUpdateComputer() throws OpenException {
+	private void executeUpdateComputer() {
 		int id = askComputerId();
 		String newName = askComputerName();
 		LocalDate newIntroduced = askComputerIntroduced().orElse(null);
@@ -117,16 +120,23 @@ public class ControllerCli {
 
 		Company company = null;
 		if (newCompanyId != 0) {
-			company = new CompanyBuilder().withId(newCompanyId).build();
+			company = new CompanyBuilder()
+					.withId(newCompanyId)
+					.build();
 		}
-		Computer computer = new ComputerBuilder().withName(newName).withIntroduced(newIntroduced)
-				.withDiscontinued(newDiscontinued).withCompany(company).build();
+		Computer computer = new ComputerBuilder()
+				.withId(id)
+				.withName(newName)
+				.withIntroduced(newIntroduced)
+				.withDiscontinued(newDiscontinued)
+				.withCompany(company)
+				.build();
 
-		int numUpdate = computerService.updateComputerById(id, computer);
+		int numUpdate = computerService.updateComputer(computer);
 		System.out.println("Nombre de update : " + numUpdate);
 	}
 
-	private void executeInsertComputer() throws OpenException {
+	private void executeInsertComputer() {
 		String name = askComputerName();
 		LocalDate introduced = askComputerIntroduced().orElse(null);
 		LocalDate discontinued = askComputerDiscontinued(introduced).orElse(null);
@@ -136,8 +146,12 @@ public class ControllerCli {
 		if (company_id != 0) {
 			company = new CompanyBuilder().withId(company_id).build();
 		}
-		Computer computer = new ComputerBuilder().withName(name).withIntroduced(introduced)
-				.withDiscontinued(discontinued).withCompany(company).build();
+		Computer computer = new ComputerBuilder()
+				.withName(name)
+				.withIntroduced(introduced)
+				.withDiscontinued(discontinued)
+				.withCompany(company)
+				.build();
 
 		int numInsert = computerService.insertComputer(computer);
 		if (numInsert == 1) {
@@ -147,13 +161,13 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeDeleteComputer() throws OpenException, ExecuteQueryException {
+	private void executeDeleteComputer() {
 		int id = askComputerId();
 		int numDelete = computerService.deleteComputerById(id);
 		System.out.println("Nombre de suppression : " + numDelete);
 	}
 
-	private void executeDeleteCompany() throws OpenException, ExecuteQueryException {
+	private void executeDeleteCompany() {
 		int id = askCompanyId();
 		int numDelete = companyService.deleteCompanyById(id);
 		System.out.println("Nombre de suppression : " + numDelete);

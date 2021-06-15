@@ -1,6 +1,6 @@
 package com.excilys.cdb.service;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -8,60 +8,58 @@ import org.springframework.stereotype.Service;
 
 import com.excilys.cdb.daos.DaoComputer;
 import com.excilys.cdb.exception.ExecuteQueryException;
-import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Computer;
 
 @Service
 public class ComputerService {
 
 	private DaoComputer daoComputer;
-	
+
 	public ComputerService(DaoComputer daoComputer) {
 		this.daoComputer = daoComputer;
 	}
 
-	public LinkedList<Computer> getComputersByCriteria(Map<String, String> criteria)
-			throws OpenException, MapperException, ExecuteQueryException {
-		return daoComputer.getComputersByCriteria(criteria);
+	public List<Computer> selectAllComputers() throws ExecuteQueryException {
+		return daoComputer.selectAllComputers();
 	}
 
-	public LinkedList<Computer> getAllComputers() throws OpenException, MapperException, ExecuteQueryException {
-		return daoComputer.getAllComputers();
+	public Optional<Computer> selectComputerById(int id) throws ExecuteQueryException {
+		return daoComputer.selectComputerById(id);
 	}
 
-	public Optional<Computer> getComputerById(int id) throws OpenException, MapperException, ExecuteQueryException {
-		return daoComputer.getComputerById(id);
+	public List<Computer> selectComputersByName(String name) throws ExecuteQueryException {
+		return daoComputer.selectComputersByName(name);
 	}
 
-	public LinkedList<Computer> getComputerByName(String computerName)
-			throws OpenException, MapperException, ExecuteQueryException {
-		return daoComputer.getComputerByName(computerName);
+	public List<Computer> selectPartOfComputers(int limit, int offset) throws ExecuteQueryException {
+		return daoComputer.selectPartOfComputers(limit, offset);
 	}
 
-	public LinkedList<Computer> getPartOfComputers(int n, int offset)
-			throws OpenException, MapperException, ExecuteQueryException {
-		return daoComputer.getPartOfComputers(n, offset);
+	public List<Computer> selectPartOfComputersByName(String name, int limit, int offset) throws ExecuteQueryException {
+		return daoComputer.selectPartOfComputersByName(name, limit, offset);
 	}
 
-	public LinkedList<Computer> getPartOfComputersByName(String name, int n, int offset)
-			throws OpenException, MapperException, ExecuteQueryException {
-		return daoComputer.getPartOfComputersByName(name, n, offset);
+	public List<Computer> selectComputersByCriteria(Map<String, String> criteria) throws ExecuteQueryException {
+		return daoComputer.selectComputersByCriteria(criteria);
 	}
 
-	public int getNumberOfComputer() throws OpenException, MapperException, ExecuteQueryException {
-		return daoComputer.getNumberOfComputer();
+	public int selectNumberOfComputer() throws ExecuteQueryException {
+		return daoComputer.selectNumberOfComputer();
 	}
 
-	public int deleteComputerById(int id) throws OpenException, ExecuteQueryException {
+	public int deleteComputerById(int id) {
 		return daoComputer.deleteComputerById(id);
 	}
 
-	public int updateComputerById(int id, Computer computer) throws OpenException {
-		return daoComputer.updateComputerById(id, computer);
+	public int deleteComputersByCompanyId(int id) {
+		return daoComputer.deleteComputersByCompanyId(id);
 	}
 
-	public int insertComputer(Computer computer) throws OpenException {
+	public int updateComputer(Computer computer) {
+		return daoComputer.updateComputer(computer);
+	}
+
+	public int insertComputer(Computer computer) {
 		return daoComputer.insertComputer(computer);
 	}
 

@@ -17,12 +17,11 @@ import com.zaxxer.hikari.HikariDataSource;
 @Repository
 public class DatabaseConnection {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConnection.class);
 	private static final String HIKARY_CONFIG_FILE = "datasource.properties";
 
-	private static HikariConfig config;
-	private static HikariDataSource ds;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConnection.class);
+	private HikariConfig config;
+	private HikariDataSource ds;
 
 	public DatabaseConnection() throws OpenException {
 		Properties properties = new Properties();
@@ -47,6 +46,10 @@ public class DatabaseConnection {
 			LOGGER.error("Echec openConnection", e);
 			throw new OpenException();
 		}
+	}
+
+	public HikariDataSource getDs() {
+		return ds;
 	}
 
 }

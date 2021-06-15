@@ -21,7 +21,7 @@ public class Cli {
 		sc = new Scanner(System.in);
 	}
 
-	public void runCli() throws OpenException, MapperException, ExecuteQueryException {
+	public void runCli() throws ExecuteQueryException, OpenException, MapperException {
 		int opt;
 		do {
 			opt = askChoice();
@@ -51,5 +51,5 @@ public class Cli {
 	public ControllerCli getControllerCli() {
 		return controllerCli;
 	}
-	
+
 }

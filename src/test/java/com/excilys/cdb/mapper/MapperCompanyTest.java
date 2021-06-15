@@ -1,14 +1,9 @@
 package com.excilys.cdb.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,62 +11,22 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.excilys.cdb.ConfigTest;
 import com.excilys.cdb.dtos.CompanyDto;
-import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
 
 @SpringJUnitConfig(ConfigTest.class)
 class MapperCompanyTest {
-	
+
 	private MapperCompany mapperCompany;
-	
+
 	@Autowired
 	public MapperCompanyTest(MapperCompany mapperCompany) {
 		this.mapperCompany = mapperCompany;
 	}
 
 	@Test
-	void testMapToCompanyShouldReturnListOfCompanies() {
-		ResultSet mockResultSet = mock(ResultSet.class);
-		try {
-			when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-			when(mockResultSet.getInt("id")).thenReturn(1);
-			when(mockResultSet.getString("name")).thenReturn("WR7");
-			LinkedList<Company> company = mapperCompany.fromResultSetToCompany(mockResultSet);
-			assertEquals(1, company.size());
-			assertEquals(1, company.getFirst().getId());
-			assertEquals("WR7", company.getFirst().getName());
-			verify(mockResultSet, times(2)).next();
-			verify(mockResultSet, times(1)).getInt("id");
-			verify(mockResultSet, times(1)).getString("name");
-		} catch (SQLException | MapperException e) {
-			fail("Should not throw an exception");
-		}
-	}
-
-	@Test
-	void testMapToCompanyShouldReturnAnEmptyListOfCompanies() {
-		ResultSet mockResultSet = mock(ResultSet.class);
-		try {
-			when(mockResultSet.next()).thenReturn(false);
-			LinkedList<Company> company = mapperCompany.fromResultSetToCompany(mockResultSet);
-			assertEquals(0, company.size());
-			verify(mockResultSet, times(1)).next();
-		} catch (SQLException | MapperException e) {
-			fail("Should not throw an exception");
-		}
-	}
-
-	@Test
-	void testMapToCompanyShouldThrowAnException() {
-		assertThrows(MapperException.class, () -> {
-			mapperCompany.fromResultSetToCompany(null);
-		});
-	}
-
-	@Test
 	void testFromCompanyListToCompanyDtoListShouldReturnListOfCompanyDto() {
-		LinkedList<Company> companies = new LinkedList<>();
+		List<Company> companies = new ArrayList<>(2);
 		Company wr7Company = new CompanyBuilder()
 				.withId(1)
 				.withName("WR7-Company")
@@ -82,17 +37,18 @@ class MapperCompanyTest {
 				.build();
 		companies.add(wr7Company);
 		companies.add(testCompany);
-		LinkedList<CompanyDto> companiesDto = mapperCompany.fromCompanyListToCompanyDtoList(companies);
+
+		List<CompanyDto> companiesDto = mapperCompany.fromCompanyListToCompanyDtoList(companies);
 		assertEquals(2, companiesDto.size());
-		CompanyDto companyDto = companiesDto.getFirst();
+		CompanyDto companyDto = companiesDto.get(0);
 		assertEquals(wr7Company.getId(), companyDto.getId());
 		assertEquals(wr7Company.getName(), companyDto.getName());
 	}
 
 	@Test
 	void testFromCompanyListToCompanyDtoListShouldReturnAnEmptyListOfCompanyDto() {
-		LinkedList<Company> companies = new LinkedList<>();
-		LinkedList<CompanyDto> companiesDto = mapperCompany.fromCompanyListToCompanyDtoList(companies);
+		List<Company> companies = new ArrayList<>();
+		List<CompanyDto> companiesDto = mapperCompany.fromCompanyListToCompanyDtoList(companies);
 		assertEquals(0, companiesDto.size());
 	}
 

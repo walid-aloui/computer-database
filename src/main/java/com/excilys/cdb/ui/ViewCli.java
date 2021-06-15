@@ -1,6 +1,6 @@
 package com.excilys.cdb.ui;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,7 @@ import com.excilys.cdb.model.Page;
 
 @Component
 public class ViewCli {
-	
+
 	public ViewCli() {
 		super();
 	}
@@ -26,10 +26,8 @@ public class ViewCli {
 		System.out.println("8- Quitter\n");
 	}
 
-	void showCompanies(LinkedList<Company> companies) {
-		for (Company c : companies) {
-			System.out.println(c);
-		}
+	void showCompanies(List<Company> companies) {
+		companies.forEach(company -> System.out.println(company));
 	}
 
 	public void showPage(Page p) {

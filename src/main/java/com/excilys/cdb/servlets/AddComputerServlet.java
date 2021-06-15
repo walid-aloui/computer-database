@@ -1,7 +1,7 @@
 package com.excilys.cdb.servlets;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -81,15 +81,15 @@ public class AddComputerServlet extends HttpServlet {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
 			computerService.insertComputer(computer);
 			resp.sendRedirect(ROUTE_ADD_COMPUTER);
-		} catch (MapperException | OpenException e) {
+		} catch (MapperException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
 	}
 
 	private void updateCompaniesId(HttpServletRequest req)
 			throws OpenException, MapperException, ExecuteQueryException {
-		LinkedList<Company> listCompanies = companyService.getAllCompanies();
-		LinkedList<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
+		List<Company> listCompanies = companyService.selectAllCompanies();
+		List<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
 		req.setAttribute(ATTR_LIST_COMPANY, listDtoCompanies);
 	}
 

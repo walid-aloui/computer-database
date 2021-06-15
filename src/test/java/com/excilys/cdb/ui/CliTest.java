@@ -111,9 +111,9 @@ class CliTest {
 				.withName("Company_three")
 				.build());
 		try {
-			when(mockCompanyService.getAllCompanies()).thenReturn(allCompanies);
+			when(mockCompanyService.selectAllCompanies()).thenReturn(allCompanies);
 			cli.runCli();
-			verify(mockCompanyService, times(1)).getAllCompanies();
+			verify(mockCompanyService, times(1)).selectAllCompanies();
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -132,11 +132,11 @@ class CliTest {
 		final int offset = 0;
 		LinkedList<Computer> listComputers = createListOfTenComputers();
 		try {
-			when(mockComputerService.getPartOfComputers(numElements, offset)).thenReturn(listComputers);
-			when(mockComputerService.getNumberOfComputer()).thenReturn(numElements);
+			when(mockComputerService.selectPartOfComputers(numElements, offset)).thenReturn(listComputers);
+			when(mockComputerService.selectNumberOfComputer()).thenReturn(numElements);
 			cli.runCli();
-			verify(mockComputerService, times(1)).getPartOfComputers(numElements, offset);
-			verify(mockComputerService, times(1)).getNumberOfComputer();
+			verify(mockComputerService, times(1)).selectPartOfComputers(numElements, offset);
+			verify(mockComputerService, times(1)).selectNumberOfComputer();
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -156,9 +156,9 @@ class CliTest {
 				.withName("Computer_WR7")
 				.build();
 		try {
-			when(mockComputerService.getComputerById(computerId)).thenReturn(Optional.of(computer));
+			when(mockComputerService.selectComputerById(computerId)).thenReturn(Optional.of(computer));
 			cli.runCli();
-			verify(mockComputerService, times(1)).getComputerById(computerId);
+			verify(mockComputerService, times(1)).selectComputerById(computerId);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -174,9 +174,9 @@ class CliTest {
 		changeNextLineController(String.valueOf(computerId));
 
 		try {
-			when(mockComputerService.getComputerById(computerId)).thenReturn(Optional.empty());
+			when(mockComputerService.selectComputerById(computerId)).thenReturn(Optional.empty());
 			cli.runCli();
-			verify(mockComputerService, times(1)).getComputerById(computerId);
+			verify(mockComputerService, times(1)).selectComputerById(computerId);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}
@@ -199,12 +199,13 @@ class CliTest {
 		changeNextLineController(userInputs);
 
 		Computer computer = new ComputerBuilder()
+				.withId(computerId)
 				.withName(name)
 				.build();
 		try {
-			when(mockComputerService.updateComputerById(computerId, computer)).thenReturn(1);
+			when(mockComputerService.updateComputer(computer)).thenReturn(1);
 			cli.runCli();
-			verify(mockComputerService, times(1)).updateComputerById(computerId, computer);
+			verify(mockComputerService, times(1)).updateComputer(computer);
 		} catch (OpenException | ExecuteQueryException | MapperException e) {
 			fail("Should not throw an exception");
 		}

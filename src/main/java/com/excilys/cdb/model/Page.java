@@ -1,6 +1,6 @@
 package com.excilys.cdb.model;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
@@ -11,7 +11,7 @@ public class Page {
 	private static final int DEFAULT_NUM_ELEMENT = 25;
 	private int numPage;
 	private final int totalPage;
-	private LinkedList<Computer> contenue;
+	private List<Computer> contenue;
 
 	private Page(PageBuilder pageBuilder) throws OpenException, ExecuteQueryException, MapperException {
 		this.numPage = pageBuilder.numPage;
@@ -45,14 +45,14 @@ public class Page {
 		return totalPage;
 	}
 
-	public void setContenue(LinkedList<Computer> contenue) {
+	public void setContenue(List<Computer> contenue) {
 		this.contenue = contenue;
 	}
 
 	public static class PageBuilder {
 		private int numPage;
 		private int totalPage;
-		private LinkedList<Computer> contenue;
+		private List<Computer> contenue;
 
 		public PageBuilder() {
 			super();
@@ -68,7 +68,7 @@ public class Page {
 			return this;
 		}
 
-		public PageBuilder withContenue(LinkedList<Computer> contenue) {
+		public PageBuilder withContenue(List<Computer> contenue) {
 			this.contenue = contenue;
 			return this;
 		}

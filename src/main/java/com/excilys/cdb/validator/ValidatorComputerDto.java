@@ -20,7 +20,9 @@ public class ValidatorComputerDto {
 	}
 
 	private boolean validatorCompanyId(String id) {
-		return SecureInputs.isInteger(id) && validatorId(Integer.parseInt(id));
+		return (id == null) ||
+				(SecureInputs.isInteger(id) && 
+				validatorId(Integer.parseInt(id)));
 	}
 
 	private boolean validatorName(String name) {

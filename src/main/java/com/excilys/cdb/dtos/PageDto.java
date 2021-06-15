@@ -1,6 +1,6 @@
 package com.excilys.cdb.dtos;
 
-import java.util.LinkedList;
+import java.util.List;
 
 public class PageDto {
 
@@ -9,7 +9,7 @@ public class PageDto {
 	private int totalPage;
 	private int numElementPerPage;
 	private int numElementTotal;
-	private LinkedList<ComputerDto> contenue;
+	private List<ComputerDto> contenue;
 
 	public PageDto() {
 		super();
@@ -65,11 +65,11 @@ public class PageDto {
 		this.numElementTotal = numElementTotal;
 	}
 
-	public LinkedList<ComputerDto> getContenue() {
+	public List<ComputerDto> getContenue() {
 		return contenue;
 	}
 
-	public void setContenue(LinkedList<ComputerDto> contenue) {
+	public void setContenue(List<ComputerDto> contenue) {
 		this.contenue = contenue;
 	}
 
@@ -83,7 +83,7 @@ public class PageDto {
 		private int totalPage;
 		private int numElementPerPage;
 		private int numElementTotal;
-		private LinkedList<ComputerDto> contenue;
+		private List<ComputerDto> contenue;
 
 		public PageDtoBuilder() {
 			super();
@@ -109,7 +109,7 @@ public class PageDto {
 			return this;
 		}
 
-		public PageDtoBuilder withContenue(LinkedList<ComputerDto> contenue) {
+		public PageDtoBuilder withContenue(List<ComputerDto> contenue) {
 			this.contenue = contenue;
 			return this;
 		}

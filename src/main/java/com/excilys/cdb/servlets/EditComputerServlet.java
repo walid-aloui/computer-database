@@ -1,7 +1,7 @@
 package com.excilys.cdb.servlets;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -75,26 +75,27 @@ public class EditComputerServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		int computerId = Integer.parseInt(req.getParameter(PARAM_ID));
 		ComputerDto computerDto = new ComputerDtoBuilder()
+				.withId(computerId)
 				.withName(req.getParameter(PARAM_NAME))
 				.withIntroduced(req.getParameter(PARAM_INTRODUCED))
 				.withDiscontinued(req.getParameter(PARAM_DISCONTINUED))
 				.withCompanyId(req.getParameter(PARAM_COMPANY_ID))
 				.build();
-		int computerId = Integer.parseInt(req.getParameter(PARAM_ID));
 		try {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
-			computerService.updateComputerById(computerId, computer);
+			computerService.updateComputer(computer);
 			resp.sendRedirect(ROUTE_EDIT_COMPUTER);
-		} catch (MapperException | OpenException e) {
+		} catch (MapperException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
 	}
 
 	private void updateCompaniesId(HttpServletRequest req)
 			throws OpenException, MapperException, ExecuteQueryException {
-		LinkedList<Company> listCompanies = companyService.getAllCompanies();
-		LinkedList<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
+		List<Company> listCompanies = companyService.selectAllCompanies();
+		List<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
 		req.setAttribute(ATTR_LIST_COMPANY, listDtoCompanies);
 	}
 	

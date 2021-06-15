@@ -3,7 +3,6 @@ package com.excilys.cdb.servlets;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -82,7 +81,7 @@ public class DashboardServlet extends HttpServlet {
 		selection.stream().forEach(id -> {
 			try {
 				computerService.deleteComputerById(Integer.valueOf(id));
-			} catch (NumberFormatException | OpenException | ExecuteQueryException e) {
+			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
 		});
@@ -100,7 +99,7 @@ public class DashboardServlet extends HttpServlet {
 
 	private void initNumElementPage(HttpServletRequest req)
 			throws OpenException, MapperException, ExecuteQueryException {
-		int numComputers = computerService.getNumberOfComputer();
+		int numComputers = computerService.selectNumberOfComputer();
 		pageDto.setNumElementTotal(numComputers);
 	}
 
@@ -138,8 +137,8 @@ public class DashboardServlet extends HttpServlet {
 		criteria.put(KEY_OFFSET, String.valueOf(offset));
 		criteria.put(KEY_ORDER, orderBy);
 		criteria.put(KEY_MODE, mode);
-		LinkedList<Computer> computers = computerService.getComputersByCriteria(criteria);
-		LinkedList<ComputerDto> listDtoComputers = mapperComputer.fromComputerListToComputerDtoList(computers);
+		List<Computer> computers = computerService.selectComputersByCriteria(criteria);
+		List<ComputerDto> listDtoComputers = mapperComputer.fromComputerListToComputerDtoList(computers);
 		pageDto.setContenue(listDtoComputers);
 	}
 

@@ -1,14 +1,12 @@
 package com.excilys.cdb.service;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.excilys.cdb.daos.DaoCompany;
 import com.excilys.cdb.exception.ExecuteQueryException;
-import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
 
 @Service
@@ -20,15 +18,15 @@ public class CompanyService {
 		this.daoCompany = daoCompany;
 	}
 
-	public LinkedList<Company> getAllCompanies() throws OpenException, MapperException, ExecuteQueryException {
-		return daoCompany.getAllCompanies();
+	public List<Company> selectAllCompanies() throws ExecuteQueryException {
+		return daoCompany.selectAllCompanies();
 	}
 
-	public Optional<Company> getCompanyById(int id) throws OpenException, MapperException, ExecuteQueryException {
-		return daoCompany.getCompanyById(id);
+	public Optional<Company> selectCompanyById(int id) throws ExecuteQueryException {
+		return daoCompany.selectCompanyById(id);
 	}
 
-	public int deleteCompanyById(int id) throws OpenException, ExecuteQueryException {
+	public int deleteCompanyById(int id) {
 		return daoCompany.deleteCompanyById(id);
 	}
 
