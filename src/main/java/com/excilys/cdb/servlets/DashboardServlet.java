@@ -19,8 +19,6 @@ import org.springframework.stereotype.Controller;
 import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.dtos.PageDto;
 import com.excilys.cdb.exception.ExecuteQueryException;
-import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.mapper.MapperComputer;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
@@ -45,7 +43,7 @@ public class DashboardServlet extends HttpServlet {
 	private static final String PARAM_ORDER_BY = "orderBy";
 	private static final String PARAM_MODE = "mode";
 
-	private static final String KEY_NAME = "computerName";
+	private static final String KEY_SEARCH = "search";
 	private static final String KEY_ORDER = "orderBy";
 	private static final String KEY_MODE = "mode";
 	private static final String KEY_LIMIT = "limit";
@@ -70,7 +68,7 @@ public class DashboardServlet extends HttpServlet {
 		try {
 			initPage(req);
 			this.getServletContext().getRequestDispatcher(JSP_DASHBOARD).forward(req, resp);
-		} catch (OpenException | MapperException | ExecuteQueryException e) {
+		} catch (ExecuteQueryException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
 	}
@@ -88,7 +86,7 @@ public class DashboardServlet extends HttpServlet {
 		resp.sendRedirect(ROUTE_DASHBOARD);
 	}
 
-	private void initPage(HttpServletRequest req) throws OpenException, MapperException, ExecuteQueryException {
+	private void initPage(HttpServletRequest req) throws ExecuteQueryException {
 		initNumElementPage(req);
 		initNumPage(req);
 		initNumElementPerPage(req);
@@ -97,9 +95,9 @@ public class DashboardServlet extends HttpServlet {
 		req.setAttribute(ATTR_PAGE, pageDto);
 	}
 
-	private void initNumElementPage(HttpServletRequest req)
-			throws OpenException, MapperException, ExecuteQueryException {
-		int numComputers = computerService.selectNumberOfComputer();
+	private void initNumElementPage(HttpServletRequest req) throws ExecuteQueryException {
+		String search = req.getParameter(PARAM_SEARCH);
+		int numComputers = computerService.selectNumberOfComputerBySearch(search);
 		pageDto.setNumElementTotal(numComputers);
 	}
 
@@ -123,7 +121,7 @@ public class DashboardServlet extends HttpServlet {
 		pageDto.setTotalPage(totalPage);
 	}
 
-	private void initContenuePage(HttpServletRequest req) throws OpenException, MapperException, ExecuteQueryException {
+	private void initContenuePage(HttpServletRequest req) throws ExecuteQueryException {
 		int numPage = pageDto.getNumPage();
 		int limit = pageDto.getNumElementPerPage();
 		int offset = (numPage - 1) * limit;
@@ -132,7 +130,7 @@ public class DashboardServlet extends HttpServlet {
 		String mode = req.getParameter(PARAM_MODE);
 
 		Map<String, String> criteria = new HashMap<>();
-		criteria.put(KEY_NAME, search);
+		criteria.put(KEY_SEARCH, search);
 		criteria.put(KEY_LIMIT, String.valueOf(limit));
 		criteria.put(KEY_OFFSET, String.valueOf(offset));
 		criteria.put(KEY_ORDER, orderBy);

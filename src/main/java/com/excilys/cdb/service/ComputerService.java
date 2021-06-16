@@ -47,6 +47,10 @@ public class ComputerService {
 		return daoComputer.selectNumberOfComputer();
 	}
 
+	public int selectNumberOfComputerBySearch(String search) throws ExecuteQueryException {
+		return daoComputer.selectNumberOfComputerBySearch(search);
+	}
+
 	public int deleteComputerById(int id) {
 		return daoComputer.deleteComputerById(id);
 	}

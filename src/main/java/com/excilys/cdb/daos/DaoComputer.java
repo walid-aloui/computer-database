@@ -37,10 +37,6 @@ public class DaoComputer {
 			SELECT_ALL 
 			+ " WHERE computer.name = :name";
 
-	private static final String SELECT_NUM_COMPUTER = 
-			"SELECT COUNT(*)"
-			+ " FROM computer";
-
 	private static final String SELECT_WITH_LIMIT = 
 			SELECT_ALL 
 			+ " LIMIT :offset, :limit";
@@ -53,9 +49,21 @@ public class DaoComputer {
 	private static final String SELECT_BY_CRITERIA = 
 			SELECT_ALL 
 			+ " WHERE computer.name LIKE :computerName"
-			+ " OR computer.company_id LIKE :company_id" 
+			+ " OR company.name LIKE :companyName" 
 			+ " ORDER BY :order :mode" 
 			+ " LIMIT :offset, :limit";
+	
+	private static final String SELECT_NUM_COMPUTER = 
+			"SELECT COUNT(*)"
+			+ " FROM computer";
+	
+	private static final String SELECT_NUM_COMPUTER_BY_SEARCH = 
+			"SELECT COUNT(*)"
+			+ " FROM computer"
+			+ " LEFT JOIN company"
+			+ " ON (computer.company_id = company.id)"
+			+ " WHERE computer.name LIKE :computerName"
+			+ " OR company.name LIKE :companyName";
 
 	private static final String DELETE_BY_ID = 
 			"DELETE"
@@ -80,7 +88,7 @@ public class DaoComputer {
 			+ " INTO computer(name,introduced,discontinued,company_id)"
 			+ " VALUES (:name, :introduced, :discontinued, :companyId)";
 
-	private static final String KEY_NAME = "computerName";
+	private static final String KEY_SEARCH = "search";
 	private static final String KEY_ORDER = "orderBy";
 	private static final String KEY_MODE = "mode";
 	private static final String KEY_LIMIT = "limit";
@@ -167,17 +175,62 @@ public class DaoComputer {
 
 	public List<Computer> selectComputersByCriteria(Map<String, String> criteria) throws ExecuteQueryException {
 		try {
+			String search = criteria.get(KEY_SEARCH);
+			if(search == null || search.isBlank()) {
+				search = "%";
+			}else {
+				search = "%" + search + "%";
+			}
+			
+			String order = criteria.get(KEY_ORDER);
+			order = getColumn(order);
+			
+			String mode = criteria.get(KEY_MODE);
+			if(mode == null || mode.isBlank()) {
+				mode = "ASC";
+			}
+			
+			int offset = Integer.parseInt(criteria.get(KEY_OFFSET));
+			int limit = Integer.parseInt(criteria.get(KEY_LIMIT));
+			
+			String query = SELECT_BY_CRITERIA
+					.replace(":order", order)
+					.replace(":mode", mode);
+			
 			NamedParameterJdbcTemplate vJdbcTemplate = new NamedParameterJdbcTemplate(dbConnection.getDs());
 			MapSqlParameterSource nameParameters = new MapSqlParameterSource();
-			nameParameters.addValue("name", criteria.get(KEY_NAME));
-			nameParameters.addValue("order", criteria.get(KEY_ORDER));
-			nameParameters.addValue("mode", criteria.get(KEY_MODE));
-			nameParameters.addValue("offset", criteria.get(KEY_OFFSET));
-			nameParameters.addValue("limit", criteria.get(KEY_LIMIT));
-			return vJdbcTemplate.query(SELECT_BY_CRITERIA, nameParameters, rowMapperComputer);
+			nameParameters.addValue("computerName", search);
+			nameParameters.addValue("companyName", search);
+			nameParameters.addValue("offset", offset);
+			nameParameters.addValue("limit", limit);
+			return vJdbcTemplate.query(query, nameParameters, rowMapperComputer);
 		} catch (DataAccessException e) {
 			LOGGER.error("Echec getComputersByCriteria", e);
 			throw new ExecuteQueryException();
+		}
+	}
+	
+	private String getColumn(String order) {
+		if(order == null) {
+			return "computer.id";
+		}
+		
+		switch (order) {
+		
+		case "name":
+			return "computer.name";
+			
+		case "introduced":
+			return "introduced";
+			
+		case "discontinued":
+			return "discontinued";
+			
+		case "company":
+			return "company.id";
+
+		default:
+			return "computer.id";
 		}
 	}
 
@@ -186,7 +239,26 @@ public class DaoComputer {
 			JdbcTemplate vJdbcTemplate = new JdbcTemplate(dbConnection.getDs());
 			return vJdbcTemplate.queryForObject(SELECT_NUM_COMPUTER, Integer.class);
 		} catch (DataAccessException e) {
-			LOGGER.error("Echec getNumberOfComputer", e);
+			LOGGER.error("Echec selectNumberOfComputer", e);
+			throw new ExecuteQueryException();
+		}
+	}
+	
+	public int selectNumberOfComputerBySearch(String search) throws ExecuteQueryException {
+		try {
+			String s = null;
+			if(search == null || search.isBlank()) {
+				s = "%";
+			}else {
+				s = "%" + search + "%";
+			}
+			NamedParameterJdbcTemplate vJdbcTemplate = new NamedParameterJdbcTemplate(dbConnection.getDs());
+			MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+			namedParameters.addValue("computerName", s);
+			namedParameters.addValue("companyName", s);
+			return vJdbcTemplate.queryForObject(SELECT_NUM_COMPUTER_BY_SEARCH, namedParameters, Integer.class);
+		} catch (DataAccessException e) {
+			LOGGER.error("Echec selectNumberOfComputerByName", e);
 			throw new ExecuteQueryException();
 		}
 	}

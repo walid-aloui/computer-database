@@ -34,7 +34,7 @@ public class EditComputerServlet extends HttpServlet {
 	private static final String JSP_EDIT_COMPUTER = "/WEB-INF/views/editComputer.jsp";
 	private static final String JSP_ERROR_500 = "/WEB-INF/views/500.jsp";
 	
-	private static final String ROUTE_EDIT_COMPUTER = "editComputer";
+	private static final String ROUTE_DASHBOARD = "dashboard";
 	
 	private static final String ATTR_LIST_COMPANY = "listCompanies";
 	private static final String ATTR_COMPANY_ID = "computerId";
@@ -86,7 +86,7 @@ public class EditComputerServlet extends HttpServlet {
 		try {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
 			computerService.updateComputer(computer);
-			resp.sendRedirect(ROUTE_EDIT_COMPUTER);
+			resp.sendRedirect(ROUTE_DASHBOARD);
 		} catch (MapperException e) {
 			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
 		}
