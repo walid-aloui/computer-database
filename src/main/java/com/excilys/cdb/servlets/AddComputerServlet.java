@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.excilys.cdb.dtos.CompanyDto;
 import com.excilys.cdb.dtos.ComputerDto;
@@ -56,9 +57,14 @@ public class AddComputerServlet {
 			return new ModelAndView(ROUTE_ERROR_500);
 		}
 	}
+	
+	@GetMapping("/error")
+	public ModelAndView getError500() {
+		return new ModelAndView(ROUTE_ERROR_500);
+	}
 
 	@PostMapping
-	public ModelAndView doPost(@RequestParam(value = PARAM_NAME, required = true) String name,
+	public RedirectView doPost(@RequestParam(value = PARAM_NAME, required = true) String name,
 							   @RequestParam(value = PARAM_INTRODUCED, required = false) String introduced,
 							   @RequestParam(value = PARAM_DISCONTINUED, required = false) String discontinued,
 							   @RequestParam(value = PARAM_COMPANY_ID, required = false) String companyId) {
@@ -71,9 +77,9 @@ public class AddComputerServlet {
 		try {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
 			computerService.insertComputer(computer);
-			return new ModelAndView(ROUTE_ADD_COMPUTER);
+			return new RedirectView(ROUTE_ADD_COMPUTER);
 		} catch (MapperException e) {
-			return new ModelAndView(ROUTE_ERROR_500);
+			return new RedirectView(ROUTE_ADD_COMPUTER + "/error");
 		}
 	}
 

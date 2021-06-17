@@ -1,9 +1,10 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Computer Database</title>
+<title><spring:message code="label.title"></spring:message></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <!-- Bootstrap -->
@@ -14,23 +15,23 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="dashboard"> Application - Computer Database </a>
+			<a class="navbar-brand" href="dashboard"> <spring:message code="label.home"></spring:message> </a>
 		</div>
 	</header>
 
 	<section id="main">
 		<div class="container">
-			<h1 id="homeTitle">${ requestScope.page.numElementTotal } Computers found</h1>
+			<h1 id="homeTitle">${ requestScope.page.numElementTotal } <spring:message code="label.computerFound"></spring:message> </h1>
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm" action="#" method="GET" class="form-inline">
-						<input type="search" id="searchbox" name="search" class="form-control" placeholder="Search name" />
-						<input type="submit" id="searchsubmit" value="Filter by name" class="btn btn-primary" />
+						<input type="search" id="searchbox" name="search" class="form-control" placeholder=<spring:message code = "label.searchName"></spring:message>/>
+						<input type="submit" id="searchsubmit" value="<spring:message code = "label.filterByName"></spring:message>" class="btn btn-primary" />
 					</form>
 				</div>
 				<div class="pull-right">
-					<a class="btn btn-success" id="addComputer" href="addComputer">Add Computer</a>
-					<a class="btn btn-default" id="editComputer" href="#" onclick="$.fn.toggleEditMode();">Edit</a>
+					<a class="btn btn-success" id="addComputer" href="addComputer"><spring:message code="label.addComputer"></spring:message> </a>
+					<a class="btn btn-default" id="editComputer" href="#" onclick="$.fn.toggleEditMode();"><spring:message code="label.edit"></spring:message></a>
 				</div>
 			</div>
 		</div>
@@ -62,12 +63,12 @@
 						</c:url>
 						<c:set var="mode" value="${ ((empty param.mode) || param.mode eq 'desc' ) ? 'asc' : 'desc' }"></c:set>
 						
-						<th><a href="${ url }&orderBy=name&mode=${ mode }">Computer name</a></th>
-						<th><a href="${ url }&orderBy=introduced&mode=${ mode }">Introduced date</a></th>
+						<th><a href="${ url }&orderBy=name&mode=${ mode }"><spring:message code="label.computerName"></spring:message></a></th>
+						<th><a href="${ url }&orderBy=introduced&mode=${ mode }"><spring:message code="label.introducedDate"></spring:message></a></th>
 						<!-- Table header for Discontinued Date -->
-						<th><a href="${ url }&orderBy=discontinued&mode=${ mode }">Discontinued date</a></th>
+						<th><a href="${ url }&orderBy=discontinued&mode=${ mode }"><spring:message code="label.discontinuedDate"></spring:message></a></th>
 						<!-- Table header for Company -->
-						<th><a href="${ url }&orderBy=company&mode=${ mode }">Company</a></th>
+						<th><a href="${ url }&orderBy=company&mode=${ mode }"><spring:message code="label.company"></spring:message></a></th>
 
 					</tr>
 				</thead>
