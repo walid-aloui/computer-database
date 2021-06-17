@@ -1,24 +1,19 @@
 package com.excilys.cdb.servlets;
 
-import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.excilys.cdb.dtos.CompanyDto;
 import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.dtos.ComputerDto.ComputerDtoBuilder;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.mapper.MapperCompany;
 import com.excilys.cdb.mapper.MapperComputer;
 import com.excilys.cdb.model.Company;
@@ -27,14 +22,11 @@ import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
 @Controller
-@SuppressWarnings("serial")
-@WebServlet("/addComputer")
-public class AddComputerServlet extends HttpServlet {
-
-	private static final String JSP_ADD_COMPUTER = "/WEB-INF/views/addComputer.jsp";
-	private static final String JSP_ERROR_500 = "/WEB-INF/views/500.jsp";
+@RequestMapping("/addComputer")
+public class AddComputerServlet {
 
 	private static final String ROUTE_ADD_COMPUTER = "addComputer";
+	private static final String ROUTE_ERROR_500 = "500";
 	
 	private static final String ATTR_LIST_COMPANY = "listCompanies";
 
@@ -48,49 +40,47 @@ public class AddComputerServlet extends HttpServlet {
 	private MapperComputer mapperComputer;
 	private MapperCompany mapperCompany;
 	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		@SuppressWarnings("resource")
-		ApplicationContext context = new AnnotationConfigApplicationContext(com.excilys.cdb.MainApp.class);
-		computerService = context.getBean(ComputerService.class);
-		companyService = context.getBean(CompanyService.class);
-		mapperComputer = context.getBean(MapperComputer.class);
-		mapperCompany = context.getBean(MapperCompany.class);
+	public AddComputerServlet(ComputerService computerService, CompanyService companyService,
+			MapperComputer mapperComputer, MapperCompany mapperCompany) {
+		this.computerService = computerService;
+		this.companyService = companyService;
+		this.mapperComputer = mapperComputer;
+		this.mapperCompany = mapperCompany;
 	}
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	@GetMapping
+	public ModelAndView doGet() {
 		try {
-			updateCompaniesId(req);
-			this.getServletContext().getRequestDispatcher(JSP_ADD_COMPUTER).forward(req, resp);
-		} catch (OpenException | MapperException | ExecuteQueryException e) {
-			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
+			return updateCompaniesId();
+		} catch (ExecuteQueryException e) {
+			return new ModelAndView(ROUTE_ERROR_500);
 		}
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	@PostMapping
+	public ModelAndView doPost(@RequestParam(value = PARAM_NAME, required = true) String name,
+							   @RequestParam(value = PARAM_INTRODUCED, required = false) String introduced,
+							   @RequestParam(value = PARAM_DISCONTINUED, required = false) String discontinued,
+							   @RequestParam(value = PARAM_COMPANY_ID, required = false) String companyId) {
 		ComputerDto computerDto = new ComputerDtoBuilder()
-				.withName(req.getParameter(PARAM_NAME))
-				.withIntroduced(req.getParameter(PARAM_INTRODUCED))
-				.withDiscontinued(req.getParameter(PARAM_DISCONTINUED))
-				.withCompanyId(req.getParameter(PARAM_COMPANY_ID))
+				.withName(name)
+				.withIntroduced(introduced)
+				.withDiscontinued(discontinued)
+				.withCompanyId(companyId)
 				.build();
 		try {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
 			computerService.insertComputer(computer);
-			resp.sendRedirect(ROUTE_ADD_COMPUTER);
+			return new ModelAndView(ROUTE_ADD_COMPUTER);
 		} catch (MapperException e) {
-			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
+			return new ModelAndView(ROUTE_ERROR_500);
 		}
 	}
 
-	private void updateCompaniesId(HttpServletRequest req)
-			throws OpenException, MapperException, ExecuteQueryException {
+	private ModelAndView updateCompaniesId() throws ExecuteQueryException {
 		List<Company> listCompanies = companyService.selectAllCompanies();
 		List<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
-		req.setAttribute(ATTR_LIST_COMPANY, listDtoCompanies);
+		return new ModelAndView(ROUTE_ADD_COMPUTER).addObject(ATTR_LIST_COMPANY, listDtoCompanies);
 	}
 
 }

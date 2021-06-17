@@ -1,24 +1,20 @@
 package com.excilys.cdb.servlets;
 
-import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.excilys.cdb.dtos.CompanyDto;
 import com.excilys.cdb.dtos.ComputerDto;
 import com.excilys.cdb.dtos.ComputerDto.ComputerDtoBuilder;
 import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.mapper.MapperCompany;
 import com.excilys.cdb.mapper.MapperComputer;
 import com.excilys.cdb.model.Company;
@@ -27,17 +23,15 @@ import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
 @Controller
-@SuppressWarnings("serial")
-@WebServlet("/editComputer")
-public class EditComputerServlet extends HttpServlet {
+@RequestMapping("/editComputer")
+public class EditComputerServlet {
 
-	private static final String JSP_EDIT_COMPUTER = "/WEB-INF/views/editComputer.jsp";
-	private static final String JSP_ERROR_500 = "/WEB-INF/views/500.jsp";
-	
+	private static final String ROUTE_EDIT_COMPUTER = "editComputer";
 	private static final String ROUTE_DASHBOARD = "dashboard";
+	private static final String ROUTE_ERROR_500 = "500";
 	
 	private static final String ATTR_LIST_COMPANY = "listCompanies";
-	private static final String ATTR_COMPANY_ID = "computerId";
+	private static final String ATTR_COMPUTER_ID = "computerId";
 	
 	private static final String PARAM_ID = "id";
 	private static final String PARAM_NAME = "computerName";
@@ -50,57 +44,62 @@ public class EditComputerServlet extends HttpServlet {
 	private MapperComputer mapperComputer;
 	private MapperCompany mapperCompany;
 	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		@SuppressWarnings("resource")
-		ApplicationContext context = new AnnotationConfigApplicationContext(com.excilys.cdb.MainApp.class);
-		computerService = context.getBean(ComputerService.class);
-		companyService = context.getBean(CompanyService.class);
-		mapperComputer = context.getBean(MapperComputer.class);
-		mapperCompany = context.getBean(MapperCompany.class);
+	public EditComputerServlet(ComputerService computerService, CompanyService companyService,
+			MapperComputer mapperComputer, MapperCompany mapperCompany) {
+		super();
+		this.computerService = computerService;
+		this.companyService = companyService;
+		this.mapperComputer = mapperComputer;
+		this.mapperCompany = mapperCompany;
 	}
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	@GetMapping
+	public ModelAndView doGet(@RequestParam(value = PARAM_ID) int id) {
 		try {
-			updateCompaniesId(req);
-			updateComputerId(req);
-			this.getServletContext().getRequestDispatcher(JSP_EDIT_COMPUTER).forward(req, resp);
-		} catch (OpenException | MapperException | ExecuteQueryException e) {
-			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
+			ModelAndView modelAndView = new ModelAndView(ROUTE_EDIT_COMPUTER);
+			modelAndView = updateCompaniesId(modelAndView);
+			modelAndView = updateComputerId(id, modelAndView);
+			return modelAndView;
+		} catch (ExecuteQueryException e) {
+			return new ModelAndView(ROUTE_ERROR_500);
 		}
-
+	}
+	
+	@GetMapping("/error")
+	public ModelAndView getError500() {
+		return new ModelAndView(ROUTE_ERROR_500);
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		int computerId = Integer.parseInt(req.getParameter(PARAM_ID));
+	@PostMapping
+	public RedirectView doPost(@RequestParam(value = PARAM_ID, required = true) int id,
+					   @RequestParam(value = PARAM_NAME, required = true) String name,
+					   @RequestParam(value = PARAM_INTRODUCED, required = false) String introduced,
+					   @RequestParam(value = PARAM_DISCONTINUED, required = false) String discontinued,
+					   @RequestParam(value = PARAM_COMPANY_ID, required = false) String companyId) {
 		ComputerDto computerDto = new ComputerDtoBuilder()
-				.withId(computerId)
-				.withName(req.getParameter(PARAM_NAME))
-				.withIntroduced(req.getParameter(PARAM_INTRODUCED))
-				.withDiscontinued(req.getParameter(PARAM_DISCONTINUED))
-				.withCompanyId(req.getParameter(PARAM_COMPANY_ID))
+				.withId(id)
+				.withName(name)
+				.withIntroduced(introduced)
+				.withDiscontinued(discontinued)
+				.withCompanyId(companyId)
 				.build();
 		try {
 			Computer computer = mapperComputer.fromComputerDtoToComputer(computerDto);
 			computerService.updateComputer(computer);
-			resp.sendRedirect(ROUTE_DASHBOARD);
+			return new RedirectView(ROUTE_DASHBOARD);
 		} catch (MapperException e) {
-			this.getServletContext().getRequestDispatcher(JSP_ERROR_500).forward(req, resp);
+			return new RedirectView(ROUTE_EDIT_COMPUTER + "/error");
 		}
 	}
 
-	private void updateCompaniesId(HttpServletRequest req)
-			throws OpenException, MapperException, ExecuteQueryException {
+	private ModelAndView updateCompaniesId(ModelAndView modelAndView) throws ExecuteQueryException {
 		List<Company> listCompanies = companyService.selectAllCompanies();
 		List<CompanyDto> listDtoCompanies = mapperCompany.fromCompanyListToCompanyDtoList(listCompanies);
-		req.setAttribute(ATTR_LIST_COMPANY, listDtoCompanies);
+		return modelAndView.addObject(ATTR_LIST_COMPANY, listDtoCompanies);
 	}
 	
-	private void updateComputerId(HttpServletRequest req) {
-		req.setAttribute(ATTR_COMPANY_ID, req.getParameter(PARAM_ID));
+	private ModelAndView updateComputerId(int id, ModelAndView modelAndView) {
+		return modelAndView.addObject(ATTR_COMPUTER_ID, id);
 	}
 
 }
