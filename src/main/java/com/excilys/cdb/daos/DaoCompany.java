@@ -32,10 +32,12 @@ public class DaoCompany {
 
 	private DatabaseConnection dbConnection;
 	private RowMapperCompany rowMapperCompany;
+	private DaoComputer daoComputer;
 
-	public DaoCompany(DatabaseConnection dbConnection, RowMapperCompany rowMapperCompany) {
+	public DaoCompany(DatabaseConnection dbConnection, RowMapperCompany rowMapperCompany, DaoComputer daoComputer) {
 		this.dbConnection = dbConnection;
 		this.rowMapperCompany = rowMapperCompany;
+		this.daoComputer = daoComputer;
 	}
 
 	public List<Company> selectAllCompanies() throws ExecuteQueryException {
@@ -67,6 +69,7 @@ public class DaoCompany {
 
 	@Transactional
 	public int deleteCompanyById(int id) {
+		daoComputer.deleteComputersByCompanyId(id);
 		try {
 			NamedParameterJdbcTemplate vJdbcTemplate = new NamedParameterJdbcTemplate(dbConnection.getDs());
 			MapSqlParameterSource namedParameters = new MapSqlParameterSource();
