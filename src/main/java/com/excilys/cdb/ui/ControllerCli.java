@@ -7,9 +7,6 @@ import java.util.Scanner;
 
 import org.springframework.stereotype.Controller;
 
-import com.excilys.cdb.exception.ExecuteQueryException;
-import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
@@ -35,7 +32,7 @@ public class ControllerCli {
 		this.companyService = companyService;
 	}
 
-	public void executeOption(int opt) throws ExecuteQueryException, OpenException, MapperException {
+	public void executeOption(int opt) {
 		ChoixMenu choice = ChoixMenu.toChoixMenu(opt);
 		switch (choice) {
 		case LIST_COMPANIES:
@@ -71,13 +68,13 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeListCompanies() throws ExecuteQueryException {
+	private void executeListCompanies() {
 		List<Company> allCompanies = companyService.selectAllCompanies();
 		viewCli.showCompanies(allCompanies);
 	}
 
-	private void executeListComputers() throws ExecuteQueryException, OpenException, MapperException {
-		int numberOfComputer = computerService.selectNumberOfComputer();
+	private void executeListComputers() {
+		long numberOfComputer = computerService.selectNumberOfComputer();
 		int limit = Page.getDefaultNumElement();
 		int totalPage = (int) Math.ceil((double) numberOfComputer / limit);
 		int numPage = 1;
@@ -101,7 +98,7 @@ public class ControllerCli {
 		}
 	}
 
-	private void executeShowDetails() throws ExecuteQueryException {
+	private void executeShowDetails() {
 		int id = askComputerId();
 		Optional<Computer> c = computerService.selectComputerById(id);
 		if (c.isPresent()) {
@@ -132,7 +129,7 @@ public class ControllerCli {
 				.withCompany(company)
 				.build();
 
-		int numUpdate = computerService.updateComputer(computer);
+		long numUpdate = computerService.updateComputer(computer);
 		System.out.println("Nombre de update : " + numUpdate);
 	}
 
@@ -153,23 +150,22 @@ public class ControllerCli {
 				.withCompany(company)
 				.build();
 
-		int numInsert = computerService.insertComputer(computer);
-		if (numInsert == 1) {
+		if(computerService.insertComputer(computer)) {
 			System.out.println("Insertion Reussie");
-		} else {
+		}else {
 			System.out.println("Echec Insertion");
 		}
 	}
 
 	private void executeDeleteComputer() {
 		int id = askComputerId();
-		int numDelete = computerService.deleteComputerById(id);
+		long numDelete = computerService.deleteComputerById(id);
 		System.out.println("Nombre de suppression : " + numDelete);
 	}
 
 	private void executeDeleteCompany() {
 		int id = askCompanyId();
-		int numDelete = companyService.deleteCompanyById(id);
+		long numDelete = companyService.deleteCompanyById(id);
 		System.out.println("Nombre de suppression : " + numDelete);
 	}
 

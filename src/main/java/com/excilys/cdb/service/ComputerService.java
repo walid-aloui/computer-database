@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.excilys.cdb.daos.DaoComputer;
-import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.model.Computer;
 
 @Service
@@ -19,51 +18,47 @@ public class ComputerService {
 		this.daoComputer = daoComputer;
 	}
 
-	public List<Computer> selectAllComputers() throws ExecuteQueryException {
+	public List<Computer> selectAllComputers() {
 		return daoComputer.selectAllComputers();
 	}
 
-	public Optional<Computer> selectComputerById(int id) throws ExecuteQueryException {
+	public Optional<Computer> selectComputerById(int id) {
 		return daoComputer.selectComputerById(id);
 	}
 
-	public List<Computer> selectComputersByName(String name) throws ExecuteQueryException {
-		return daoComputer.selectComputersByName(name);
-	}
-
-	public List<Computer> selectPartOfComputers(int limit, int offset) throws ExecuteQueryException {
+	public List<Computer> selectPartOfComputers(long limit, int offset) {
 		return daoComputer.selectPartOfComputers(limit, offset);
 	}
 
-	public List<Computer> selectPartOfComputersByName(String name, int limit, int offset) throws ExecuteQueryException {
-		return daoComputer.selectPartOfComputersByName(name, limit, offset);
+	public List<Computer> selectPartOfComputersBySearch(String search, int limit, int offset) {
+		return daoComputer.selectPartOfComputersBySearch(search, limit, offset);
 	}
 
-	public List<Computer> selectComputersByCriteria(Map<String, String> criteria) throws ExecuteQueryException {
+	public List<Computer> selectComputersByCriteria(Map<String, String> criteria) {
 		return daoComputer.selectComputersByCriteria(criteria);
 	}
 
-	public int selectNumberOfComputer() throws ExecuteQueryException {
+	public long selectNumberOfComputer() {
 		return daoComputer.selectNumberOfComputer();
 	}
 
-	public int selectNumberOfComputerBySearch(String search) throws ExecuteQueryException {
+	public long selectNumberOfComputerBySearch(String search) {
 		return daoComputer.selectNumberOfComputerBySearch(search);
 	}
 
-	public int deleteComputerById(int id) {
+	public long deleteComputerById(int id) {
 		return daoComputer.deleteComputerById(id);
 	}
 
-	public int deleteComputersByCompanyId(int id) {
+	public long deleteComputersByCompanyId(int id) {
 		return daoComputer.deleteComputersByCompanyId(id);
 	}
 
-	public int updateComputer(Computer computer) {
+	public long updateComputer(Computer computer) {
 		return daoComputer.updateComputer(computer);
 	}
 
-	public int insertComputer(Computer computer) {
+	public boolean insertComputer(Computer computer) {
 		return daoComputer.insertComputer(computer);
 	}
 

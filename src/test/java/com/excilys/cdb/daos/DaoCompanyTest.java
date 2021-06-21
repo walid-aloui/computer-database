@@ -16,24 +16,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.excilys.cdb.ConfigTest;
-import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.model.Company;
+import com.zaxxer.hikari.HikariDataSource;
 
 @SpringJUnitConfig(ConfigTest.class)
 class DaoCompanyTest {
 
-	private DatabaseConnection dbConnection;
 	private DaoCompany daoCompany;
+	private HikariDataSource ds;
 
 	@Autowired
-	public DaoCompanyTest(DatabaseConnection db, DaoCompany daoCompany) {
-		this.dbConnection = db;
+	public DaoCompanyTest(DaoCompany daoCompany, HikariDataSource ds) {
 		this.daoCompany = daoCompany;
+		this.ds = ds;
 	}
-
+	
 	@BeforeEach
 	void setUp() throws Exception {
-		try (Connection con = dbConnection.openConnection();) {
+		try (Connection con = ds.getConnection();) {
 			ScriptRunner sr = new ScriptRunner(con);
 			Reader reader = new BufferedReader(
 					new FileReader("/home/aloui/Bureau/computer-database/src/test/resources/test-db.sql"));
@@ -43,54 +43,42 @@ class DaoCompanyTest {
 
 	@Test
 	void testGetAllCompaniesShouldReturnListOfCompanies() {
-		try {
-			int numCompanies = 42;
-			List<Company> allcompanies = daoCompany.selectAllCompanies();
-			assertEquals(numCompanies, allcompanies.size());
-		} catch (ExecuteQueryException e) {
-			fail("Should not throw an exception");
-		}
+		int numCompanies = 42;
+		List<Company> allcompanies = daoCompany.selectAllCompanies();
+		assertEquals(numCompanies, allcompanies.size());
 	}
 
 	@Test
 	void testGetCompanyByIdShouldReturnCompany() {
-		try {
-			int id = 1;
-			Optional<Company> allcompanies = daoCompany.selectCompanyById(id);
-			if (allcompanies.isPresent()) {
-				assertEquals(id, allcompanies.get().getId());
-			} else {
-				fail("Should not be empty");
-			}
-		} catch (ExecuteQueryException e) {
-			fail("Should not throw an exception");
+		int id = 1;
+		Optional<Company> allcompanies = daoCompany.selectCompanyById(id);
+		if (allcompanies.isPresent()) {
+			assertEquals(id, allcompanies.get().getId());
+		} else {
+			fail("Should not be empty");
 		}
 	}
 
 	@Test
 	void testGetCompanyByIdShouldNotReturnCompany() {
-		try {
-			int falseId = 999;
-			Optional<Company> allcompanies = daoCompany.selectCompanyById(falseId);
-			if (allcompanies.isPresent()) {
-				fail("Should be empty");
-			}
-		} catch (ExecuteQueryException e) {
-			fail("Should not throw an exception");
+		int falseId = 999;
+		Optional<Company> allcompanies = daoCompany.selectCompanyById(falseId);
+		if (allcompanies.isPresent()) {
+			fail("Should be empty");
 		}
 	}
 
 	@Test
 	void testDeleteCompanyByIdShouldDeleteCompany() {
 		int companyId = 1;
-		int numDelete = daoCompany.deleteCompanyById(companyId);
-		assertEquals(companyId, numDelete);
+		long numDelete = daoCompany.deleteCompanyById(companyId);
+		assertEquals(1, numDelete);
 	}
 
 	@Test
 	void testDeleteCompanyByIdShouldNotDeleteCompany() {
 		int falseId = 999;
-		int numDelete = daoCompany.deleteCompanyById(falseId);
+		long numDelete = daoCompany.deleteCompanyById(falseId);
 		assertEquals(0, numDelete);
 	}
 

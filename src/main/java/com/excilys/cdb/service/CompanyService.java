@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.excilys.cdb.daos.DaoCompany;
-import com.excilys.cdb.exception.ExecuteQueryException;
 import com.excilys.cdb.model.Company;
 
 @Service
@@ -18,15 +17,15 @@ public class CompanyService {
 		this.daoCompany = daoCompany;
 	}
 
-	public List<Company> selectAllCompanies() throws ExecuteQueryException {
+	public List<Company> selectAllCompanies() {
 		return daoCompany.selectAllCompanies();
 	}
 
-	public Optional<Company> selectCompanyById(int id) throws ExecuteQueryException {
+	public Optional<Company> selectCompanyById(int id) {
 		return daoCompany.selectCompanyById(id);
 	}
 
-	public int deleteCompanyById(int id) {
+	public long deleteCompanyById(int id) {
 		return daoCompany.deleteCompanyById(id);
 	}
 

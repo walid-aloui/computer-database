@@ -15,6 +15,9 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 @Configuration
 @ComponentScan({"com.excilys.cdb.validator",
 				"com.excilys.cdb.mapper",
@@ -23,6 +26,8 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 				"com.excilys.cdb.servlets"})
 public class WebConfig extends DelegatingWebMvcConfiguration {
 	
+	private static final String HIKARY_CONFIG_FILE = "/datasource.properties";
+
 	@Override
 	protected void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry
@@ -34,7 +39,12 @@ public class WebConfig extends DelegatingWebMvcConfiguration {
 	protected void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(localeChangeInterceptor());
 	}
-
+	
+	@Bean
+	public HikariDataSource getDatasource() {
+		return new HikariDataSource(new HikariConfig(HIKARY_CONFIG_FILE));
+	}
+	
 	@Bean
 	public InternalResourceViewResolver viewResolver() {
 		InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();

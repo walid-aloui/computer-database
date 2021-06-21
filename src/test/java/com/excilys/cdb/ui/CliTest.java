@@ -1,6 +1,5 @@
 package com.excilys.cdb.ui;
 
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.excilys.cdb.ConfigTest;
-import com.excilys.cdb.exception.ExecuteQueryException;
-import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
@@ -83,11 +79,7 @@ class CliTest {
 		String choiceMenu = "8";
 		changeNextLineCli(choiceMenu);
 		
-		try {
-			cli.runCli();
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		cli.runCli();
 
 		// TODO : Verifier la sortit sur console
 	}
@@ -110,13 +102,9 @@ class CliTest {
 				.withId(3)
 				.withName("Company_three")
 				.build());
-		try {
-			when(mockCompanyService.selectAllCompanies()).thenReturn(allCompanies);
-			cli.runCli();
-			verify(mockCompanyService, times(1)).selectAllCompanies();
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		when(mockCompanyService.selectAllCompanies()).thenReturn(allCompanies);
+		cli.runCli();
+		verify(mockCompanyService, times(1)).selectAllCompanies();
 
 		// TODO : Verifier la sortit sur console
 	}
@@ -128,18 +116,14 @@ class CliTest {
 		String userInput = "q";
 		changeNextLineController(userInput);
 
-		final int numElements = Page.getDefaultNumElement();
+		final long numElements = Page.getDefaultNumElement();
 		final int offset = 0;
 		LinkedList<Computer> listComputers = createListOfTenComputers();
-		try {
-			when(mockComputerService.selectPartOfComputers(numElements, offset)).thenReturn(listComputers);
-			when(mockComputerService.selectNumberOfComputer()).thenReturn(numElements);
-			cli.runCli();
-			verify(mockComputerService, times(1)).selectPartOfComputers(numElements, offset);
-			verify(mockComputerService, times(1)).selectNumberOfComputer();
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		when(mockComputerService.selectPartOfComputers(numElements, offset)).thenReturn(listComputers);
+		when(mockComputerService.selectNumberOfComputer()).thenReturn(numElements);
+		cli.runCli();
+		verify(mockComputerService, times(1)).selectPartOfComputers(numElements, offset);
+		verify(mockComputerService, times(1)).selectNumberOfComputer();
 
 		// TODO : Verifier la sortit sur console
 	}
@@ -155,13 +139,9 @@ class CliTest {
 				.withId(computerId)
 				.withName("Computer_WR7")
 				.build();
-		try {
-			when(mockComputerService.selectComputerById(computerId)).thenReturn(Optional.of(computer));
-			cli.runCli();
-			verify(mockComputerService, times(1)).selectComputerById(computerId);
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		when(mockComputerService.selectComputerById(computerId)).thenReturn(Optional.of(computer));
+		cli.runCli();
+		verify(mockComputerService, times(1)).selectComputerById(computerId);
 
 		// TODO : Verifier la sortit sur console
 	}
@@ -173,13 +153,9 @@ class CliTest {
 		int computerId = 999;
 		changeNextLineController(String.valueOf(computerId));
 
-		try {
-			when(mockComputerService.selectComputerById(computerId)).thenReturn(Optional.empty());
-			cli.runCli();
-			verify(mockComputerService, times(1)).selectComputerById(computerId);
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		when(mockComputerService.selectComputerById(computerId)).thenReturn(Optional.empty());
+		cli.runCli();
+		verify(mockComputerService, times(1)).selectComputerById(computerId);
 
 		// TODO : Verifier la sortit sur console
 	}
@@ -202,13 +178,9 @@ class CliTest {
 				.withId(computerId)
 				.withName(name)
 				.build();
-		try {
-			when(mockComputerService.updateComputer(computer)).thenReturn(1);
-			cli.runCli();
-			verify(mockComputerService, times(1)).updateComputer(computer);
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		when(mockComputerService.updateComputer(computer)).thenReturn(1L);
+		cli.runCli();
+		verify(mockComputerService, times(1)).updateComputer(computer);
 
 		// TODO : Verifier la sortit sur console
 	}
@@ -225,16 +197,11 @@ class CliTest {
 		String userInputs = name + "\n" + introduced + "\n" + discontinued + "\n" + company_id + "\n";
 		changeNextLineController(userInputs);
 
-		try {
-			Computer computer = new ComputerBuilder()
-					.withName(name)
-					.build();
-			when(mockComputerService.insertComputer(computer)).thenReturn(1);
-			cli.runCli();
-			verify(mockComputerService, times(1)).insertComputer(computer);
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		Computer computer = new ComputerBuilder()
+				.withName(name)
+				.build();
+		cli.runCli();
+		verify(mockComputerService, times(1)).insertComputer(computer);
 
 		// TODO : Verifier la sortit sur console
 	}
@@ -247,13 +214,9 @@ class CliTest {
 		int computerId = 1;
 		changeNextLineController(String.valueOf(computerId));
 
-		try {
-			when(mockComputerService.deleteComputerById(computerId)).thenReturn(1);
-			cli.runCli();
-			verify(mockComputerService, times(1)).deleteComputerById(computerId);
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		when(mockComputerService.deleteComputerById(computerId)).thenReturn(1L);
+		cli.runCli();
+		verify(mockComputerService, times(1)).deleteComputerById(computerId);
 
 		// TODO : Verifier la sortit sur console
 	}
@@ -266,13 +229,9 @@ class CliTest {
 		int companyId = 1;
 		changeNextLineController(String.valueOf(companyId));
 
-		try {
-			when(mockCompanyService.deleteCompanyById(companyId)).thenReturn(1);
-			cli.runCli();
-			verify(mockCompanyService, times(1)).deleteCompanyById(companyId);
-		} catch (OpenException | ExecuteQueryException | MapperException e) {
-			fail("Should not throw an exception");
-		}
+		when(mockCompanyService.deleteCompanyById(companyId)).thenReturn(1L);
+		cli.runCli();
+		verify(mockCompanyService, times(1)).deleteCompanyById(companyId);
 
 		// TODO : Verifier la sortit sur console
 	}

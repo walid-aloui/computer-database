@@ -14,14 +14,17 @@ import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Company.CompanyBuilder;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
+import com.excilys.cdb.model.QComputer;
 import com.excilys.cdb.utils.SecureInputs;
 import com.excilys.cdb.validator.ValidatorComputerDto;
+import com.querydsl.core.Tuple;
 
 @Component
 public class MapperComputer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MapperComputer.class);
-
+	private static final QComputer qComputer = QComputer.computer;
+	
 	private ValidatorComputerDto validatorComputerDto;
 	
 	public MapperComputer(ValidatorComputerDto validatorComputerDto) {
@@ -69,6 +72,23 @@ public class MapperComputer {
 		return computers
 				.stream()
 				.map(computer -> fromComputerToComputerDto(computer))
+				.collect(Collectors.toList());
+	}
+	
+	public Computer fromTupleToComputer(Tuple t) {
+		return new ComputerBuilder()
+				.withId(t.get(qComputer.id))
+				.withName(t.get(qComputer.name))
+				.withIntroduced(t.get(qComputer.introduced))
+				.withDiscontinued(t.get(qComputer.discontinued))
+				.withCompany(t.get(qComputer.company))
+				.build();
+	}
+	
+	public List<Computer> fromTupleListToComputerList(List<Tuple> tupleList) {
+		return tupleList
+				.stream()
+				.map(tuple -> fromTupleToComputer(tuple))
 				.collect(Collectors.toList());
 	}
 

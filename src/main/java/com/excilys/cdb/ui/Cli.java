@@ -5,9 +5,6 @@ import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.excilys.cdb.exception.ExecuteQueryException;
-import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
 import com.excilys.cdb.utils.SecureInputs;
 
 @Component
@@ -21,7 +18,7 @@ public class Cli {
 		sc = new Scanner(System.in);
 	}
 
-	public void runCli() throws ExecuteQueryException, OpenException, MapperException {
+	public void runCli() {
 		int opt;
 		do {
 			opt = askChoice();

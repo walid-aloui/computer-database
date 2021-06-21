@@ -2,10 +2,6 @@ package com.excilys.cdb.model;
 
 import java.util.List;
 
-import com.excilys.cdb.exception.ExecuteQueryException;
-import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.exception.OpenException;
-
 public class Page {
 
 	private static final int DEFAULT_NUM_ELEMENT = 25;
@@ -13,7 +9,7 @@ public class Page {
 	private final int totalPage;
 	private List<Computer> contenue;
 
-	private Page(PageBuilder pageBuilder) throws OpenException, ExecuteQueryException, MapperException {
+	private Page(PageBuilder pageBuilder) {
 		this.numPage = pageBuilder.numPage;
 		this.totalPage = pageBuilder.totalPage;
 		this.contenue = pageBuilder.contenue;
@@ -50,6 +46,7 @@ public class Page {
 	}
 
 	public static class PageBuilder {
+
 		private int numPage;
 		private int totalPage;
 		private List<Computer> contenue;
@@ -73,7 +70,7 @@ public class Page {
 			return this;
 		}
 
-		public Page build() throws OpenException, ExecuteQueryException, MapperException {
+		public Page build() {
 			return new Page(this);
 		}
 	}

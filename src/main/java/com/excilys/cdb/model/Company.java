@@ -1,9 +1,27 @@
 package com.excilys.cdb.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "company")
 public class Company {
 
-	private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false)
+	private Integer id;
+
+	@Column(name = "name", nullable = false)
 	private String name;
+
+	public Company() {
+		super();
+	}
 
 	private Company(CompanyBuilder companyBuilder) {
 		this.id = companyBuilder.id;
@@ -19,7 +37,7 @@ public class Company {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + id;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -33,7 +51,10 @@ public class Company {
 		if (getClass() != obj.getClass())
 			return false;
 		Company other = (Company) obj;
-		if (id != other.id)
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		if (name == null) {
 			if (other.name != null)
@@ -43,23 +64,32 @@ public class Company {
 		return true;
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getName() {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public static class CompanyBuilder {
-		private int id;
+
+		private Integer id;
 		private String name;
 
 		public CompanyBuilder() {
 			super();
 		}
 
-		public CompanyBuilder withId(int id) {
+		public CompanyBuilder withId(Integer id) {
 			this.id = id;
 			return this;
 		}

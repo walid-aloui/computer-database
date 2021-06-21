@@ -2,13 +2,40 @@ package com.excilys.cdb.model;
 
 import java.time.LocalDate;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "computer")
 public class Computer {
 
-	private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false)
+	private Integer id;
+
+	@Column(name = "name", nullable = false)
 	private String name;
+
+	@Column(name = "introduced")
 	private LocalDate introduced;
+
+	@Column(name = "discontinued")
 	private LocalDate discontinued;
+
+	@ManyToOne
+	@JoinColumn(name = "company_id", referencedColumnName = "id")
 	private Company company;
+	
+	public Computer() {
+		super();
+	}
 
 	private Computer(ComputerBuilder computerBuilder) {
 		this.id = computerBuilder.id;
@@ -20,9 +47,8 @@ public class Computer {
 
 	@Override
 	public String toString() {
-		int company_id = (company == null) ? 0 : company.getId();
 		return "Computer [id=" + id + ", name=" + name + ", introduced=" + introduced + ", discontinued=" + discontinued
-				+ ", companyId=" + company_id + "]";
+				+ ", company=" + company + "]";
 	}
 
 	@Override
@@ -31,7 +57,7 @@ public class Computer {
 		int result = 1;
 		result = prime * result + ((company == null) ? 0 : company.hashCode());
 		result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
-		result = prime * result + id;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
@@ -56,7 +82,10 @@ public class Computer {
 				return false;
 		} else if (!discontinued.equals(other.discontinued))
 			return false;
-		if (id != other.id)
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		if (introduced == null) {
 			if (other.introduced != null)
@@ -92,7 +121,8 @@ public class Computer {
 	}
 
 	public static class ComputerBuilder {
-		private int id;
+
+		private Integer id;
 		private String name;
 		private LocalDate introduced;
 		private LocalDate discontinued;
@@ -102,7 +132,7 @@ public class Computer {
 			super();
 		}
 
-		public ComputerBuilder withId(int id) {
+		public ComputerBuilder withId(Integer id) {
 			this.id = id;
 			return this;
 		}

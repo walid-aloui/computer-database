@@ -8,7 +8,7 @@ public class PageDto {
 	private int numPage;
 	private int totalPage;
 	private int numElementPerPage;
-	private int numElementTotal;
+	private long numElementTotal;
 	private List<ComputerDto> contenue;
 
 	public PageDto() {
@@ -57,11 +57,11 @@ public class PageDto {
 		this.numElementPerPage = numElementPerPage;
 	}
 
-	public int getNumElementTotal() {
+	public long getNumElementTotal() {
 		return numElementTotal;
 	}
 
-	public void setNumElementTotal(int numElementTotal) {
+	public void setNumElementTotal(long numElementTotal) {
 		this.numElementTotal = numElementTotal;
 	}
 
@@ -82,7 +82,7 @@ public class PageDto {
 		private int numPage;
 		private int totalPage;
 		private int numElementPerPage;
-		private int numElementTotal;
+		private long numElementTotal;
 		private List<ComputerDto> contenue;
 
 		public PageDtoBuilder() {
@@ -104,7 +104,7 @@ public class PageDto {
 			return this;
 		}
 
-		public PageDtoBuilder withNumElementTotal(int numElementTotal) {
+		public PageDtoBuilder withNumElementTotal(long numElementTotal) {
 			this.numElementTotal = numElementTotal;
 			return this;
 		}

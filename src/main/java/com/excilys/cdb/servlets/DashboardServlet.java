@@ -89,7 +89,7 @@ public class DashboardServlet {
 	}
 
 	private void initNumElementPage(String search) throws ExecuteQueryException {
-		int numComputers = computerService.selectNumberOfComputerBySearch(search);
+		long numComputers = computerService.selectNumberOfComputerBySearch(search);
 		pageDto.setNumElementTotal(numComputers);
 	}
 
@@ -104,7 +104,7 @@ public class DashboardServlet {
 	}
 
 	private void initTotalPage() {
-		int numComputer = pageDto.getNumElementTotal();
+		long numComputer = pageDto.getNumElementTotal();
 		int limit = pageDto.getNumElementPerPage();
 		int totalPage = (int) Math.ceil((double) numComputer / limit);
 		pageDto.setTotalPage(totalPage);
