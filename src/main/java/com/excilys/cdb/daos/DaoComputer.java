@@ -94,32 +94,91 @@ public class DaoComputer {
 	}
 
 	public List<Computer> selectComputersByCriteria(Map<String, String> criteria) {
-		String column = getColumn(criteria.get(KEY_ORDER));
-		return null;
+		JPAQuery<Tuple> query = buildSelectAll();
+		query = addLike(query, criteria);
+		query = addOrderBy(query, criteria);
+		query = addLimit(query, criteria);
+		List<Tuple> tupleList = query.fetch();
+		return mapperComputer.fromTupleListToComputerList(tupleList);
 	}
-
-	private String getColumn(String order) {
-		if (order == null) {
-			return "computer.id";
+	
+	JPAQuery<Tuple> addLimit(JPAQuery<Tuple> query, Map<String, String> criteria){
+		int offset = Integer.parseInt(criteria.get(KEY_OFFSET));
+		int limit = Integer.parseInt(criteria.get(KEY_LIMIT));
+		return query.limit(limit).offset(offset);
+	}
+	
+	JPAQuery<Tuple> addLike(JPAQuery<Tuple> query, Map<String, String> criteria){
+		String search = criteria.get(KEY_SEARCH);
+		if(search == null || search.isBlank()) {
+			search = "%";
+		}else {
+			search = "%" + search + "%";
 		}
-
+		return query.where(qComputer.name.like(search)
+				.or(qCompany.name.like(search)));
+	}
+	
+	JPAQuery<Tuple> addOrderBy(JPAQuery<Tuple> query, Map<String, String> criteria){
+		String mode = criteria.get(KEY_MODE);
+		if(mode == null || mode.isBlank()) {
+			mode = "asc";
+		}
+		String order = criteria.get(KEY_ORDER);
+		if(order == null || order.isBlank()) {
+			order = "id";
+		}
 		switch (order) {
-
+		
+		case "id":
+			if("asc".equals(mode)) {
+				query = query.orderBy(qComputer.id.asc());
+			}else {
+				query = query.orderBy(qComputer.id.desc());
+			}
+			break;
+			
 		case "name":
-			return "computer.name";
-
+			if("asc".equals(mode)) {
+				query = query.orderBy(qComputer.name.asc());
+			}else {
+				query = query.orderBy(qComputer.name.desc());
+			}
+			break;
+			
 		case "introduced":
-			return "introduced";
-
+			if("asc".equals(mode)) {
+				query = query.orderBy(qComputer.introduced.asc());
+			}else {
+				query = query.orderBy(qComputer.introduced.desc());
+			}
+			break;
+			
 		case "discontinued":
-			return "discontinued";
-
+			if("asc".equals(mode)) {
+				query = query.orderBy(qComputer.discontinued.asc());
+			}else {
+				query = query.orderBy(qComputer.discontinued.desc());
+			}
+			break;
+			
 		case "company":
-			return "company.id";
-
+			if("asc".equals(mode)) {
+				query = query.orderBy(qComputer.company.name.asc());
+			}else {
+				query = query.orderBy(qComputer.company.name.desc());
+			}
+			break;
+			
 		default:
-			return "computer.id";
+			if("asc".equals(mode)) {
+				query = query.orderBy(qComputer.id.asc());
+			}else {
+				query = query.orderBy(qComputer.id.desc());
+			}
+			break;
 		}
+		return query;
 	}
 
 	public long selectNumberOfComputer() {
@@ -129,12 +188,18 @@ public class DaoComputer {
 	}
 
 	public long selectNumberOfComputerBySearch(String search) {
+		String s = null;
+		if(search == null || search.isBlank()) {
+			s = "%";
+		}else {
+			s = "%" + search + "%";
+		}
 		return queryFactory
 				.from(qComputer)
 				.leftJoin(qComputer.company, qCompany)
 				.on(qComputer.company.eq(qCompany))
-				.where(qComputer.name.like("%" + search + "%")
-						.or(qCompany.name.like("%" + search + "%")))
+				.where(qComputer.name.like("%" + s + "%")
+						.or(qCompany.name.like("%" + s + "%")))
 				.fetchCount();
 	}
 
@@ -172,6 +237,7 @@ public class DaoComputer {
 			entityManager.getTransaction().commit();
 			return numupdate;
 		} catch (PersistenceException e) {
+			entityManager.getTransaction().rollback();
 			LOGGER.warn("Echec updateComputer", e);
 			return 0;
 		}
@@ -181,11 +247,12 @@ public class DaoComputer {
 		entityManager.getTransaction().begin();
 		try {
 			entityManager.merge(computer);
+			entityManager.getTransaction().commit();
 		} catch (EntityNotFoundException e) {
+			entityManager.getTransaction().rollback();
 			LOGGER.warn("Echec insertComputer", e);
 			return false;
 		}
-		entityManager.getTransaction().commit();
 		return true;
 	}
 

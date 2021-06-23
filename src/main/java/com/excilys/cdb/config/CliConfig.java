@@ -24,11 +24,15 @@ import com.zaxxer.hikari.HikariDataSource;
 public class CliConfig {
 
 	private static final String HIKARY_CONFIG_FILE = "/datasource.properties";
+	
+	/*--------------------Datasource--------------------->*/
 
 	@Bean
 	public HikariDataSource getDatasource() {
 		return new HikariDataSource(new HikariConfig(HIKARY_CONFIG_FILE));
 	}
+	
+	/*--------------------Hibernate--------------------->*/
 	
 	@Bean
 	public EntityManager entityManager() {
@@ -49,7 +53,7 @@ public class CliConfig {
 
 	private Properties hibernateProperties() {
 		Properties properties = new Properties();
-		properties.setProperty("hibernate.show_sql", "true");
+		properties.setProperty("hibernate.show_sql", "false");
 		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
 		properties.setProperty("hibernate.hbm2ddl.auto", "update");
 		return properties;
