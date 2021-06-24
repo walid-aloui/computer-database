@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceException;
 
 import org.slf4j.Logger;
@@ -246,9 +245,9 @@ public class DaoComputer {
 	public boolean insertComputer(Computer computer) {
 		entityManager.getTransaction().begin();
 		try {
-			entityManager.merge(computer);
+			entityManager.persist(computer);
 			entityManager.getTransaction().commit();
-		} catch (EntityNotFoundException e) {
+		} catch (PersistenceException e) {
 			entityManager.getTransaction().rollback();
 			LOGGER.warn("Echec insertComputer", e);
 			return false;

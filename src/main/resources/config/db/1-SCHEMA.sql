@@ -4,6 +4,7 @@ drop schema if exists `computer-database-db`;
 
   drop table if exists computer;
   drop table if exists company;
+  drop table if exists user;
 
   create table company (
     id                        bigint not null auto_increment,

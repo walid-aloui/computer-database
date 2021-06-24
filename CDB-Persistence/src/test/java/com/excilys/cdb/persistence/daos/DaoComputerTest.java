@@ -1,6 +1,7 @@
 package com.excilys.cdb.persistence.daos;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
@@ -47,13 +48,12 @@ class DaoComputerTest {
 	}
 
 	private Computer createWr7Computer() {
-		int id = 1;
 		String name = "Computer_WR7";
 		Computer computer = new ComputerBuilder()
 				.withName(name)
-				.withId(id)
 				.build();
-		daoComputer.insertComputer(computer);
+		boolean insert = daoComputer.insertComputer(computer);
+		assertTrue(insert);
 		return computer;
 	}
 	
@@ -62,12 +62,12 @@ class DaoComputerTest {
 		Computer computer = new ComputerBuilder()
 				.withName(name)
 				.build();
-		daoComputer.insertComputer(computer);
+		boolean insert = daoComputer.insertComputer(computer);
+		assertTrue(insert);
 		return computer;
 	}
 
 	private Computer createTestComputer() {
-		int id = 2;
 		String name = "Computer_test";
 		LocalDate introduced = LocalDate.of(2021, 05, 11);
 		LocalDate discontinued = LocalDate.of(2022, 05, 11);
@@ -79,14 +79,14 @@ class DaoComputerTest {
 				.withName(companyName)
 				.build();
 		Computer computer = new ComputerBuilder()
-				.withId(id)
 				.withName(name)
 				.withIntroduced(introduced)
 				.withDiscontinued(discontinued)
 				.withCompany(company)
 				.build();
 
-		daoComputer.insertComputer(computer);
+		boolean insert = daoComputer.insertComputer(computer);
+		assertTrue(insert);
 		return computer;
 	}
 
@@ -289,6 +289,7 @@ class DaoComputerTest {
 		createWr7Computer();
 		createTestComputer();
 		List<Computer> allComputers = daoComputer.selectPartOfComputers(10, 0);
+		System.out.println(allComputers.get(0));
 		assertEquals(2, allComputers.size());
 	}
 

@@ -27,7 +27,7 @@ public class PersistenceConfig {
 	}
 
 	/*--------------------Hibernate--------------------->*/
-
+	
 	@Bean
 	public EntityManager entityManager() {
 		return entityManagerFactory().createEntityManager();

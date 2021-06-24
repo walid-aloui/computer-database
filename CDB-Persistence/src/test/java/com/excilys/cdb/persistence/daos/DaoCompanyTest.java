@@ -40,16 +40,16 @@ class DaoCompanyTest {
 			sr.runScript(reader);
 		}
 	}
-
+	
 	@Test
-	void testGetAllCompaniesShouldReturnListOfCompanies() {
+	void testSelectAllCompaniesShouldReturnListOfCompanies() {
 		int numCompanies = 42;
 		List<Company> allcompanies = daoCompany.selectAllCompanies();
 		assertEquals(numCompanies, allcompanies.size());
 	}
 
 	@Test
-	void testGetCompanyByIdShouldReturnCompany() {
+	void testSelectCompanyByIdShouldReturnCompany() {
 		int id = 1;
 		Optional<Company> allcompanies = daoCompany.selectCompanyById(id);
 		if (allcompanies.isPresent()) {
@@ -60,7 +60,7 @@ class DaoCompanyTest {
 	}
 
 	@Test
-	void testGetCompanyByIdShouldNotReturnCompany() {
+	void testSelectCompanyByIdShouldNotReturnCompany() {
 		int falseId = 999;
 		Optional<Company> allcompanies = daoCompany.selectCompanyById(falseId);
 		if (allcompanies.isPresent()) {
