@@ -2,7 +2,6 @@ package com.excilys.cdb.console.ui;
 
 import java.util.Scanner;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.binding.utils.SecureInputs;
@@ -11,10 +10,10 @@ import com.excilys.cdb.binding.utils.SecureInputs;
 public class Cli {
 
 	private Scanner sc;
-	@Autowired
 	private ControllerCli controllerCli;
-
-	public Cli() {
+	
+	public Cli(ControllerCli controllerCli) {
+		this.controllerCli = controllerCli;
 		sc = new Scanner(System.in);
 	}
 
