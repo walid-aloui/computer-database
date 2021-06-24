@@ -11,11 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import com.excilys.cdb.binding.mapper.MapperComputer;
 import com.excilys.cdb.core.model.Computer;
 import com.excilys.cdb.core.model.QCompany;
 import com.excilys.cdb.core.model.QComputer;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -35,79 +33,65 @@ public class DaoComputer {
 	private EntityManager entityManager;
 	private JPAQueryFactory queryFactory;
 
-	private MapperComputer mapperComputer;
-
-	public DaoComputer(MapperComputer mapperComputer, EntityManager entityManager) {
-		this.mapperComputer = mapperComputer;
+	public DaoComputer(EntityManager entityManager) {
 		this.entityManager = entityManager;
 		this.queryFactory = new JPAQueryFactory(entityManager);
 	}
 
-	private JPAQuery<Tuple> buildSelectAll() {
+	private JPAQuery<Computer> buildSelectAll() {
 		return queryFactory
-				.select(qComputer.id, 
-						qComputer.name, 
-						qComputer.introduced, 
-						qComputer.discontinued, 
-						qComputer.company,
-						qCompany.id, 
-						qCompany.name)
-				.from(qComputer)
+				.selectFrom(qComputer)
 				.leftJoin(qComputer.company, qCompany)
 				.on(qComputer.company.eq(qCompany));
 	}
 
 	public List<Computer> selectAllComputers() {
-		List<Tuple> tupleList = buildSelectAll().fetch();
-		return mapperComputer.fromTupleListToComputerList(tupleList);
+		return buildSelectAll().fetch();
 	}
 
 	public Optional<Computer> selectComputerById(int id) {
-		Tuple tuple = buildSelectAll()
+		Computer computer = buildSelectAll()
 				.where(qComputer.id.eq(id))
 				.fetchOne();
 
-		if (tuple == null) {
+		if (computer == null) {
 			return Optional.empty();
 		} else {
-			return Optional.of(mapperComputer.fromTupleToComputer(tuple));
+			return Optional.of(computer);
 		}
 	}
 
 	public List<Computer> selectPartOfComputers(long limit, int offset) {
-		List<Tuple> tupleList = buildSelectAll()
+		return buildSelectAll()
 				.limit(limit)
 				.offset(offset)
 				.fetch();
-		return mapperComputer.fromTupleListToComputerList(tupleList);
 	}
 
 	public List<Computer> selectPartOfComputersBySearch(String search, int limit, int offset) {
-		List<Tuple> tupleList = buildSelectAll()
+		return buildSelectAll()
 				.where(qComputer.name.like("%" + search + "%")
 						.or(qCompany.name.like("%" + search + "%")))
 				.limit(limit)
 				.offset(offset)
 				.fetch();
-		return mapperComputer.fromTupleListToComputerList(tupleList);
 	}
 
 	public List<Computer> selectComputersByCriteria(Map<String, String> criteria) {
-		JPAQuery<Tuple> query = buildSelectAll();
+		JPAQuery<Computer> query = buildSelectAll();
 		query = addLike(query, criteria);
 		query = addOrderBy(query, criteria);
 		query = addLimit(query, criteria);
-		List<Tuple> tupleList = query.fetch();
-		return mapperComputer.fromTupleListToComputerList(tupleList);
+		return query.fetch();
 	}
 	
-	JPAQuery<Tuple> addLimit(JPAQuery<Tuple> query, Map<String, String> criteria){
+	JPAQuery<Computer> addLimit(JPAQuery<Computer> query, Map<String, String> criteria){
 		int offset = Integer.parseInt(criteria.get(KEY_OFFSET));
 		int limit = Integer.parseInt(criteria.get(KEY_LIMIT));
 		return query.limit(limit).offset(offset);
 	}
 	
-	JPAQuery<Tuple> addLike(JPAQuery<Tuple> query, Map<String, String> criteria){
+	JPAQuery<Computer> addLike(JPAQuery<Computer> query, Map<String, String> criteria){
 		String search = criteria.get(KEY_SEARCH);
 		if(search == null || search.isBlank()) {
 			search = "%";
@@ -118,7 +102,7 @@ public class DaoComputer {
 				.or(qCompany.name.like(search)));
 	}
 	
-	JPAQuery<Tuple> addOrderBy(JPAQuery<Tuple> query, Map<String, String> criteria){
+	JPAQuery<Computer> addOrderBy(JPAQuery<Computer> query, Map<String, String> criteria){
 		String mode = criteria.get(KEY_MODE);
 		if(mode == null || mode.isBlank()) {
 			mode = "asc";
@@ -224,6 +208,7 @@ public class DaoComputer {
 
 	public long updateComputer(Computer computer) {
 		try {
+			entityManager.clear();
 			entityManager.getTransaction().begin();
 			long numupdate = queryFactory
 					.update(qComputer)
@@ -243,8 +228,9 @@ public class DaoComputer {
 	}
 
 	public boolean insertComputer(Computer computer) {
-		entityManager.getTransaction().begin();
 		try {
+			entityManager.clear();
+			entityManager.getTransaction().begin();
 			entityManager.persist(computer);
 			entityManager.getTransaction().commit();
 		} catch (PersistenceException e) {

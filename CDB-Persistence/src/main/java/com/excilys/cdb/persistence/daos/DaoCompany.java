@@ -9,10 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import com.excilys.cdb.binding.mapper.MapperCompany;
 import com.excilys.cdb.core.model.Company;
 import com.excilys.cdb.core.model.QCompany;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -25,36 +23,31 @@ public class DaoCompany {
 	private EntityManager entityManager;
 	private JPAQueryFactory queryFactory;
 
-	private MapperCompany mapperCompany;
 	private DaoComputer daoComputer;
 
-	public DaoCompany(MapperCompany mapperCompany, DaoComputer daoComputer, EntityManager entityManager) {
-		this.mapperCompany = mapperCompany;
+	public DaoCompany(DaoComputer daoComputer, EntityManager entityManager) {
 		this.daoComputer = daoComputer;
 		this.entityManager = entityManager;
 		this.queryFactory = new JPAQueryFactory(entityManager);
 	}
 
-	private JPAQuery<Tuple> buildSelectAll() {
-		return queryFactory
-				.select(qCompany.id, qCompany.name)
-				.from(qCompany);
+	private JPAQuery<Company> buildSelectAll() {
+		return queryFactory.selectFrom(qCompany);
 	}
 
 	public List<Company> selectAllCompanies() {
-		List<Tuple> tupleList = buildSelectAll().fetch();
-		return mapperCompany.fromTupleListToCompanyList(tupleList);
+		return buildSelectAll().fetch();
 	}
 
 	public Optional<Company> selectCompanyById(int id) {
-		Tuple tuple = buildSelectAll()
+		Company company = buildSelectAll()
 				.where(qCompany.id.eq(id))
 				.fetchOne();
 
-		if (tuple == null) {
+		if (company == null) {
 			return Optional.empty();
 		} else {
-			return Optional.of(mapperCompany.fromTupleToCompany(tuple));
+			return Optional.of(company);
 		}
 	}
 

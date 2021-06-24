@@ -10,10 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import com.excilys.cdb.binding.mapper.MapperUser;
 import com.excilys.cdb.core.model.QUser;
 import com.excilys.cdb.core.model.User;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -25,41 +23,35 @@ public class DaoUser {
 
 	private EntityManager entityManager;
 	private JPAQueryFactory queryBuilder;
-	private MapperUser mapperUser;
 
-	public DaoUser(EntityManager entityManager, MapperUser mapperUser) {
+	public DaoUser(EntityManager entityManager) {
 		this.entityManager = entityManager;
 		this.queryBuilder = new JPAQueryFactory(entityManager);
-		this.mapperUser = mapperUser;
 	}
 
-	private JPAQuery<Tuple> buildSelectAll() {
-		return queryBuilder
-				.select(qUser.login, 
-						qUser.password, 
-						qUser.role)
-				.from(qUser);
+	private JPAQuery<User> buildSelectAll() {
+		return queryBuilder.selectFrom(qUser);
 	}
 
 	public List<User> selectAllUsers() {
-		List<Tuple> tupleList = buildSelectAll().fetch();
-		return mapperUser.fromTupleListToUserList(tupleList);
+		return buildSelectAll().fetch();
 	}
 
 	public Optional<User> selectUserById(String login) {
-		Tuple tuple = buildSelectAll()
+		User user = buildSelectAll()
 				.where(qUser.login.eq(login))
 				.fetchOne();
-		if (tuple == null) {
+		if (user == null) {
 			return Optional.empty();
 		} else {
-			return Optional.of(mapperUser.fromTupleToUser(tuple));
+			return Optional.of(user);
 		}
 	}
 
 	public boolean insertUser(User user) {
-		entityManager.getTransaction().begin();
 		try {
+			entityManager.clear();
+			entityManager.getTransaction().begin();
 			entityManager.persist(user);
 			entityManager.getTransaction().commit();
 		} catch (PersistenceException e) {

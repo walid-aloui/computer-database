@@ -2,6 +2,7 @@ package com.excilys.cdb.persistence.daos;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
@@ -49,7 +50,8 @@ public class DaoUserTest {
 		String password = "boss";
 		UserRole role = UserRole.ADMIN;
 		User user = new User(login, password, role);
-		daoUser.insertUser(user);
+		boolean insert = daoUser.insertUser(user);
+		assertTrue(insert);
 		return user;
 	}
 	
@@ -58,7 +60,8 @@ public class DaoUserTest {
 		String password = "test";
 		UserRole role = UserRole.USER;
 		User user = new User(login, password, role);
-		daoUser.insertUser(user);
+		boolean insert = daoUser.insertUser(user);
+		assertTrue(insert);
 		return user;
 	}
 	
