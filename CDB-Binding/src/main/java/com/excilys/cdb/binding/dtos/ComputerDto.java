@@ -7,6 +7,7 @@ public class ComputerDto {
 	private String introduced;
 	private String discontinued;
 	private String companyId;
+	private String companyName;
 
 	public ComputerDto() {
 		super();
@@ -18,12 +19,13 @@ public class ComputerDto {
 		this.introduced = builder.introduced;
 		this.discontinued = builder.discontinued;
 		this.companyId = builder.companyId;
+		this.companyName = builder.companyName;
 	}
 
 	@Override
 	public String toString() {
 		return "ComputerDto [id=" + id + ", name=" + name + ", introduced=" + introduced + ", discontinued="
-				+ discontinued + ", companyId=" + companyId + "]";
+				+ discontinued + ", companyId=" + companyId + ", companyName=" + companyName + "]";
 	}
 
 	public int getId() {
@@ -46,6 +48,10 @@ public class ComputerDto {
 		return companyId;
 	}
 
+	public String getCompanyName() {
+		return companyName;
+	}
+
 	public static class ComputerDtoBuilder {
 
 		private int id;
@@ -53,6 +59,7 @@ public class ComputerDto {
 		private String introduced;
 		private String discontinued;
 		private String companyId;
+		private String companyName;
 
 		public ComputerDtoBuilder() {
 			super();
@@ -80,6 +87,11 @@ public class ComputerDto {
 
 		public ComputerDtoBuilder withCompanyId(String companyId) {
 			this.companyId = companyId;
+			return this;
+		}
+		
+		public ComputerDtoBuilder withCompanyName(String companyName) {
+			this.companyName = companyName;
 			return this;
 		}
 

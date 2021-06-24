@@ -38,6 +38,7 @@ public class MapperComputer {
 			if (companyId != 0) {
 				company = new CompanyBuilder()
 						.withId(companyId)
+						.withName(computerDto.getCompanyName())
 						.build();
 			}
 			return new ComputerBuilder()
@@ -64,6 +65,7 @@ public class MapperComputer {
 		}
 		if (computer.getCompany() != null) {
 			computerDtoBuilder.withCompanyId(String.valueOf(computer.getCompany().getId()));
+			computerDtoBuilder.withCompanyName(computer.getCompany().getName());
 		}
 		return computerDtoBuilder.build();
 	}

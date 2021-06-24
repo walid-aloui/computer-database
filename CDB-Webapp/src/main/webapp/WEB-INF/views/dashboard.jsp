@@ -82,7 +82,7 @@
 							<td><a href="editComputer?id=${ computer.id }" onclick="">${ computer.name }</a></td>
 							<td>${ computer.introduced }</td>
 							<td>${ computer.discontinued }</td>
-							<td>${ computer.companyId }</td>
+							<td>${ computer.companyName }</td>
 						</tr>
 					</c:forEach>
 				</tbody>
